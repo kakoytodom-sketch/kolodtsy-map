@@ -29,11 +29,10 @@
             height: 100%;
         }
 
-        #locationButton {
+        .map-button {
             position: absolute;
             z-index: 1000;
             right: 15px;
-            bottom: 25px;
 
             width: 52px;
             height: 52px;
@@ -44,15 +43,28 @@
             background: white;
             color: #222;
 
-            font-size: 24px;
+            font-size: 28px;
 
             box-shadow: 0 2px 10px rgba(0,0,0,0.25);
 
             cursor: pointer;
         }
 
-        #locationButton:active {
+        #locationButton {
+            bottom: 25px;
+        }
+
+        #addWellButton {
+            bottom: 90px;
+        }
+
+        .map-button:active {
             transform: scale(0.95);
+        }
+
+        #addWellButton.active {
+            background: #222;
+            color: white;
         }
     </style>
 </head>
@@ -61,7 +73,8 @@
 
 <div id="map"></div>
 
-<button id="locationButton">📍</button>
+<button id="locationButton" class="map-button">📍</button>
+<button id="addWellButton" class="map-button">＋</button>
 
 <script>
     const tg = window.Telegram.WebApp;
@@ -69,6 +82,8 @@
     tg.ready();
     tg.expand();
 
+
+    // Карта
     const map = L.map('map').setView([51.1605, 71.4704], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -77,8 +92,13 @@
     }).addTo(map);
 
 
+    // Маркер пользователя
     let userMarker = null;
 
+
+    // =========================
+    // МОЁ МЕСТОПОЛОЖЕНИЕ
+    // =========================
 
     document.getElementById('locationButton').addEventListener('click', () => {
 
@@ -97,16 +117,27 @@
                 map.setView([latitude, longitude], 17);
 
                 if (userMarker) {
-                    userMarker.setLatLng([latitude, longitude]);
+
+                    userMarker.setLatLng([
+                        latitude,
+                        longitude
+                    ]);
+
                 } else {
-                    userMarker = L.marker([latitude, longitude])
-                        .addTo(map)
-                        .bindPopup('Вы здесь')
-                        .openPopup();
+
+                    userMarker = L.marker([
+                        latitude,
+                        longitude
+                    ])
+                    .addTo(map)
+                    .bindPopup('Вы здесь')
+                    .openPopup();
+
                 }
+
             },
 
-            (error) => {
+            () => {
 
                 alert(
                     'Не удалось определить местоположение.\n' +
@@ -123,6 +154,66 @@
         );
 
     });
+
+
+    // =========================
+    // ДОБАВЛЕНИЕ КОЛОДЦА
+    // =========================
+
+    const addWellButton = document.getElementById('addWellButton');
+
+    let addingWell = false;
+
+
+    addWellButton.addEventListener('click', () => {
+
+        addingWell = !addingWell;
+
+        if (addingWell) {
+
+            addWellButton.classList.add('active');
+
+            tg.showAlert('Выберите место колодца на карте');
+
+        } else {
+
+            addWellButton.classList.remove('active');
+
+        }
+
+    });
+
+
+    map.on('click', (event) => {
+
+        if (!addingWell) {
+            return;
+        }
+
+
+        const latitude = event.latlng.lat;
+        const longitude = event.latlng.lng;
+
+
+        L.marker([
+            latitude,
+            longitude
+        ])
+        .addTo(map)
+        .bindPopup(
+            'Новый колодец<br>' +
+            'Широта: ' + latitude.toFixed(6) + '<br>' +
+            'Долгота: ' + longitude.toFixed(6)
+        )
+        .openPopup();
+
+
+        addingWell = false;
+
+        addWellButton.classList.remove('active');
+
+    });
+
 </script>
 
 </body>
