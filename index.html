@@ -487,18 +487,30 @@ fetch('https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api', {
     console.log('Ответ Supabase:', data);
 
     
-
-    if (data.ok) {
-
+if (data.ok) {
     if (data.user && data.user.exists === true) {
-
         document.getElementById('registrationScreen').style.display = 'none';
 
+        const currentUser = data.user.user;
+
+        document.getElementById('menuNickname').textContent =
+            currentUser.nickname;
+
+        if (currentUser.role === 'admin') {
+            document.getElementById('menuRole').textContent =
+                'Администратор';
+
+            document.getElementById('menuAdminButton').style.display =
+                'block';
+        } else {
+            document.getElementById('menuRole').textContent =
+                'Пользователь';
+        }
     }
 
     console.log('Telegram пользователь:', data.telegramUser);
-
-} else {
+}
+     else {
 
     console.error('Ошибка:', data.error);
 
