@@ -261,6 +261,75 @@
 #menuOverlay.open {
     display: block;
 }
+        .adminPanel {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    background: #ffffff;
+    display: none;
+    overflow-y: auto;
+}
+
+.adminPanel.open {
+    display: block;
+}
+
+.adminPanelHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.adminPanelHeader h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.adminBackButton {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 12px;
+    background: #f1f1f1;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+.adminPanelContent {
+    padding: 20px;
+}
+
+.adminPanelSubtitle {
+    margin-top: 0;
+    color: #777;
+    font-size: 14px;
+}
+
+.generateInviteButton {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: #111111;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.generateInviteButton:active {
+    opacity: 0.8;
+}
+
+.inviteResult {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #f5f5f5;
+    font-size: 16px;
+    word-break: break-word;
+}
     </style>
 </head>
 
