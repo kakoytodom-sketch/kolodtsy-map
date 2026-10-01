@@ -890,12 +890,11 @@ generateInviteButton.addEventListener('click', async () => {
 
     } catch (error) {
 
-        console.error(error);
+    console.error('Ошибка загрузки приглашений:', error);
 
-        inviteResult.textContent =
-            'Ошибка соединения с сервером';
-
-    }
+    inviteList.textContent =
+        'Ошибка: ' + error.message;
+}
 
     generateInviteButton.disabled = false;
     generateInviteButton.textContent =
