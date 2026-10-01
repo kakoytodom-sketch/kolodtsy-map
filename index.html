@@ -96,31 +96,7 @@
 
     tg.ready();
     tg.expand();
-const debug = document.createElement('div');
 
-debug.style.cssText = `
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    right: 10px;
-    z-index: 99999;
-    background: white;
-    color: black;
-    padding: 15px;
-    font-size: 16px;
-    font-family: monospace;
-    white-space: pre-wrap;
-    border: 2px solid red;
-`;
-
-debug.textContent =
-    'Telegram version: ' + tg.version + '\n' +
-    'Platform: ' + tg.platform + '\n' +
-    'initData length: ' + tg.initData.length + '\n' +
-    'initDataUnsafe user: ' +
-    (tg.initDataUnsafe.user ? 'YES' : 'NO');
-
-document.body.appendChild(debug);
 
     // Карта
     const map = L.map('map').setView([51.1605, 71.4704], 12);
