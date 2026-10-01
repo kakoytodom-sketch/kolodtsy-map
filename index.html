@@ -231,6 +231,8 @@ fetch('https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api', {
 
     console.log('Ответ Supabase:', data);
 
+    alert(JSON.stringify(data));
+
     if (data.ok) {
         console.log('Telegram пользователь:', data.telegramUser);
     } else {
