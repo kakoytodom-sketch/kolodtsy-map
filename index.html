@@ -478,9 +478,6 @@
             font-size: 14px;
         }
 
-
-        /* Тип */
-
         .selectedType {
             padding: 13px 15px;
 
@@ -494,9 +491,6 @@
 
             color: #222;
         }
-
-
-        /* Поля */
 
         .wellField {
             margin-bottom: 18px;
@@ -552,9 +546,6 @@
             border-color: #222;
         }
 
-
-        /* Работы */
-
         .workList {
             display: flex;
 
@@ -593,9 +584,6 @@
             color: #333;
         }
 
-
-        /* Координаты */
-
         .coordinatesBox {
             padding: 12px;
 
@@ -609,9 +597,6 @@
 
             color: #555;
         }
-
-
-        /* Кнопки */
 
         .wellFormButtons {
             display: flex;
@@ -848,8 +833,6 @@
             </div>
 
 
-            <!-- СТАТУС -->
-
             <div class="wellField">
 
                 <label for="wellStatus">
@@ -878,8 +861,6 @@
 
             </div>
 
-
-            <!-- РАБОТЫ -->
 
             <div class="wellField">
 
@@ -950,8 +931,6 @@
             </div>
 
 
-            <!-- ОПИСАНИЕ -->
-
             <div class="wellField">
 
                 <label for="wellDescription">
@@ -965,8 +944,6 @@
 
             </div>
 
-
-            <!-- КООРДИНАТЫ -->
 
             <div class="wellField">
 
@@ -983,8 +960,6 @@
 
             </div>
 
-
-            <!-- КНОПКИ -->
 
             <div class="wellFormButtons">
 
@@ -1298,23 +1273,8 @@
 
 
     /* =========================
-       КОЛЛЕКТОР
+       КНОПКИ ТИПА
        ========================= */
-
-    document
-        .getElementById(
-            'selectedType'
-        );
-
-
-    /*
-       Здесь временно используем
-       два отдельных обработчика.
-    */
-
-
-    /* Создадим кнопки типа
-       перед основной формой */
 
     const typeButtonsContainer =
         document.createElement('div');
@@ -1446,301 +1406,15 @@
     );
 
 
-   /* =========================
-   СОЗДАНИЕ КОЛОДЦА
-   ========================= */
-
-document
-    .getElementById('createWellButton')
-    .addEventListener(
-        'click',
-        async () => {
-
-            if (!selectedWellType) {
-
-                tg.showAlert(
-                    'Сначала выберите тип объекта'
-                );
-
-                return;
-            }
-
-
-            if (
-                selectedWellLatitude === null ||
-                selectedWellLongitude === null
-            ) {
-
-                tg.showAlert(
-                    'Не выбраны координаты'
-                );
-
-                return;
-            }
-
-
-            const createButton =
-                document.getElementById(
-                    'createWellButton'
-                );
-
-
-            const status =
-                document.getElementById(
-                    'wellStatus'
-                ).value;
-
-
-            const description =
-                document.getElementById(
-                    'wellDescription'
-                ).value.trim();
-
-
-            const workRequirements = {
-
-                concrete:
-                    document.getElementById(
-                        'workConcrete'
-                    ).checked,
-
-                cover:
-                    document.getElementById(
-                        'workCover'
-                    ).checked,
-
-                kit:
-                    document.getElementById(
-                        'workKit'
-                    ).checked,
-
-                kcp:
-                    document.getElementById(
-                        'workKcp'
-                    ).checked
-
-            };
-
-
-            createButton.disabled =
-                true;
-
-
-            createButton.textContent =
-                'Сохранение...';
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json'
-                            },
-
-                            body: JSON.stringify({
-
-                                initData:
-                                    tg.initData,
-
-                                action:
-                                    'create_well',
-
-                                latitude:
-                                    selectedWellLatitude,
-
-                                longitude:
-                                    selectedWellLongitude,
-
-                                type:
-                                    selectedWellType,
-
-                                status:
-                                    status,
-
-                                description:
-                                    description,
-
-                                workRequirements:
-                                    workRequirements
-
-                            })
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                console.log(
-                    'Создание колодца:',
-                    data
-                );
-
-
-                if (!data.ok) {
-
-                    throw new Error(
-                        data.error ||
-                        'Не удалось создать колодец'
-                    );
-
-                }
-
-
-                const createdWell =
-                    data.well;
-
-
-                /*
-                 * Временно ставим обычный
-                 * маркер на созданную точку.
-                 *
-                 * Позже заменим его на наши
-                 * иконки коллектора/дождеприёмника.
-                 */
-
-                const marker =
-                    L.marker([
-                        createdWell.latitude,
-                        createdWell.longitude
-                    ])
-                    .addTo(map);
-
-
-                const typeName =
-                    createdWell.type === 'collector'
-                        ? 'Коллектор'
-                        : 'Дождеприёмник';
-
-
-                marker.bindPopup(
-                    `<b>${typeName}</b><br>` +
-                    `Статус: ${createdWell.status}`
-                );
-
-
-                marker.openPopup();
-
-
-                tg.showAlert(
-                    'Колодец успешно создан'
-                );
-
-
-                /*
-                 * Закрываем форму
-                 */
-
-                wellForm.style.display =
-                    'none';
-
-
-                /*
-                 * Сбрасываем состояние формы
-                 */
-
-                addingWell =
-                    false;
-
-
-                selectedWellLatitude =
-                    null;
-
-
-                selectedWellLongitude =
-                    null;
-
-
-                selectedWellType =
-                    null;
-
-
-                addWellButton.classList.remove(
-                    'active'
-                );
-
-
-                document.getElementById(
-                    'wellStatus'
-                ).value =
-                    'active';
-
-
-                document.getElementById(
-                    'workConcrete'
-                ).checked =
-                    false;
-
-
-                document.getElementById(
-                    'workCover'
-                ).checked =
-                    false;
-
-
-                document.getElementById(
-                    'workKit'
-                ).checked =
-                    false;
-
-
-                document.getElementById(
-                    'workKcp'
-                ).checked =
-                    false;
-
-
-                document.getElementById(
-                    'wellDescription'
-                ).value =
-                    '';
-
-
-                selectedTypeElement.textContent =
-                    'Тип не выбран';
-
-
-                wellCoordinates.textContent =
-                    'Координаты не выбраны';
-
-
-            } catch (error) {
-
-                console.error(
-                    'Ошибка создания колодца:',
-                    error
-                );
-
-
-                tg.showAlert(
-                    error.message ||
-                    'Не удалось создать колодец'
-                );
-
-            } finally {
-
-                createButton.disabled =
-                    false;
-
-
-                createButton.textContent =
-                    'Создать колодец';
-
-            }
-
-        }
-    );
-        )
+    /* =========================
+       СОЗДАНИЕ КОЛОДЦА
+       ========================= */
+
+    document
+        .getElementById('createWellButton')
         .addEventListener(
             'click',
-            () => {
+            async () => {
 
                 if (!selectedWellType) {
 
@@ -1750,6 +1424,25 @@ document
 
                     return;
                 }
+
+
+                if (
+                    selectedWellLatitude === null ||
+                    selectedWellLongitude === null
+                ) {
+
+                    tg.showAlert(
+                        'Не выбраны координаты'
+                    );
+
+                    return;
+                }
+
+
+                const createButton =
+                    document.getElementById(
+                        'createWellButton'
+                    );
 
 
                 const status =
@@ -1764,67 +1457,258 @@ document
                     ).value.trim();
 
 
-                const workConcrete =
+                const workRequirements = {
+
+                    concrete:
+                        document.getElementById(
+                            'workConcrete'
+                        ).checked,
+
+                    cover:
+                        document.getElementById(
+                            'workCover'
+                        ).checked,
+
+                    kit:
+                        document.getElementById(
+                            'workKit'
+                        ).checked,
+
+                    kcp:
+                        document.getElementById(
+                            'workKcp'
+                        ).checked
+
+                };
+
+
+                createButton.disabled =
+                    true;
+
+
+                createButton.textContent =
+                    'Сохранение...';
+
+
+                try {
+
+                    const response =
+                        await fetch(
+                            'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
+                            {
+                                method: 'POST',
+
+                                headers: {
+                                    'Content-Type':
+                                        'application/json'
+                                },
+
+                                body: JSON.stringify({
+
+                                    initData:
+                                        tg.initData,
+
+                                    action:
+                                        'create_well',
+
+                                    latitude:
+                                        selectedWellLatitude,
+
+                                    longitude:
+                                        selectedWellLongitude,
+
+                                    type:
+                                        selectedWellType,
+
+                                    status:
+                                        status,
+
+                                    description:
+                                        description || null,
+
+                                    workRequirements:
+                                        workRequirements
+
+                                })
+                            }
+                        );
+
+
+                    const responseText =
+                        await response.text();
+
+
+                    let data;
+
+
+                    try {
+
+                        data =
+                            JSON.parse(
+                                responseText
+                            );
+
+                    } catch (parseError) {
+
+                        console.error(
+                            'Ответ сервера:',
+                            responseText
+                        );
+
+                        throw new Error(
+                            'Сервер вернул некорректный ответ'
+                        );
+
+                    }
+
+
+                    console.log(
+                        'Создание колодца:',
+                        data
+                    );
+
+
+                    if (!response.ok || !data.ok) {
+
+                        throw new Error(
+                            data.error ||
+                            'Не удалось создать колодец'
+                        );
+
+                    }
+
+
+                    const createdWell =
+                        data.well;
+
+
+                    if (
+                        createdWell &&
+                        createdWell.latitude !== undefined &&
+                        createdWell.longitude !== undefined
+                    ) {
+
+                        const marker =
+                            L.marker([
+                                createdWell.latitude,
+                                createdWell.longitude
+                            ])
+                            .addTo(map);
+
+
+                        const typeName =
+                            createdWell.type === 'collector'
+                                ? 'Коллектор'
+                                : 'Дождеприёмник';
+
+
+                        marker.bindPopup(
+                            `<b>${typeName}</b><br>` +
+                            `Статус: ${createdWell.status}`
+                        );
+
+
+                        marker.openPopup();
+
+                    }
+
+
+                    wellForm.style.display =
+                        'none';
+
+
+                    addingWell =
+                        false;
+
+
+                    selectedWellLatitude =
+                        null;
+
+
+                    selectedWellLongitude =
+                        null;
+
+
+                    selectedWellType =
+                        null;
+
+
+                    addWellButton.classList.remove(
+                        'active'
+                    );
+
+
+                    document.getElementById(
+                        'wellStatus'
+                    ).value =
+                        'active';
+
+
                     document.getElementById(
                         'workConcrete'
-                    ).checked;
+                    ).checked =
+                        false;
 
 
-                const workCover =
                     document.getElementById(
                         'workCover'
-                    ).checked;
+                    ).checked =
+                        false;
 
 
-                const workKit =
                     document.getElementById(
                         'workKit'
-                    ).checked;
+                    ).checked =
+                        false;
 
 
-                const workKcp =
                     document.getElementById(
                         'workKcp'
-                    ).checked;
+                    ).checked =
+                        false;
 
 
-                console.log(
-                    'НОВЫЙ КОЛОДЕЦ:',
-                    {
-                        type:
-                            selectedWellType,
-
-                        status:
-                            status,
-
-                        description:
-                            description,
-
-                        latitude:
-                            selectedWellLatitude,
-
-                        longitude:
-                            selectedWellLongitude,
-
-                        workConcrete:
-                            workConcrete,
-
-                        workCover:
-                            workCover,
-
-                        workKit:
-                            workKit,
-
-                        workKcp:
-                            workKcp
-                    }
-                );
+                    document.getElementById(
+                        'wellDescription'
+                    ).value =
+                        '';
 
 
-                tg.showAlert(
-                    'Данные колодца собраны.\n' +
-                    'Сохранение в базу подключим следующим шагом.'
-                );
+                    selectedTypeElement.textContent =
+                        'Тип не выбран';
+
+
+                    wellCoordinates.textContent =
+                        'Координаты не выбраны';
+
+
+                    tg.showAlert(
+                        'Колодец успешно создан'
+                    );
+
+                } catch (error) {
+
+                    console.error(
+                        'Ошибка создания колодца:',
+                        error
+                    );
+
+
+                    tg.showAlert(
+                        error.message ||
+                        'Не удалось создать колодец'
+                    );
+
+                } finally {
+
+                    createButton.disabled =
+                        false;
+
+
+                    createButton.textContent =
+                        'Создать колодец';
+
+                }
 
             }
         );
@@ -2336,11 +2220,13 @@ document
                         },
 
                         body: JSON.stringify({
+
                             initData:
                                 tg.initData,
 
                             action:
                                 'list_invites'
+
                         })
                     }
                 );
