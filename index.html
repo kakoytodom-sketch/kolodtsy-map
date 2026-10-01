@@ -249,6 +249,54 @@ fetch('https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api', {
     alert(JSON.stringify(data.user));
 
     if (data.ok) {
+        if (data.user && data.user.exists === false) {
+
+    const nickname = prompt('Придумайте никнейм (2–20 символов):');
+
+    if (nickname) {
+
+        fetch('https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                initData: tg.initData,
+                nickname: nickname
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+
+            if (result.ok) {
+
+                alert(
+                    'Профиль создан!\n' +
+                    'Ваш ник: ' + result.user.nickname
+                );
+
+            } else {
+
+                alert(
+                    'Ошибка:\n' +
+                    result.error
+                );
+
+            }
+
+        })
+        .catch(error => {
+
+            alert(
+                'Ошибка соединения:\n' +
+                error
+            );
+
+        });
+
+    }
+
+}
         console.log('Telegram пользователь:', data.telegramUser);
     } else {
         console.error('Ошибка:', data.error);
