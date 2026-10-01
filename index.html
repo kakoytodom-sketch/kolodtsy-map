@@ -16,7 +16,9 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <style>
-        html, body {
+
+        html,
+        body {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -28,6 +30,11 @@
             width: 100%;
             height: 100%;
         }
+
+
+        /* =========================
+           КНОПКИ КАРТЫ
+           ========================= */
 
         .map-button {
             position: absolute;
@@ -66,901 +73,1483 @@
             background: #222;
             color: white;
         }
+
+
+        /* =========================
+           ЭКРАН РЕГИСТРАЦИИ
+           ========================= */
+
         #registrationScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 10000;
+            position: fixed;
+            inset: 0;
+            z-index: 10000;
 
-    display: flex;
-    align-items: center;
-    justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-    background: #f5f5f5;
-}
+            background: #f5f5f5;
+        }
 
-.registrationBox {
-    width: calc(100% - 40px);
-    max-width: 360px;
+        .registrationBox {
+            width: calc(100% - 40px);
+            max-width: 360px;
 
-    padding: 30px 20px;
+            padding: 30px 20px;
 
-    box-sizing: border-box;
+            box-sizing: border-box;
 
-    text-align: center;
+            text-align: center;
 
-    background: white;
-    border-radius: 20px;
+            background: white;
+            border-radius: 20px;
 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
-}
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
 
-.registrationBox .logo {
-    font-size: 56px;
-    margin-bottom: 10px;
-}
+        .registrationBox .logo {
+            font-size: 56px;
+            margin-bottom: 10px;
+        }
 
-.registrationBox h1 {
-    margin: 0 0 10px;
+        .registrationBox h1 {
+            margin: 0 0 10px;
 
-    font-size: 24px;
-    color: #222;
-}
+            font-size: 24px;
+            color: #222;
+        }
 
-.registrationBox p {
-    margin: 0 0 25px;
+        .registrationBox p {
+            margin: 0 0 25px;
 
-    font-size: 15px;
-    line-height: 1.4;
+            font-size: 15px;
+            line-height: 1.4;
 
-    color: #777;
-}
+            color: #777;
+        }
 
-.registrationBox input {
-    width: 100%;
-    height: 50px;
+        .registrationBox input {
+            width: 100%;
+            height: 50px;
 
-    box-sizing: border-box;
+            box-sizing: border-box;
 
-    margin-bottom: 12px;
-    padding: 0 15px;
+            margin-bottom: 12px;
+            padding: 0 15px;
 
-    border: 1px solid #ddd;
-    border-radius: 12px;
+            border: 1px solid #ddd;
+            border-radius: 12px;
 
-    font-size: 16px;
-    outline: none;
-}
+            font-size: 16px;
+            outline: none;
+        }
 
-.registrationBox input:focus {
-    border-color: #222;
-}
+        .registrationBox input:focus {
+            border-color: #222;
+        }
 
-#loginButton {
-    width: 100%;
-    height: 50px;
+        #loginButton {
+            width: 100%;
+            height: 50px;
 
-    margin-top: 5px;
+            margin-top: 5px;
 
-    border: none;
-    border-radius: 12px;
+            border: none;
+            border-radius: 12px;
 
-    background: #222;
-    color: white;
+            background: #222;
+            color: white;
 
-    font-size: 16px;
-    font-weight: 600;
+            font-size: 16px;
+            font-weight: 600;
 
-    cursor: pointer;
-}
+            cursor: pointer;
+        }
 
-#loginButton:active {
-    transform: scale(0.98);
-}
+        #loginButton:active {
+            transform: scale(0.98);
+        }
 
-#registrationError {
-    min-height: 20px;
+        #registrationError {
+            min-height: 20px;
 
-    margin-top: 12px;
+            margin-top: 12px;
 
-    color: #d00;
-    font-size: 14px;
-}
+            color: #d00;
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           КНОПКА МЕНЮ
+           ========================= */
+
         .menuButton {
-    position: fixed;
-    top: 75px;
-    left: 0;
-    z-index: 1000;
-    width: 48px;
-    height: 48px;
-    border: none;
-    border-radius: 14px;
-    background: rgba(20, 20, 20, 0.9);
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-}
+            position: fixed;
+            top: 75px;
+            left: 0;
+            z-index: 1000;
+            width: 48px;
+            height: 48px;
+            border: none;
+            border-radius: 14px;
+            background: rgba(20, 20, 20, 0.9);
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        }
 
-.sideMenu {
-    position: fixed;
-    top: 0;
-    left: -300px;
-    width: 280px;
-    height: 100%;
-    z-index: 1100;
-    background: #ffffff;
-    box-shadow: 4px 0 20px rgba(0,0,0,0.2);
-    transition: left 0.25s ease;
-    padding: 20px;
-    box-sizing: border-box;
-}
 
-.sideMenu.open {
-    left: 0;
-}
+        /* =========================
+           БОКОВОЕ МЕНЮ
+           ========================= */
 
-.sideMenuHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e5e5e5;
-}
+        .sideMenu {
+            position: fixed;
+            top: 0;
+            left: -300px;
 
-.menuAvatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 25px;
-}
+            width: 280px;
+            height: 100%;
 
-#menuNickname {
-    font-size: 17px;
-    font-weight: 600;
-}
+            z-index: 1100;
 
-#menuRole {
-    margin-top: 3px;
-    font-size: 13px;
-    color: #777;
-}
+            background: #ffffff;
 
-.sideMenuItems {
-    margin-top: 20px;
-}
+            box-shadow: 4px 0 20px rgba(0,0,0,0.2);
 
-.sideMenuItem {
-    display: block;
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 8px;
-    border: none;
-    border-radius: 12px;
-    background: #f5f5f5;
-    text-align: left;
-    font-size: 16px;
-    cursor: pointer;
-}
+            transition: left 0.25s ease;
 
-.sideMenuItem:active {
-    background: #e9e9e9;
-}
+            padding: 20px;
 
-#menuOverlay {
-    position: fixed;
-    inset: 0;
-    z-index: 1050;
-    background: rgba(0,0,0,0.35);
-    display: none;
-}
+            box-sizing: border-box;
+        }
 
-#menuOverlay.open {
-    display: block;
-}
+        .sideMenu.open {
+            left: 0;
+        }
+
+        .sideMenuHeader {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            padding-bottom: 20px;
+
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .menuAvatar {
+            width: 48px;
+            height: 48px;
+
+            border-radius: 14px;
+
+            background: #f0f0f0;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 25px;
+        }
+
+        #menuNickname {
+            font-size: 17px;
+            font-weight: 600;
+        }
+
+        #menuRole {
+            margin-top: 3px;
+
+            font-size: 13px;
+
+            color: #777;
+        }
+
+        .sideMenuItems {
+            margin-top: 20px;
+        }
+
+        .sideMenuItem {
+            display: block;
+
+            width: 100%;
+
+            padding: 14px;
+
+            margin-bottom: 8px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: #f5f5f5;
+
+            text-align: left;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        .sideMenuItem:active {
+            background: #e9e9e9;
+        }
+
+
+        /* =========================
+           ЗАТЕМНЕНИЕ ПОД МЕНЮ
+           ========================= */
+
+        #menuOverlay {
+            position: fixed;
+            inset: 0;
+
+            z-index: 1050;
+
+            background: rgba(0,0,0,0.35);
+
+            display: none;
+        }
+
+        #menuOverlay.open {
+            display: block;
+        }
+
+
+        /* =========================
+           АДМИНКА
+           ========================= */
+
         .adminPanel {
-    position: fixed;
-    inset: 0;
-    z-index: 1200;
-    background: #ffffff;
-    display: none;
-    overflow-y: auto;
-}
+            position: fixed;
+            inset: 0;
 
-.adminPanel.open {
-    display: block;
-}
+            z-index: 1200;
 
-.adminPanelHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 15px;
-    border-bottom: 1px solid #e5e5e5;
-}
+            background: #ffffff;
 
-.adminPanelHeader h2 {
-    margin: 0;
-    font-size: 20px;
-}
+            display: none;
 
-.adminBackButton {
-    width: 42px;
-    height: 42px;
-    border: none;
-    border-radius: 12px;
-    background: #f1f1f1;
-    font-size: 22px;
-    cursor: pointer;
-}
+            overflow-y: auto;
+        }
 
-.adminPanelContent {
-    padding: 20px;
-}
+        .adminPanel.open {
+            display: block;
+        }
 
-.adminPanelSubtitle {
-    margin-top: 0;
-    color: #777;
-    font-size: 14px;
-}
+        .adminPanelHeader {
+            display: flex;
+            align-items: center;
 
-.generateInviteButton {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 12px;
-    background: #111111;
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-}
+            gap: 12px;
 
-.generateInviteButton:active {
-    opacity: 0.8;
-}
+            padding: 15px;
 
-.inviteResult {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 12px;
-    background: #f5f5f5;
-    font-size: 16px;
-    word-break: break-word;
-}
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .adminPanelHeader h2 {
+            margin: 0;
+
+            font-size: 20px;
+        }
+
+        .adminBackButton {
+            width: 42px;
+            height: 42px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: #f1f1f1;
+
+            font-size: 22px;
+
+            cursor: pointer;
+        }
+
+        .adminPanelContent {
+            padding: 20px;
+        }
+
+        .adminPanelSubtitle {
+            margin-top: 0;
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+        .generateInviteButton {
+            width: 100%;
+
+            padding: 15px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: #111111;
+            color: white;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        .generateInviteButton:active {
+            opacity: 0.8;
+        }
+
+        .inviteResult {
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 12px;
+
+            background: #f5f5f5;
+
+            font-size: 16px;
+
+            word-break: break-word;
+        }
+
         .adminSectionTitle {
-    margin: 25px 0 12px;
-    font-size: 17px;
-    color: #222;
-}
+            margin: 25px 0 12px;
 
-.inviteList {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+            font-size: 17px;
 
-.inviteItem {
-    padding: 14px;
-    border-radius: 12px;
-    background: #f5f5f5;
-}
+            color: #222;
+        }
 
-.inviteCode {
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 1px;
-}
+        .inviteList {
+            display: flex;
 
-.inviteStatus {
-    margin-top: 5px;
-    font-size: 13px;
-    color: #777;
-}
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+        .inviteItem {
+            padding: 14px;
+
+            border-radius: 12px;
+
+            background: #f5f5f5;
+        }
+
+        .inviteCode {
+            font-size: 16px;
+
+            font-weight: 600;
+
+            letter-spacing: 1px;
+        }
+
+        .inviteStatus {
+            margin-top: 5px;
+
+            font-size: 13px;
+
+            color: #777;
+        }
+
+
+        /* =========================
+           ФОРМА НОВОГО КОЛОДЦА
+           ========================= */
+
+        #wellForm {
+            position: fixed;
+            inset: 0;
+
+            z-index: 9000;
+
+            display: none;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 20px;
+
+            box-sizing: border-box;
+
+            background: rgba(0,0,0,0.45);
+        }
+
+        .wellFormBox {
+            width: 100%;
+            max-width: 360px;
+
+            padding: 25px 20px;
+
+            box-sizing: border-box;
+
+            background: white;
+
+            border-radius: 20px;
+
+            box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+
+            text-align: center;
+        }
+
+        .wellFormBox h2 {
+            margin: 0 0 8px;
+
+            font-size: 22px;
+
+            color: #222;
+        }
+
+        .wellFormBox p {
+            margin: 0 0 20px;
+
+            color: #777;
+
+            font-size: 15px;
+        }
+
+        .wellTypeButton {
+            width: 100%;
+
+            height: 52px;
+
+            margin-bottom: 10px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #222;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+        .wellTypeButton:active {
+            transform: scale(0.98);
+        }
+
+        .cancelWellButton {
+            width: 100%;
+
+            height: 48px;
+
+            margin-top: 5px;
+
+            border: none;
+
+            border-radius: 12px;
+
+            background: #f1f1f1;
+
+            color: #333;
+
+            font-size: 16px;
+
+            cursor: pointer;
+        }
+
+        .cancelWellButton:active {
+            background: #e5e5e5;
+        }
+
     </style>
 </head>
 
+
 <body>
-    <button id="menuButton" class="menuButton">☰</button>
 
-<div id="sideMenu" class="sideMenu">
-    <div class="sideMenuHeader">
-        <div class="menuAvatar">💧</div>
-        <div>
-            <div id="menuNickname">Пользователь</div>
-            <div id="menuRole">Пользователь</div>
+
+    <!-- =========================
+         КНОПКА МЕНЮ
+         ========================= -->
+
+    <button id="menuButton" class="menuButton">
+        ☰
+    </button>
+
+
+    <!-- =========================
+         БОКОВОЕ МЕНЮ
+         ========================= -->
+
+    <div id="sideMenu" class="sideMenu">
+
+        <div class="sideMenuHeader">
+
+            <div class="menuAvatar">
+                💧
+            </div>
+
+            <div>
+
+                <div id="menuNickname">
+                    Пользователь
+                </div>
+
+                <div id="menuRole">
+                    Пользователь
+                </div>
+
+            </div>
+
         </div>
-    </div>
 
-    <div class="sideMenuItems">
-        <button class="sideMenuItem" id="menuMapButton">
-            🗺️ Карта
-        </button>
 
-        <button class="sideMenuItem" id="menuAdminButton" style="display:none;">
-            ⚙️ Администрирование
-        </button>
-    </div>
-    <div id="adminPanel" class="adminPanel">
-    <div class="adminPanelHeader">
-        <button id="adminBackButton" class="adminBackButton">←</button>
-        <h2>Администрирование</h2>
-    </div>
+        <div class="sideMenuItems">
 
-    <div class="adminPanelContent">
-        <p class="adminPanelSubtitle">
-            Управление доступом к приложению
-        </p>
+            <button
+                class="sideMenuItem"
+                id="menuMapButton"
+            >
+                🗺️ Карта
+            </button>
 
-        <button id="generateInviteButton" class="generateInviteButton">
-            + Создать приглашение
-        </button>
 
-        <div id="inviteResult" class="inviteResult"></div>
-        <h3 class="adminSectionTitle">Приглашения</h3>
+            <button
+                class="sideMenuItem"
+                id="menuAdminButton"
+                style="display:none;"
+            >
+                ⚙️ Администрирование
+            </button>
 
-<div id="inviteList" class="inviteList"></div>
-    </div>
-</div>
-</div>
+        </div>
 
-<div id="menuOverlay"></div>
-<div id="registrationScreen">
 
-    <div class="registrationBox">
+        <!-- =========================
+             АДМИН-ПАНЕЛЬ
+             ========================= -->
 
-        <div class="logo">💧</div>
+        <div id="adminPanel" class="adminPanel">
 
-        <h1>Карта колодцев</h1>
+            <div class="adminPanelHeader">
 
-        <p>Введите пригласительный код<br>для доступа к приложению</p>
+                <button
+                    id="adminBackButton"
+                    class="adminBackButton"
+                >
+                    ←
+                </button>
 
-        <input
-            id="inviteCodeInput"
-            type="text"
-            placeholder="Пригласительный код"
-            autocomplete="off"
-        >
+                <h2>
+                    Администрирование
+                </h2>
 
-        <input
-            id="nicknameInput"
-            type="text"
-            placeholder="Ваш никнейм"
-            autocomplete="off"
-            maxlength="20"
-        >
+            </div>
 
-        <button id="loginButton">
-            Войти
-        </button>
 
-        <div id="registrationError"></div>
+            <div class="adminPanelContent">
 
-    </div>
+                <p class="adminPanelSubtitle">
+                    Управление доступом к приложению
+                </p>
 
-</div>
 
-<div id="wellForm" style="display: none;">
+                <button
+                    id="generateInviteButton"
+                    class="generateInviteButton"
+                >
+                    + Создать приглашение
+                </button>
 
-    <div class="wellFormBox">
 
-        <h2>Новый колодец</h2>
+                <div
+                    id="inviteResult"
+                    class="inviteResult"
+                ></div>
 
-        <p>Выберите тип объекта</p>
 
-        <button id="collectorTypeButton">
-            Коллектор
-        </button>
+                <h3 class="adminSectionTitle">
+                    Приглашения
+                </h3>
 
-        <button id="rainInletTypeButton">
-            Дождеприёмник
-        </button>
 
-        <button id="cancelWellButton">
-            Отмена
-        </button>
+                <div
+                    id="inviteList"
+                    class="inviteList"
+                ></div>
+
+            </div>
+
+        </div>
 
     </div>
 
-</div>
-   
-    
-<div id="map"></div>
 
-<button id="locationButton" class="map-button">📍</button>
-<button id="addWellButton" class="map-button">＋</button>
+    <!-- =========================
+         ЗАТЕМНЕНИЕ
+         ========================= -->
+
+    <div id="menuOverlay"></div>
+
+
+    <!-- =========================
+         РЕГИСТРАЦИЯ
+         ========================= -->
+
+    <div id="registrationScreen">
+
+        <div class="registrationBox">
+
+            <div class="logo">
+                💧
+            </div>
+
+
+            <h1>
+                Карта колодцев
+            </h1>
+
+
+            <p>
+                Введите пригласительный код<br>
+                для доступа к приложению
+            </p>
+
+
+            <input
+                id="inviteCodeInput"
+                type="text"
+                placeholder="Пригласительный код"
+                autocomplete="off"
+            >
+
+
+            <input
+                id="nicknameInput"
+                type="text"
+                placeholder="Ваш никнейм"
+                autocomplete="off"
+                maxlength="20"
+            >
+
+
+            <button id="loginButton">
+                Войти
+            </button>
+
+
+            <div id="registrationError"></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         ФОРМА НОВОГО КОЛОДЦА
+         ========================= -->
+
+    <div id="wellForm">
+
+        <div class="wellFormBox">
+
+            <h2>
+                Новый колодец
+            </h2>
+
+
+            <p>
+                Выберите тип объекта
+            </p>
+
+
+            <button
+                id="collectorTypeButton"
+                class="wellTypeButton"
+            >
+                Коллектор
+            </button>
+
+
+            <button
+                id="rainInletTypeButton"
+                class="wellTypeButton"
+            >
+                Дождеприёмник
+            </button>
+
+
+            <button
+                id="cancelWellButton"
+                class="cancelWellButton"
+            >
+                Отмена
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         КАРТА
+         ========================= -->
+
+    <div id="map"></div>
+
+
+    <button
+        id="locationButton"
+        class="map-button"
+    >
+        📍
+    </button>
+
+
+    <button
+        id="addWellButton"
+        class="map-button"
+    >
+        ＋
+    </button>
+
 
 <script>
+
+    /* =========================
+       TELEGRAM
+       ========================= */
+
     const tg = window.Telegram.WebApp;
 
     tg.ready();
+
     tg.expand();
 
 
- 
+    /* =========================
+       КАРТА
+       ========================= */
 
-    // Карта
-    const map = L.map('map').setView([51.1605, 71.4704], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    const map = L.map('map').setView(
+        [51.1605, 71.4704],
+        12
+    );
 
 
-    // Маркер пользователя
+    L.tileLayer(
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }
+    ).addTo(map);
+
+
+    /* =========================
+       МАРКЕР ПОЛЬЗОВАТЕЛЯ
+       ========================= */
+
     let userMarker = null;
 
 
-    // =========================
-    // МОЁ МЕСТОПОЛОЖЕНИЕ
-    // =========================
+    /* =========================
+       МОЁ МЕСТОПОЛОЖЕНИЕ
+       ========================= */
 
-    document.getElementById('locationButton').addEventListener('click', () => {
+    document
+        .getElementById('locationButton')
+        .addEventListener('click', () => {
 
-        if (!navigator.geolocation) {
-            alert('Ваш браузер не поддерживает определение местоположения.');
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-
-            (position) => {
-
-                const latitude = position.coords.latitude;
-                const longitude = position.coords.longitude;
-
-                map.setView([latitude, longitude], 17);
-
-                if (userMarker) {
-
-                    userMarker.setLatLng([
-                        latitude,
-                        longitude
-                    ]);
-
-                } else {
-
-                    userMarker = L.marker([
-                        latitude,
-                        longitude
-                    ])
-                    .addTo(map)
-                    .bindPopup('Вы здесь')
-                    .openPopup();
-
-                }
-
-            },
-
-            () => {
+            if (!navigator.geolocation) {
 
                 alert(
-                    'Не удалось определить местоположение.\n' +
-                    'Проверьте разрешение на геолокацию для Telegram.'
+                    'Ваш браузер не поддерживает ' +
+                    'определение местоположения.'
                 );
 
-            },
-
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
+                return;
             }
+
+
+            navigator.geolocation.getCurrentPosition(
+
+                (position) => {
+
+                    const latitude =
+                        position.coords.latitude;
+
+                    const longitude =
+                        position.coords.longitude;
+
+
+                    map.setView(
+                        [latitude, longitude],
+                        17
+                    );
+
+
+                    if (userMarker) {
+
+                        userMarker.setLatLng([
+                            latitude,
+                            longitude
+                        ]);
+
+                    } else {
+
+                        userMarker = L.marker([
+                            latitude,
+                            longitude
+                        ])
+                        .addTo(map)
+                        .bindPopup('Вы здесь')
+                        .openPopup();
+
+                    }
+
+                },
+
+
+                () => {
+
+                    alert(
+                        'Не удалось определить местоположение.\n' +
+                        'Проверьте разрешение на геолокацию для Telegram.'
+                    );
+
+                },
+
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+
+            );
+
+        });
+
+
+    /* =========================
+       ДОБАВЛЕНИЕ КОЛОДЦА
+       ========================= */
+
+    const addWellButton =
+        document.getElementById(
+            'addWellButton'
         );
 
-    });
 
+    const wellForm =
+        document.getElementById(
+            'wellForm'
+        );
 
-    // =========================
-    // ДОБАВЛЕНИЕ КОЛОДЦА
-    // =========================
-
-    const addWellButton = document.getElementById('addWellButton');
 
     let addingWell = false;
 
 
-    addWellButton.addEventListener('click', () => {
+    let selectedWellLatitude = null;
 
-        addingWell = !addingWell;
+    let selectedWellLongitude = null;
 
-        if (addingWell) {
-
-            addWellButton.classList.add('active');
-
-            tg.showAlert('Выберите место колодца на карте');
-
-        } else {
-
-            addWellButton.classList.remove('active');
-
-        }
-
-    });
+    let selectedWellType = null;
 
 
-    map.on('click', (event) => {
+    addWellButton.addEventListener(
+        'click',
+        () => {
 
-        if (!addingWell) {
-            return;
-        }
-
-
-        const latitude = event.latlng.lat;
-        const longitude = event.latlng.lng;
+            addingWell = !addingWell;
 
 
-        document.getElementById('wellForm').style.display = 'flex';
+            if (addingWell) {
 
-window.selectedWellLatitude = latitude;
-window.selectedWellLongitude = longitude;
+                addWellButton.classList.add(
+                    'active'
+                );
 
 
-        addingWell = false;
+                tg.showAlert(
+                    'Выберите место колодца на карте'
+                );
 
-        addWellButton.classList.remove('active');
+            } else {
 
-    });
-// =========================
-// ПРОВЕРКА TELEGRAM ПОЛЬЗОВАТЕЛЯ
-// =========================
+                addWellButton.classList.remove(
+                    'active'
+                );
 
-fetch('https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-        initData: tg.initData
-    })
-})
-.then(response => response.json())
-.then(data => {
-
-    console.log('Ответ Supabase:', data);
-
-    
-if (data.ok) {
-    if (data.user && data.user.exists === true) {
-        document.getElementById('registrationScreen').style.display = 'none';
-
-        const currentUser = data.user.user;
-
-        document.getElementById('menuNickname').textContent =
-            currentUser.nickname;
-
-        if (currentUser.role === 'admin') {
-            document.getElementById('menuRole').textContent =
-                'Администратор';
-
-            document.getElementById('menuAdminButton').style.display =
-                'block';
-        } else {
-            document.getElementById('menuRole').textContent =
-                'Пользователь';
-        }
-    }
-
-    console.log('Telegram пользователь:', data.telegramUser);
-}
-     else {
-
-    console.error('Ошибка:', data.error);
-
-}
-
-})
-.catch(error => {
-    console.error('Ошибка соединения:', error);
-});
-    // =========================
-// РЕГИСТРАЦИЯ ПО ИНВАЙТУ
-// =========================
-
-const loginButton = document.getElementById('loginButton');
-
-loginButton.addEventListener('click', async () => {
-
-    const inviteCode = document
-        .getElementById('inviteCodeInput')
-        .value
-        .trim();
-
-    const nickname = document
-        .getElementById('nicknameInput')
-        .value
-        .trim();
-
-    const errorElement = document.getElementById('registrationError');
-
-    errorElement.textContent = '';
-
-    if (!inviteCode) {
-        errorElement.textContent = 'Введите пригласительный код';
-        return;
-    }
-
-    if (!nickname) {
-        errorElement.textContent = 'Введите никнейм';
-        return;
-    }
-
-    loginButton.disabled = true;
-    loginButton.textContent = 'Проверка...';
-
-    try {
-
-        const response = await fetch(
-            'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
-            {
-                method: 'POST',
-
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-
-                body: JSON.stringify({
-                    initData: tg.initData,
-                    action: 'redeem_invite',
-                    inviteCode: inviteCode,
-                    nickname: nickname
-                })
             }
-        );
 
-        const data = await response.json();
+        }
+    );
 
-        console.log('Регистрация:', data);
 
-        if (data.ok) {
+    /* =========================
+       ВЫБОР ТОЧКИ НА КАРТЕ
+       ========================= */
 
-            document.getElementById('registrationScreen').style.display = 'none';
+    map.on(
+        'click',
+        (event) => {
 
-            tg.showAlert(
-                'Добро пожаловать, ' + data.user.nickname + '!'
+            if (!addingWell) {
+                return;
+            }
+
+
+            selectedWellLatitude =
+                event.latlng.lat;
+
+
+            selectedWellLongitude =
+                event.latlng.lng;
+
+
+            selectedWellType = null;
+
+
+            addingWell = false;
+
+
+            addWellButton.classList.remove(
+                'active'
             );
 
-        } else {
 
-            errorElement.textContent =
-                data.error || 'Не удалось выполнить регистрацию';
-
-            loginButton.disabled = false;
-            loginButton.textContent = 'Войти';
+            wellForm.style.display =
+                'flex';
 
         }
-
-    } catch (error) {
-
-        console.error(error);
-
-        errorElement.textContent =
-            'Ошибка соединения с сервером';
-
-        loginButton.disabled = false;
-        loginButton.textContent = 'Войти';
-
-    }
-
-});
-    const menuButton = document.getElementById('menuButton');
-const sideMenu = document.getElementById('sideMenu');
-const menuOverlay = document.getElementById('menuOverlay');
-
-function openMenu() {
-    sideMenu.classList.add('open');
-    menuOverlay.classList.add('open');
-}
-
-function closeMenu() {
-    sideMenu.classList.remove('open');
-    menuOverlay.classList.remove('open');
-}
-
-menuButton.addEventListener('click', openMenu);
-menuOverlay.addEventListener('click', closeMenu);
-
-    
-const menuAdminButton =
-    document.getElementById('menuAdminButton');
-
-const adminPanel =
-    document.getElementById('adminPanel');
-
-const adminBackButton =
-    document.getElementById('adminBackButton');
+    );
 
 
-async function loadInvites() {
+    /* =========================
+       ВЫБОР ТИПА — КОЛЛЕКТОР
+       ========================= */
 
-    const inviteList =
-        document.getElementById('inviteList');
+    document
+        .getElementById('collectorTypeButton')
+        .addEventListener(
+            'click',
+            () => {
 
-    inviteList.innerHTML =
-        'Загрузка...';
+                selectedWellType =
+                    'collector';
 
-    try {
 
-        const response = await fetch(
-            'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
-            {
-                method: 'POST',
+                wellForm.style.display =
+                    'none';
 
-                headers: {
-                    'Content-Type': 'application/json'
-                },
 
-                body: JSON.stringify({
-                    initData: tg.initData,
-                    action: 'list_invites'
-                })
+                console.log(
+                    'Выбран колодец:',
+                    {
+                        type: selectedWellType,
+                        latitude:
+                            selectedWellLatitude,
+                        longitude:
+                            selectedWellLongitude
+                    }
+                );
+
+
+                tg.showAlert(
+                    'Выбран тип: Коллектор'
+                );
+
             }
         );
 
-        console.log(
-            'HTTP статус:',
-            response.status
+
+    /* =========================
+       ВЫБОР ТИПА — ДОЖДЕПРИЁМНИК
+       ========================= */
+
+    document
+        .getElementById('rainInletTypeButton')
+        .addEventListener(
+            'click',
+            () => {
+
+                selectedWellType =
+                    'rain_inlet';
+
+
+                wellForm.style.display =
+                    'none';
+
+
+                console.log(
+                    'Выбран колодец:',
+                    {
+                        type: selectedWellType,
+                        latitude:
+                            selectedWellLatitude,
+                        longitude:
+                            selectedWellLongitude
+                    }
+                );
+
+
+                tg.showAlert(
+                    'Выбран тип: Дождеприёмник'
+                );
+
+            }
         );
 
-        const responseText =
-            await response.text();
 
-        console.log(
-            'Ответ сервера:',
-            responseText
+    /* =========================
+       ОТМЕНА СОЗДАНИЯ
+       ========================= */
+
+    document
+        .getElementById('cancelWellButton')
+        .addEventListener(
+            'click',
+            () => {
+
+                wellForm.style.display =
+                    'none';
+
+
+                addingWell = false;
+
+
+                selectedWellLatitude = null;
+
+                selectedWellLongitude = null;
+
+                selectedWellType = null;
+
+
+                addWellButton.classList.remove(
+                    'active'
+                );
+
+            }
         );
 
-        let data;
 
-        try {
+    /* =========================
+       ПРОВЕРКА TELEGRAM ПОЛЬЗОВАТЕЛЯ
+       ========================= */
 
-            data =
-                JSON.parse(responseText);
-
-        } catch (parseError) {
-
-            inviteList.textContent =
-                'Сервер вернул неожиданный ответ: ' +
-                responseText;
-
-            return;
-        }
-
-
-        if (!data.ok) {
-
-            inviteList.textContent =
-                'Ошибка сервера: ' +
-                (data.error ||
-                 'Неизвестная ошибка');
-
-            return;
-        }
-
-
-        if (!data.invites ||
-            data.invites.length === 0) {
-
-            inviteList.textContent =
-                'Приглашений пока нет.';
-
-            return;
-        }
-
-
-        inviteList.innerHTML = '';
-
-
-        data.invites.forEach(invite => {
-
-            const item =
-                document.createElement('div');
-
-            item.className =
-                'inviteItem';
-
-
-            const status =
-                invite.used_at
-                    ? 'Использован'
-                    : 'Свободен';
-
-
-           const createdDate =
-    new Date(invite.created_at).toLocaleString(
-        'ru-RU',
+    fetch(
+        'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
         {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            method: 'POST',
+
+            headers: {
+                'Content-Type': 'application/json'
+            },
+
+            body: JSON.stringify({
+                initData: tg.initData
+            })
+        }
+    )
+    .then(
+        response => response.json()
+    )
+    .then(
+        data => {
+
+            console.log(
+                'Ответ Supabase:',
+                data
+            );
+
+
+            if (data.ok) {
+
+                if (
+                    data.user &&
+                    data.user.exists === true
+                ) {
+
+                    document
+                        .getElementById(
+                            'registrationScreen'
+                        )
+                        .style.display =
+                            'none';
+
+
+                    const currentUser =
+                        data.user.user;
+
+
+                    document
+                        .getElementById(
+                            'menuNickname'
+                        )
+                        .textContent =
+                            currentUser.nickname;
+
+
+                    if (
+                        currentUser.role === 'admin'
+                    ) {
+
+                        document
+                            .getElementById(
+                                'menuRole'
+                            )
+                            .textContent =
+                                'Администратор';
+
+
+                        document
+                            .getElementById(
+                                'menuAdminButton'
+                            )
+                            .style.display =
+                                'block';
+
+                    } else {
+
+                        document
+                            .getElementById(
+                                'menuRole'
+                            )
+                            .textContent =
+                                'Пользователь';
+
+                    }
+
+                }
+
+
+                console.log(
+                    'Telegram пользователь:',
+                    data.telegramUser
+                );
+
+            } else {
+
+                console.error(
+                    'Ошибка:',
+                    data.error
+                );
+
+            }
+
+        }
+    )
+    .catch(
+        error => {
+
+            console.error(
+                'Ошибка соединения:',
+                error
+            );
+
         }
     );
 
-item.innerHTML = `
-    <div class="inviteCode">
-        ${invite.code}
-    </div>
 
-    <div class="inviteStatus">
-        ${status}
-    </div>
+    /* =========================
+       РЕГИСТРАЦИЯ ПО ИНВАЙТУ
+       ========================= */
 
-    <div class="inviteStatus">
-        Создано: ${createdDate}
-    </div>
-`;
-
-
-            inviteList.appendChild(item);
-
-        });
-
-    } catch (error) {
-
-        console.error(
-            'Ошибка загрузки приглашений:',
-            error
+    const loginButton =
+        document.getElementById(
+            'loginButton'
         );
 
-        inviteList.textContent =
-            'Ошибка: ' +
-            error.message;
-    }
-}
+
+    loginButton.addEventListener(
+        'click',
+        async () => {
+
+            const inviteCode =
+                document
+                    .getElementById(
+                        'inviteCodeInput'
+                    )
+                    .value
+                    .trim();
 
 
-menuAdminButton.addEventListener(
-    'click',
-    () => {
-
-        closeMenu();
-
-        adminPanel.classList.add('open');
-
-        loadInvites();
-
-    }
-);
+            const nickname =
+                document
+                    .getElementById(
+                        'nicknameInput'
+                    )
+                    .value
+                    .trim();
 
 
-adminBackButton.addEventListener(
-    'click',
-    () => {
-
-        adminPanel.classList.remove('open');
-
-    }
-);
+            const errorElement =
+                document.getElementById(
+                    'registrationError'
+                );
 
 
-const generateInviteButton =
-    document.getElementById(
-        'generateInviteButton'
+            errorElement.textContent =
+                '';
+
+
+            if (!inviteCode) {
+
+                errorElement.textContent =
+                    'Введите пригласительный код';
+
+                return;
+            }
+
+
+            if (!nickname) {
+
+                errorElement.textContent =
+                    'Введите никнейм';
+
+                return;
+            }
+
+
+            loginButton.disabled =
+                true;
+
+
+            loginButton.textContent =
+                'Проверка...';
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body: JSON.stringify({
+
+                                initData:
+                                    tg.initData,
+
+                                action:
+                                    'redeem_invite',
+
+                                inviteCode:
+                                    inviteCode,
+
+                                nickname:
+                                    nickname
+
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    'Регистрация:',
+                    data
+                );
+
+
+                if (data.ok) {
+
+                    document
+                        .getElementById(
+                            'registrationScreen'
+                        )
+                        .style.display =
+                            'none';
+
+
+                    document
+                        .getElementById(
+                            'menuNickname'
+                        )
+                        .textContent =
+                            data.user.nickname;
+
+
+                    document
+                        .getElementById(
+                            'menuRole'
+                        )
+                        .textContent =
+                            'Пользователь';
+
+
+                    tg.showAlert(
+                        'Добро пожаловать, ' +
+                        data.user.nickname +
+                        '!'
+                    );
+
+                } else {
+
+                    errorElement.textContent =
+                        data.error ||
+                        'Не удалось выполнить регистрацию';
+
+
+                    loginButton.disabled =
+                        false;
+
+
+                    loginButton.textContent =
+                        'Войти';
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    error
+                );
+
+
+                errorElement.textContent =
+                    'Ошибка соединения с сервером';
+
+
+                loginButton.disabled =
+                    false;
+
+
+                loginButton.textContent =
+                    'Войти';
+
+            }
+
+        }
     );
 
-const inviteResult =
-    document.getElementById(
-        'inviteResult'
+
+    /* =========================
+       МЕНЮ
+       ========================= */
+
+    const menuButton =
+        document.getElementById(
+            'menuButton'
+        );
+
+
+    const sideMenu =
+        document.getElementById(
+            'sideMenu'
+        );
+
+
+    const menuOverlay =
+        document.getElementById(
+            'menuOverlay'
+        );
+
+
+    function openMenu() {
+
+        sideMenu.classList.add(
+            'open'
+        );
+
+
+        menuOverlay.classList.add(
+            'open'
+        );
+
+    }
+
+
+    function closeMenu() {
+
+        sideMenu.classList.remove(
+            'open'
+        );
+
+
+        menuOverlay.classList.remove(
+            'open'
+        );
+
+    }
+
+
+    menuButton.addEventListener(
+        'click',
+        openMenu
     );
 
 
-generateInviteButton.addEventListener(
-    'click',
-    async () => {
+    menuOverlay.addEventListener(
+        'click',
+        closeMenu
+    );
 
-        generateInviteButton.disabled =
-            true;
 
-        generateInviteButton.textContent =
-            'Создание...';
+    /* =========================
+       КНОПКА "КАРТА"
+       ========================= */
 
-        inviteResult.textContent =
-            '';
+    document
+        .getElementById('menuMapButton')
+        .addEventListener(
+            'click',
+            () => {
+
+                closeMenu();
+
+                adminPanel.classList.remove(
+                    'open'
+                );
+
+            }
+        );
+
+
+    /* =========================
+       АДМИНКА
+       ========================= */
+
+    const menuAdminButton =
+        document.getElementById(
+            'menuAdminButton'
+        );
+
+
+    const adminPanel =
+        document.getElementById(
+            'adminPanel'
+        );
+
+
+    const adminBackButton =
+        document.getElementById(
+            'adminBackButton'
+        );
+
+
+    async function loadInvites() {
+
+        const inviteList =
+            document.getElementById(
+                'inviteList'
+            );
+
+
+        inviteList.innerHTML =
+            'Загрузка...';
 
 
         try {
@@ -981,60 +1570,293 @@ generateInviteButton.addEventListener(
                                 tg.initData,
 
                             action:
-                                'generate_invite'
+                                'list_invites'
                         })
                     }
                 );
 
 
-            const data =
-                await response.json();
-
-
             console.log(
-                'Создание приглашения:',
-                data
+                'HTTP статус:',
+                response.status
             );
 
 
-            if (data.ok) {
+            const responseText =
+                await response.text();
 
-                inviteResult.textContent =
-                    'Код приглашения: ' +
-                    data.invite.code;
 
-                loadInvites();
+            console.log(
+                'Ответ сервера:',
+                responseText
+            );
 
-            } else {
 
-                inviteResult.textContent =
-                    data.error ||
-                    'Не удалось создать приглашение';
+            let data;
+
+
+            try {
+
+                data =
+                    JSON.parse(
+                        responseText
+                    );
+
+            } catch (parseError) {
+
+                inviteList.textContent =
+                    'Сервер вернул неожиданный ответ: ' +
+                    responseText;
+
+                return;
 
             }
+
+
+            if (!data.ok) {
+
+                inviteList.textContent =
+                    'Ошибка сервера: ' +
+                    (
+                        data.error ||
+                        'Неизвестная ошибка'
+                    );
+
+                return;
+
+            }
+
+
+            if (
+                !data.invites ||
+                data.invites.length === 0
+            ) {
+
+                inviteList.textContent =
+                    'Приглашений пока нет.';
+
+                return;
+
+            }
+
+
+            inviteList.innerHTML =
+                '';
+
+
+            data.invites.forEach(
+                invite => {
+
+                    const item =
+                        document.createElement(
+                            'div'
+                        );
+
+
+                    item.className =
+                        'inviteItem';
+
+
+                    const status =
+                        invite.used_at
+                            ? 'Использован'
+                            : 'Свободен';
+
+
+                    const createdDate =
+                        new Date(
+                            invite.created_at
+                        ).toLocaleString(
+                            'ru-RU',
+                            {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }
+                        );
+
+
+                    item.innerHTML = `
+
+                        <div class="inviteCode">
+                            ${invite.code}
+                        </div>
+
+                        <div class="inviteStatus">
+                            ${status}
+                        </div>
+
+                        <div class="inviteStatus">
+                            Создано: ${createdDate}
+                        </div>
+
+                    `;
+
+
+                    inviteList.appendChild(
+                        item
+                    );
+
+                }
+            );
 
         } catch (error) {
 
             console.error(
-                'Ошибка создания приглашения:',
+                'Ошибка загрузки приглашений:',
                 error
             );
 
-            inviteResult.textContent =
+
+            inviteList.textContent =
                 'Ошибка: ' +
                 error.message;
 
         }
 
-
-        generateInviteButton.disabled =
-            false;
-
-        generateInviteButton.textContent =
-            '+ Создать приглашение';
-
     }
-);
+
+
+    menuAdminButton.addEventListener(
+        'click',
+        () => {
+
+            closeMenu();
+
+
+            adminPanel.classList.add(
+                'open'
+            );
+
+
+            loadInvites();
+
+        }
+    );
+
+
+    adminBackButton.addEventListener(
+        'click',
+        () => {
+
+            adminPanel.classList.remove(
+                'open'
+            );
+
+        }
+    );
+
+
+    /* =========================
+       СОЗДАНИЕ ИНВАЙТА
+       ========================= */
+
+    const generateInviteButton =
+        document.getElementById(
+            'generateInviteButton'
+        );
+
+
+    const inviteResult =
+        document.getElementById(
+            'inviteResult'
+        );
+
+
+    generateInviteButton.addEventListener(
+        'click',
+        async () => {
+
+            generateInviteButton.disabled =
+                true;
+
+
+            generateInviteButton.textContent =
+                'Создание...';
+
+
+            inviteResult.textContent =
+                '';
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json'
+                            },
+
+                            body: JSON.stringify({
+                                initData:
+                                    tg.initData,
+
+                                action:
+                                    'generate_invite'
+                            })
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                console.log(
+                    'Создание приглашения:',
+                    data
+                );
+
+
+                if (data.ok) {
+
+                    inviteResult.textContent =
+                        'Код приглашения: ' +
+                        data.invite.code;
+
+
+                    loadInvites();
+
+                } else {
+
+                    inviteResult.textContent =
+                        data.error ||
+                        'Не удалось создать приглашение';
+
+                }
+
+            } catch (error) {
+
+                console.error(
+                    'Ошибка создания приглашения:',
+                    error
+                );
+
+
+                inviteResult.textContent =
+                    'Ошибка: ' +
+                    error.message;
+
+            }
+
+
+            generateInviteButton.disabled =
+                false;
+
+
+            generateInviteButton.textContent =
+                '+ Создать приглашение';
+
+        }
+    );
+
 </script>
 
 </body>
