@@ -626,6 +626,11 @@ function closeMenu() {
 
 menuButton.addEventListener('click', openMenu);
 menuOverlay.addEventListener('click', closeMenu);
+    const menuAdminButton = document.getElementById('menuAdminButton');
+
+menuAdminButton.addEventListener('click', () => {
+    alert('Раздел администрирования');
+});
 </script>
 
 </body>
