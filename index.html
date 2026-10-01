@@ -727,6 +727,66 @@ menuAdminButton.addEventListener('click', () => {
 adminBackButton.addEventListener('click', () => {
     adminPanel.classList.remove('open');
 });
+    const generateInviteButton =
+    document.getElementById('generateInviteButton');
+
+const inviteResult =
+    document.getElementById('inviteResult');
+
+generateInviteButton.addEventListener('click', async () => {
+
+    generateInviteButton.disabled = true;
+    generateInviteButton.textContent = 'Создание...';
+
+    inviteResult.textContent = '';
+
+    try {
+
+        const response = await fetch(
+            'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify({
+                    initData: tg.initData,
+                    action: 'generate_invite'
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        console.log('Создание приглашения:', data);
+
+        if (data.ok) {
+
+            inviteResult.textContent =
+                'Код приглашения: ' + data.invite.code;
+
+        } else {
+
+            inviteResult.textContent =
+                data.error || 'Не удалось создать приглашение';
+
+        }
+
+    } catch (error) {
+
+        console.error(error);
+
+        inviteResult.textContent =
+            'Ошибка соединения с сервером';
+
+    }
+
+    generateInviteButton.disabled = false;
+    generateInviteButton.textContent =
+        '+ Создать приглашение';
+});
 </script>
 
 </body>
