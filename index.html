@@ -852,15 +852,31 @@ async function loadInvites() {
                     : 'Свободен';
 
 
-            item.innerHTML = `
-                <div class="inviteCode">
-                    ${invite.code}
-                </div>
+           const createdDate =
+    new Date(invite.created_at).toLocaleString(
+        'ru-RU',
+        {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        }
+    );
 
-                <div class="inviteStatus">
-                    ${status}
-                </div>
-            `;
+item.innerHTML = `
+    <div class="inviteCode">
+        ${invite.code}
+    </div>
+
+    <div class="inviteStatus">
+        ${status}
+    </div>
+
+    <div class="inviteStatus">
+        Создано: ${createdDate}
+    </div>
+`;
 
 
             inviteList.appendChild(item);
