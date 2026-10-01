@@ -747,16 +747,23 @@ menuButton.addEventListener('click', openMenu);
 menuOverlay.addEventListener('click', closeMenu);
 
     
-const menuAdminButton = document.getElementById('menuAdminButton');
-const adminPanel = document.getElementById('adminPanel');
-const adminBackButton = document.getElementById('adminBackButton');
+const menuAdminButton =
+    document.getElementById('menuAdminButton');
+
+const adminPanel =
+    document.getElementById('adminPanel');
+
+const adminBackButton =
+    document.getElementById('adminBackButton');
+
 
 async function loadInvites() {
 
     const inviteList =
         document.getElementById('inviteList');
 
-    inviteList.innerHTML = 'Загрузка...';
+    inviteList.innerHTML =
+        'Загрузка...';
 
     try {
 
@@ -776,19 +783,49 @@ async function loadInvites() {
             }
         );
 
-        const data = await response.json();
+        console.log(
+            'HTTP статус:',
+            response.status
+        );
 
-        console.log('Список приглашений:', data);
+        const responseText =
+            await response.text();
 
-        if (!data.ok) {
+        console.log(
+            'Ответ сервера:',
+            responseText
+        );
+
+        let data;
+
+        try {
+
+            data =
+                JSON.parse(responseText);
+
+        } catch (parseError) {
 
             inviteList.textContent =
-                data.error || 'Не удалось загрузить список';
+                'Сервер вернул неожиданный ответ: ' +
+                responseText;
 
             return;
         }
 
-        if (data.invites.length === 0) {
+
+        if (!data.ok) {
+
+            inviteList.textContent =
+                'Ошибка сервера: ' +
+                (data.error ||
+                 'Неизвестная ошибка');
+
+            return;
+        }
+
+
+        if (!data.invites ||
+            data.invites.length === 0) {
 
             inviteList.textContent =
                 'Приглашений пока нет.';
@@ -796,19 +833,24 @@ async function loadInvites() {
             return;
         }
 
+
         inviteList.innerHTML = '';
+
 
         data.invites.forEach(invite => {
 
             const item =
                 document.createElement('div');
 
-            item.className = 'inviteItem';
+            item.className =
+                'inviteItem';
+
 
             const status =
                 invite.used_at
                     ? 'Использован'
                     : 'Свободен';
+
 
             item.innerHTML = `
                 <div class="inviteCode">
@@ -820,86 +862,146 @@ async function loadInvites() {
                 </div>
             `;
 
+
             inviteList.appendChild(item);
+
         });
 
     } catch (error) {
 
-        console.error(error);
+        console.error(
+            'Ошибка загрузки приглашений:',
+            error
+        );
 
         inviteList.textContent =
-            'Ошибка соединения с сервером';
+            'Ошибка: ' +
+            error.message;
     }
 }
 
-menuAdminButton.addEventListener('click', () => {
-    closeMenu();
-    adminPanel.classList.add('open');
-    loadInvites();
-});
 
-adminBackButton.addEventListener('click', () => {
-    adminPanel.classList.remove('open');
-});
-    const generateInviteButton =
-    document.getElementById('generateInviteButton');
+menuAdminButton.addEventListener(
+    'click',
+    () => {
+
+        closeMenu();
+
+        adminPanel.classList.add('open');
+
+        loadInvites();
+
+    }
+);
+
+
+adminBackButton.addEventListener(
+    'click',
+    () => {
+
+        adminPanel.classList.remove('open');
+
+    }
+);
+
+
+const generateInviteButton =
+    document.getElementById(
+        'generateInviteButton'
+    );
 
 const inviteResult =
-    document.getElementById('inviteResult');
+    document.getElementById(
+        'inviteResult'
+    );
 
-generateInviteButton.addEventListener('click', async () => {
 
-    generateInviteButton.disabled = true;
-    generateInviteButton.textContent = 'Создание...';
+generateInviteButton.addEventListener(
+    'click',
+    async () => {
 
-    inviteResult.textContent = '';
+        generateInviteButton.disabled =
+            true;
 
-    try {
+        generateInviteButton.textContent =
+            'Создание...';
 
-        const response = await fetch(
-            'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
-            {
-                method: 'POST',
+        inviteResult.textContent =
+            '';
 
-                headers: {
-                    'Content-Type': 'application/json'
-                },
 
-                body: JSON.stringify({
-                    initData: tg.initData,
-                    action: 'generate_invite'
-                })
+        try {
+
+            const response =
+                await fetch(
+                    'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json'
+                        },
+
+                        body: JSON.stringify({
+                            initData:
+                                tg.initData,
+
+                            action:
+                                'generate_invite'
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            console.log(
+                'Создание приглашения:',
+                data
+            );
+
+
+            if (data.ok) {
+
+                inviteResult.textContent =
+                    'Код приглашения: ' +
+                    data.invite.code;
+
+                loadInvites();
+
+            } else {
+
+                inviteResult.textContent =
+                    data.error ||
+                    'Не удалось создать приглашение';
+
             }
-        );
 
-        const data = await response.json();
+        } catch (error) {
 
-        console.log('Создание приглашения:', data);
-
-        if (data.ok) {
-
-            inviteResult.textContent =
-                'Код приглашения: ' + data.invite.code;
-
-        } else {
+            console.error(
+                'Ошибка создания приглашения:',
+                error
+            );
 
             inviteResult.textContent =
-                data.error || 'Не удалось создать приглашение';
+                'Ошибка: ' +
+                error.message;
 
         }
 
-    } catch (error) {
 
-    console.error('Ошибка загрузки приглашений:', error);
+        generateInviteButton.disabled =
+            false;
 
-    inviteList.textContent =
-        'Ошибка: ' + error.message;
-}
+        generateInviteButton.textContent =
+            '+ Создать приглашение';
 
-    generateInviteButton.disabled = false;
-    generateInviteButton.textContent =
-        '+ Создать приглашение';
-});
+    }
+);
 </script>
 
 </body>
