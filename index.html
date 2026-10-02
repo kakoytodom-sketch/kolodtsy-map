@@ -35,13 +35,19 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        button,
+        input,
+        select,
+        textarea {
+            font-family: inherit;
+        }
+
         #map {
             position: absolute;
             inset: 0;
             width: 100%;
             height: 100%;
         }
-
 
         /* =========================
            КНОПКИ КАРТЫ
@@ -78,7 +84,6 @@
             background: white;
             color: #111;
         }
-
 
         /* =========================
            НИЖНЯЯ НАВИГАЦИЯ
@@ -126,7 +131,6 @@
             color: #777;
 
             cursor: pointer;
-            font-family: inherit;
         }
 
         .bottomNavButton.active {
@@ -152,12 +156,11 @@
             white-space: nowrap;
         }
 
-
         /* =========================
-           ЭКРАН "МОИ КОЛОДЦЫ"
+           ОБЩИЕ ЭКРАНЫ
            ========================= */
 
-        #myWellsPanel {
+        .fullPanel {
             position: fixed;
             inset: 0;
             z-index: 4000;
@@ -169,7 +172,7 @@
             color: white;
         }
 
-        #myWellsPanel.open {
+        .fullPanel.open {
             display: flex;
         }
 
@@ -210,6 +213,14 @@
 
             font-size: 22px;
             cursor: pointer;
+        }
+
+        /* =========================
+           МОИ КОЛОДЦЫ
+           ========================= */
+
+        #myWellsPanel {
+            composes: fullPanel;
         }
 
         #myWellsList {
@@ -257,37 +268,22 @@
             line-height: 1.5;
         }
 
-
         /* =========================
            ПАНЕЛЬ
            ========================= */
 
-        #userPanel {
-            position: fixed;
-            inset: 0;
-            z-index: 4500;
-
-            display: none;
-            flex-direction: column;
-
-            background: #080808;
-            color: white;
-        }
-
-        #userPanel.open {
-            display: flex;
-        }
-
         #userPanelContent {
             flex: 1;
             overflow-y: auto;
-            padding: 15px 15px 95px;
+            padding: 15px 15px 100px;
         }
 
         .profileCard {
             padding: 18px;
+
             border: 1px solid #242424;
             border-radius: 18px;
+
             background: #111;
         }
 
@@ -352,7 +348,6 @@
             color: white;
 
             text-align: left;
-            font-family: inherit;
             font-size: 15px;
 
             cursor: pointer;
@@ -381,6 +376,112 @@
             border-color: #343434;
         }
 
+        /* =========================
+           ФИЛЬТРЫ
+           ========================= */
+
+        .filterBlock {
+            padding: 15px;
+
+            border: 1px solid #242424;
+            border-radius: 16px;
+
+            background: #111;
+        }
+
+        .filterLabel {
+            margin-bottom: 8px;
+
+            color: #888;
+            font-size: 12px;
+        }
+
+        .filterButtons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .filterButton {
+            padding: 9px 11px;
+
+            border: 1px solid #303030;
+            border-radius: 10px;
+
+            background: #191919;
+            color: #aaa;
+
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .filterButton.active {
+            background: white;
+            color: #111;
+            border-color: white;
+        }
+
+        /* =========================
+           СТАТИСТИКА
+           ========================= */
+
+        .statsGrid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        .statCard {
+            padding: 15px;
+
+            border: 1px solid #242424;
+            border-radius: 15px;
+
+            background: #111;
+        }
+
+        .statValue {
+            font-size: 25px;
+            font-weight: 600;
+        }
+
+        .statLabel {
+            margin-top: 4px;
+            color: #777;
+            font-size: 12px;
+        }
+
+        /* =========================
+           ПОСЛЕДНИЕ КОЛОДЦЫ
+           ========================= */
+
+        .recentList {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recentItem {
+            padding: 13px;
+
+            border: 1px solid #242424;
+            border-radius: 13px;
+
+            background: #111;
+            cursor: pointer;
+        }
+
+        .recentItemTitle {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .recentItemMeta {
+            margin-top: 4px;
+
+            color: #777;
+            font-size: 12px;
+        }
 
         /* =========================
            РЕГИСТРАЦИЯ
@@ -483,15 +584,14 @@
             font-size: 14px;
         }
 
-
         /* =========================
-           АДМИН ПАНЕЛЬ
+           АДМИНКА
            ========================= */
 
         .adminPanel {
             position: fixed;
             inset: 0;
-            z-index: 1200;
+            z-index: 6000;
 
             background: #080808;
             color: white;
@@ -600,7 +700,6 @@
             color: #777;
         }
 
-
         /* =========================
            ФОРМА КОЛОДЦА
            ========================= */
@@ -639,7 +738,6 @@
         .wellFormBox h2 {
             margin: 0 0 6px;
             font-size: 22px;
-            color: white;
         }
 
         .wellFormSubtitle {
@@ -695,7 +793,6 @@
             min-height: 100px;
             padding: 12px;
             resize: none;
-            font-family: inherit;
         }
 
         .workList {
@@ -720,7 +817,6 @@
         .workOption input {
             width: 20px;
             height: 20px;
-
             margin: 0;
             flex-shrink: 0;
         }
@@ -757,8 +853,6 @@
 
             font-size: 16px;
             font-weight: 600;
-
-            cursor: pointer;
         }
 
         .cancelWellButton {
@@ -772,9 +866,7 @@
             color: white;
 
             font-size: 16px;
-            cursor: pointer;
         }
-
 
         /* =========================
            ОШИБКА
@@ -839,624 +931,827 @@
 
 <body>
 
+<div id="fatalError">
+    <div class="fatalErrorBox">
+        <h2>Ошибка запуска</h2>
+        <div id="fatalErrorText" class="fatalErrorText"></div>
+        <button id="fatalReload" class="fatalReload">
+            Перезагрузить
+        </button>
+    </div>
+</div>
 
-    <!-- =========================
-         ОШИБКА
-         ========================= -->
 
-    <div id="fatalError">
+<!-- =========================
+     РЕГИСТРАЦИЯ
+     ========================= -->
 
-        <div class="fatalErrorBox">
+<div id="registrationScreen">
 
-            <h2>
-                Ошибка запуска
+    <div class="registrationBox">
+
+        <div class="logo">💧</div>
+
+        <h1>Карта колодцев</h1>
+
+        <p>
+            Введите пригласительный код<br>
+            для доступа к приложению
+        </p>
+
+        <input
+            id="inviteCodeInput"
+            type="text"
+            placeholder="Пригласительный код"
+            autocomplete="off"
+        >
+
+        <input
+            id="nicknameInput"
+            type="text"
+            placeholder="Ваш никнейм"
+            autocomplete="off"
+            maxlength="30"
+        >
+
+        <button id="loginButton">
+            Войти
+        </button>
+
+        <div id="registrationError"></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     КАРТА
+     ========================= -->
+
+<div id="map"></div>
+
+
+<button
+    id="locationButton"
+    class="map-button"
+    aria-label="Моё местоположение"
+>
+    📍
+</button>
+
+<button
+    id="addWellButton"
+    class="map-button"
+    aria-label="Добавить колодец"
+>
+    ＋
+</button>
+
+
+<!-- =========================
+     МОИ КОЛОДЦЫ
+     ========================= -->
+
+<div id="myWellsPanel" class="fullPanel">
+
+    <div class="sectionHeader">
+
+        <div>
+            <h2 class="sectionHeaderTitle">
+                Мои колодцы
             </h2>
 
             <div
-                id="fatalErrorText"
-                class="fatalErrorText"
-            ></div>
-
-            <button
-                id="fatalReload"
-                class="fatalReload"
+                id="myWellsSubtitle"
+                class="sectionHeaderSubtitle"
             >
-                Перезагрузить
-            </button>
-
+                Загруженные объекты
+            </div>
         </div>
+
+        <button
+            id="myWellsCloseButton"
+            class="sectionCloseButton"
+        >
+            ×
+        </button>
 
     </div>
 
+    <div id="myWellsList"></div>
 
-    <!-- =========================
-         ЭКРАН РЕГИСТРАЦИИ
-         ========================= -->
+</div>
 
-    <div id="registrationScreen">
 
-        <div class="registrationBox">
+<!-- =========================
+     ПАНЕЛЬ
+     ========================= -->
 
-            <div class="logo">
-                💧
-            </div>
+<div id="userPanel" class="fullPanel">
 
-            <h1>
-                Карта колодцев
-            </h1>
+    <div class="sectionHeader">
 
-            <p>
-                Введите пригласительный код<br>
-                для доступа к приложению
-            </p>
-
-            <input
-                id="inviteCodeInput"
-                type="text"
-                placeholder="Пригласительный код"
-                autocomplete="off"
-            >
-
-            <input
-                id="nicknameInput"
-                type="text"
-                placeholder="Ваш никнейм"
-                autocomplete="off"
-                maxlength="30"
-            >
-
-            <button id="loginButton">
-                Войти
-            </button>
-
-            <div id="registrationError"></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         КАРТА
-         ========================= -->
-
-    <div id="map"></div>
-
-
-    <!-- =========================
-         КНОПКИ КАРТЫ
-         ========================= -->
-
-    <button
-        id="locationButton"
-        class="map-button"
-        aria-label="Моё местоположение"
-    >
-        📍
-    </button>
-
-    <button
-        id="addWellButton"
-        class="map-button"
-        aria-label="Добавить колодец"
-    >
-        ＋
-    </button>
-
-
-    <!-- =========================
-         МОИ КОЛОДЦЫ
-         ========================= -->
-
-    <div id="myWellsPanel">
-
-        <div class="sectionHeader">
-
-            <div>
-
-                <h2 class="sectionHeaderTitle">
-                    Мои колодцы
-                </h2>
-
-                <div
-                    id="myWellsSubtitle"
-                    class="sectionHeaderSubtitle"
-                >
-                    Загруженные объекты
-                </div>
-
-            </div>
-
-            <button
-                id="myWellsCloseButton"
-                class="sectionCloseButton"
-            >
-                ×
-            </button>
-
-        </div>
-
-        <div id="myWellsList"></div>
-
-    </div>
-
-
-    <!-- =========================
-         ПАНЕЛЬ
-         ========================= -->
-
-    <div id="userPanel">
-
-        <div class="sectionHeader">
-
-            <div>
-
-                <h2 class="sectionHeaderTitle">
-                    Панель
-                </h2>
-
-                <div class="sectionHeaderSubtitle">
-                    Профиль и управление
-                </div>
-
-            </div>
-
-            <button
-                id="userPanelCloseButton"
-                class="sectionCloseButton"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <div id="userPanelContent">
-
-            <div class="profileCard">
-
-                <div class="profileTop">
-
-                    <div class="profileAvatar">
-                        💧
-                    </div>
-
-                    <div>
-
-                        <div
-                            id="panelNickname"
-                            class="profileNickname"
-                        >
-                            Пользователь
-                        </div>
-
-                        <div
-                            id="panelRole"
-                            class="profileRole"
-                        >
-                            Пользователь
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="panelSection">
-
-                <div class="panelSectionTitle">
-                    Навигация
-                </div>
-
-                <button
-                    id="panelMapButton"
-                    class="panelItem"
-                >
-
-                    <div class="panelItemIcon">
-                        🗺️
-                    </div>
-
-                    <div class="panelItemText">
-                        Карта
-                    </div>
-
-                    <div class="panelItemArrow">
-                        ›
-                    </div>
-
-                </button>
-
-                <button
-                    id="panelMyWellsButton"
-                    class="panelItem"
-                >
-
-                    <div class="panelItemIcon">
-                        💧
-                    </div>
-
-                    <div class="panelItemText">
-                        Мои колодцы
-                    </div>
-
-                    <div class="panelItemArrow">
-                        ›
-                    </div>
-
-                </button>
-
-            </div>
-
-
-            <div class="panelSection">
-
-                <div class="panelSectionTitle">
-                    Управление
-                </div>
-
-                <button
-                    id="panelAdminButton"
-                    class="panelItem adminPanelItem"
-                    style="display:none;"
-                >
-
-                    <div class="panelItemIcon">
-                        ⚙️
-                    </div>
-
-                    <div class="panelItemText">
-                        Администрирование
-                    </div>
-
-                    <div class="panelItemArrow">
-                        ›
-                    </div>
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         АДМИН ПАНЕЛЬ
-         ========================= -->
-
-    <div id="adminPanel" class="adminPanel">
-
-        <div class="adminPanelHeader">
-
-            <button
-                id="adminBackButton"
-                class="adminBackButton"
-            >
-                ←
-            </button>
-
-            <h2>
-                Администрирование
+        <div>
+            <h2 class="sectionHeaderTitle">
+                Панель
             </h2>
 
+            <div class="sectionHeaderSubtitle">
+                Профиль и управление
+            </div>
         </div>
 
-        <div class="adminPanelContent">
-
-            <p class="adminPanelSubtitle">
-                Управление доступом к приложению
-            </p>
-
-            <button
-                id="generateInviteButton"
-                class="generateInviteButton"
-            >
-                + Создать приглашение
-            </button>
-
-            <div
-                id="inviteResult"
-                class="inviteResult"
-            ></div>
-
-            <h3 class="adminSectionTitle">
-                Приглашения
-            </h3>
-
-            <div
-                id="inviteList"
-                class="inviteList"
-            ></div>
-
-        </div>
+        <button
+            id="userPanelCloseButton"
+            class="sectionCloseButton"
+        >
+            ×
+        </button>
 
     </div>
 
 
-    <!-- =========================
-         ФОРМА КОЛОДЦА
-         ========================= -->
+    <div id="userPanelContent">
 
-    <div id="wellForm">
+        <!-- Профиль -->
 
-        <div class="wellFormBox">
+        <div class="profileCard">
 
-            <h2>
-                Новый колодец
-            </h2>
+            <div class="profileTop">
 
-            <p class="wellFormSubtitle">
-                Информация об объекте
-            </p>
+                <div class="profileAvatar">
+                    💧
+                </div>
 
-            <div
-                id="selectedType"
-                class="selectedType"
-            >
-                Тип не выбран
+                <div>
+
+                    <div
+                        id="panelNickname"
+                        class="profileNickname"
+                    >
+                        Пользователь
+                    </div>
+
+                    <div
+                        id="panelRole"
+                        class="profileRole"
+                    >
+                        Пользователь
+                    </div>
+
+                </div>
+
             </div>
 
+        </div>
 
-            <div class="wellField">
 
-                <label>
+        <!-- Быстрые действия -->
+
+        <div class="panelSection">
+
+            <div class="panelSectionTitle">
+                Быстрые действия
+            </div>
+
+            <button
+                id="panelLocationButton"
+                class="panelItem"
+            >
+                <div class="panelItemIcon">
+                    📍
+                </div>
+
+                <div class="panelItemText">
+                    Моё местоположение
+                </div>
+
+                <div class="panelItemArrow">
+                    ›
+                </div>
+            </button>
+
+
+            <button
+                id="panelAddWellButton"
+                class="panelItem"
+            >
+                <div class="panelItemIcon">
+                    ＋
+                </div>
+
+                <div class="panelItemText">
+                    Добавить колодец
+                </div>
+
+                <div class="panelItemArrow">
+                    ›
+                </div>
+            </button>
+
+        </div>
+
+
+        <!-- Фильтры -->
+
+        <div class="panelSection">
+
+            <div class="panelSectionTitle">
+                Фильтры
+            </div>
+
+            <div class="filterBlock">
+
+                <div class="filterLabel">
                     Тип объекта
-                </label>
+                </div>
+
+                <div class="filterButtons">
+
+                    <button
+                        class="filterButton active"
+                        data-filter-type="all"
+                    >
+                        Все
+                    </button>
+
+                    <button
+                        class="filterButton"
+                        data-filter-type="collector"
+                    >
+                        Коллекторы
+                    </button>
+
+                    <button
+                        class="filterButton"
+                        data-filter-type="rain_inlet"
+                    >
+                        Дождеприёмники
+                    </button>
+
+                </div>
+
 
                 <div
-                    id="typeButtons"
+                    class="filterLabel"
+                    style="margin-top:15px;"
+                >
+                    Состояние
+                </div>
+
+                <div class="filterButtons">
+
+                    <button
+                        class="filterButton active"
+                        data-filter-status="all"
+                    >
+                        Все
+                    </button>
+
+                    <button
+                        class="filterButton"
+                        data-filter-status="active"
+                    >
+                        Рабочие
+                    </button>
+
+                    <button
+                        class="filterButton"
+                        data-filter-status="needs_repair"
+                    >
+                        Ремонт
+                    </button>
+
+                    <button
+                        class="filterButton"
+                        data-filter-status="broken"
+                    >
+                        Неисправные
+                    </button>
+
+                    <button
+                        class="filterButton"
+                        data-filter-status="not_used"
+                    >
+                        Не используются
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Статистика -->
+
+        <div class="panelSection">
+
+            <div class="panelSectionTitle">
+                Статистика
+            </div>
+
+            <div class="statsGrid">
+
+                <div class="statCard">
+
+                    <div
+                        id="statTotal"
+                        class="statValue"
+                    >
+                        0
+                    </div>
+
+                    <div class="statLabel">
+                        Всего
+                    </div>
+
+                </div>
+
+
+                <div class="statCard">
+
+                    <div
+                        id="statActive"
+                        class="statValue"
+                    >
+                        0
+                    </div>
+
+                    <div class="statLabel">
+                        Рабочие
+                    </div>
+
+                </div>
+
+
+                <div class="statCard">
+
+                    <div
+                        id="statRepair"
+                        class="statValue"
+                    >
+                        0
+                    </div>
+
+                    <div class="statLabel">
+                        Требуют ремонта
+                    </div>
+
+                </div>
+
+
+                <div class="statCard">
+
+                    <div
+                        id="statBroken"
+                        class="statValue"
+                    >
+                        0
+                    </div>
+
+                    <div class="statLabel">
+                        Неисправные
+                    </div>
+
+                </div>
+
+
+                <div class="statCard">
+
+                    <div
+                        id="statCollectors"
+                        class="statValue"
+                    >
+                        0
+                    </div>
+
+                    <div class="statLabel">
+                        Коллекторы
+                    </div>
+
+                </div>
+
+
+                <div class="statCard">
+
+                    <div
+                        id="statRainInlets"
+                        class="statValue"
+                    >
+                        0
+                    </div>
+
+                    <div class="statLabel">
+                        Дождеприёмники
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Последние -->
+
+        <div class="panelSection">
+
+            <div class="panelSectionTitle">
+                Последние добавленные
+            </div>
+
+            <div
+                id="recentWellsList"
+                class="recentList"
+            ></div>
+
+        </div>
+
+
+        <!-- Навигация -->
+
+        <div class="panelSection">
+
+            <div class="panelSectionTitle">
+                Разделы
+            </div>
+
+            <button
+                id="panelMyWellsButton"
+                class="panelItem"
+            >
+
+                <div class="panelItemIcon">
+                    💧
+                </div>
+
+                <div class="panelItemText">
+                    Мои колодцы
+                </div>
+
+                <div class="panelItemArrow">
+                    ›
+                </div>
+
+            </button>
+
+        </div>
+
+
+        <!-- Админ -->
+
+        <div class="panelSection">
+
+            <div class="panelSectionTitle">
+                Администрирование
+            </div>
+
+            <button
+                id="panelAdminButton"
+                class="panelItem adminPanelItem"
+                style="display:none;"
+            >
+
+                <div class="panelItemIcon">
+                    ⚙️
+                </div>
+
+                <div class="panelItemText">
+                    Администрирование
+                </div>
+
+                <div class="panelItemArrow">
+                    ›
+                </div>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     АДМИНКА
+     ========================= -->
+
+<div id="adminPanel" class="adminPanel">
+
+    <div class="adminPanelHeader">
+
+        <button
+            id="adminBackButton"
+            class="adminBackButton"
+        >
+            ←
+        </button>
+
+        <h2>
+            Администрирование
+        </h2>
+
+    </div>
+
+    <div class="adminPanelContent">
+
+        <p class="adminPanelSubtitle">
+            Управление доступом к приложению
+        </p>
+
+        <button
+            id="generateInviteButton"
+            class="generateInviteButton"
+        >
+            + Создать приглашение
+        </button>
+
+        <div
+            id="inviteResult"
+            class="inviteResult"
+        ></div>
+
+        <h3 class="adminSectionTitle">
+            Приглашения
+        </h3>
+
+        <div
+            id="inviteList"
+            class="inviteList"
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================
+     ФОРМА КОЛОДЦА
+     ========================= -->
+
+<div id="wellForm">
+
+    <div class="wellFormBox">
+
+        <h2>
+            Новый колодец
+        </h2>
+
+        <p class="wellFormSubtitle">
+            Информация об объекте
+        </p>
+
+        <div
+            id="selectedType"
+            class="selectedType"
+        >
+            Тип не выбран
+        </div>
+
+
+        <div class="wellField">
+
+            <label>
+                Тип объекта
+            </label>
+
+            <div
+                style="
+                    display:flex;
+                    flex-direction:column;
+                    gap:10px;
+                "
+            >
+
+                <button
+                    id="collectorButton"
+                    type="button"
                     style="
-                        display:flex;
-                        flex-direction:column;
-                        gap:10px;
+                        height:48px;
+                        border:none;
+                        border-radius:12px;
+                        background:#222;
+                        color:white;
+                        font-size:16px;
+                        font-weight:600;
                     "
                 >
-
-                    <button
-                        id="collectorButton"
-                        type="button"
-                        style="
-                            height:48px;
-                            border:none;
-                            border-radius:12px;
-                            background:#222;
-                            color:white;
-                            font-size:16px;
-                            font-weight:600;
-                        "
-                    >
-                        Коллектор
-                    </button>
-
-                    <button
-                        id="rainInletButton"
-                        type="button"
-                        style="
-                            height:48px;
-                            border:none;
-                            border-radius:12px;
-                            background:#222;
-                            color:white;
-                            font-size:16px;
-                            font-weight:600;
-                        "
-                    >
-                        Дождеприёмник
-                    </button>
-
-                </div>
-
-            </div>
-
-
-            <div class="wellField">
-
-                <label for="wellStatus">
-                    Состояние
-                </label>
-
-                <select id="wellStatus">
-
-                    <option value="active">
-                        Рабочее
-                    </option>
-
-                    <option value="needs_repair">
-                        Требует ремонта
-                    </option>
-
-                    <option value="broken">
-                        Неисправен
-                    </option>
-
-                    <option value="not_used">
-                        Не используется
-                    </option>
-
-                </select>
-
-            </div>
-
-
-            <div class="wellField">
-
-                <label>
-                    Требуемые работы
-                </label>
-
-                <div class="workList">
-
-                    <label class="workOption">
-
-                        <input
-                            type="checkbox"
-                            id="workConcrete"
-                        >
-
-                        <span>
-                            Требуется бетонирование
-                        </span>
-
-                    </label>
-
-
-                    <label class="workOption">
-
-                        <input
-                            type="checkbox"
-                            id="workCover"
-                        >
-
-                        <span>
-                            Требуется замена крышки
-                        </span>
-
-                    </label>
-
-
-                    <label class="workOption">
-
-                        <input
-                            type="checkbox"
-                            id="workKit"
-                        >
-
-                        <span>
-                            Требуется замена комплекта
-                        </span>
-
-                    </label>
-
-
-                    <label class="workOption">
-
-                        <input
-                            type="checkbox"
-                            id="workKcp"
-                        >
-
-                        <span>
-                            Требуется замена КЦП
-                        </span>
-
-                    </label>
-
-                </div>
-
-            </div>
-
-
-            <div class="wellField">
-
-                <label for="wellDescription">
-                    Описание
-                </label>
-
-                <textarea
-                    id="wellDescription"
-                    placeholder="Дополнительная информация..."
-                ></textarea>
-
-            </div>
-
-
-            <div class="wellField">
-
-                <label>
-                    Координаты
-                </label>
-
-                <div
-                    id="wellCoordinates"
-                    class="coordinatesBox"
-                >
-                    Координаты не выбраны
-                </div>
-
-            </div>
-
-
-            <div class="wellFormButtons">
-
-                <button
-                    id="createWellButton"
-                    class="createWellButton"
-                >
-                    Создать колодец
+                    Коллектор
                 </button>
 
                 <button
-                    id="cancelWellButton"
-                    class="cancelWellButton"
+                    id="rainInletButton"
+                    type="button"
+                    style="
+                        height:48px;
+                        border:none;
+                        border-radius:12px;
+                        background:#222;
+                        color:white;
+                        font-size:16px;
+                        font-weight:600;
+                    "
                 >
-                    Отмена
+                    Дождеприёмник
                 </button>
 
             </div>
 
         </div>
 
+
+        <div class="wellField">
+
+            <label for="wellStatus">
+                Состояние
+            </label>
+
+            <select id="wellStatus">
+
+                <option value="active">
+                    Рабочее
+                </option>
+
+                <option value="needs_repair">
+                    Требует ремонта
+                </option>
+
+                <option value="broken">
+                    Неисправен
+                </option>
+
+                <option value="not_used">
+                    Не используется
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <div class="wellField">
+
+            <label>
+                Требуемые работы
+            </label>
+
+            <div class="workList">
+
+                <label class="workOption">
+                    <input
+                        type="checkbox"
+                        id="workConcrete"
+                    >
+                    <span>
+                        Требуется бетонирование
+                    </span>
+                </label>
+
+                <label class="workOption">
+                    <input
+                        type="checkbox"
+                        id="workCover"
+                    >
+                    <span>
+                        Требуется замена крышки
+                    </span>
+                </label>
+
+                <label class="workOption">
+                    <input
+                        type="checkbox"
+                        id="workKit"
+                    >
+                    <span>
+                        Требуется замена комплекта
+                    </span>
+                </label>
+
+                <label class="workOption">
+                    <input
+                        type="checkbox"
+                        id="workKcp"
+                    >
+                    <span>
+                        Требуется замена КЦП
+                    </span>
+                </label>
+
+            </div>
+
+        </div>
+
+
+        <div class="wellField">
+
+            <label for="wellDescription">
+                Описание
+            </label>
+
+            <textarea
+                id="wellDescription"
+                placeholder="Дополнительная информация..."
+            ></textarea>
+
+        </div>
+
+
+        <div class="wellField">
+
+            <label>
+                Координаты
+            </label>
+
+            <div
+                id="wellCoordinates"
+                class="coordinatesBox"
+            >
+                Координаты не выбраны
+            </div>
+
+        </div>
+
+
+        <div class="wellFormButtons">
+
+            <button
+                id="createWellButton"
+                class="createWellButton"
+            >
+                Создать колодец
+            </button>
+
+            <button
+                id="cancelWellButton"
+                class="cancelWellButton"
+            >
+                Отмена
+            </button>
+
+        </div>
+
     </div>
 
-
-    <!-- =========================
-         НИЖНЯЯ НАВИГАЦИЯ
-         ========================= -->
-
-    <nav id="bottomNavigation">
-
-        <button
-            id="bottomMapButton"
-            class="bottomNavButton active"
-        >
-
-            <div class="bottomNavIcon">
-                🗺️
-            </div>
-
-            <div class="bottomNavLabel">
-                Карта
-            </div>
-
-        </button>
+</div>
 
 
-        <button
-            id="bottomMyWellsButton"
-            class="bottomNavButton"
-        >
+<!-- =========================
+     НИЖНЯЯ НАВИГАЦИЯ
+     ========================= -->
 
-            <div class="bottomNavIcon">
-                💧
-            </div>
+<nav id="bottomNavigation">
 
-            <div class="bottomNavLabel">
-                Мои колодцы
-            </div>
+    <button
+        id="bottomMapButton"
+        class="bottomNavButton active"
+    >
 
-        </button>
+        <div class="bottomNavIcon">
+            🗺️
+        </div>
+
+        <div class="bottomNavLabel">
+            Карта
+        </div>
+
+    </button>
 
 
-        <button
-            id="bottomPanelButton"
-            class="bottomNavButton"
-        >
+    <button
+        id="bottomMyWellsButton"
+        class="bottomNavButton"
+    >
 
-            <div class="bottomNavIcon">
-                ☰
-            </div>
+        <div class="bottomNavIcon">
+            💧
+        </div>
 
-            <div class="bottomNavLabel">
-                Панель
-            </div>
+        <div class="bottomNavLabel">
+            Мои колодцы
+        </div>
 
-        </button>
+    </button>
 
-    </nav>
+
+    <button
+        id="bottomPanelButton"
+        class="bottomNavButton"
+    >
+
+        <div class="bottomNavIcon">
+            ☰
+        </div>
+
+        <div class="bottomNavLabel">
+            Панель
+        </div>
+
+    </button>
+
+</nav>
 
 
 <script>
@@ -1562,8 +1857,7 @@
 
         showFatalError(
             'Telegram WebApp API не загрузился.\n\n' +
-            'Открой приложение именно через Telegram, ' +
-            'а не обычной вкладкой браузера.'
+            'Открой приложение именно через Telegram.'
         );
 
         return;
@@ -1588,12 +1882,6 @@
 
     const initData =
         tg.initData || '';
-
-
-    console.log(
-        'Telegram initData:',
-        initData
-    );
 
 
     if (!initData) {
@@ -1628,12 +1916,7 @@
 
             }
 
-        } catch (error) {
-
-            console.error(
-                'Ошибка Telegram alert:',
-                error
-            );
+        } catch {
 
             alert(
                 String(message)
@@ -1754,6 +2037,9 @@
     let allWells =
         [];
 
+    let visibleWells =
+        [];
+
     let userMarker =
         null;
 
@@ -1769,29 +2055,15 @@
     let selectedWellType =
         null;
 
+    let activeTypeFilter =
+        'all';
 
-    /* =========================
-       ЭЛЕМЕНТЫ
-       ========================= */
-
-    const registrationScreen =
-        document.getElementById(
-            'registrationScreen'
-        );
-
-    const registrationError =
-        document.getElementById(
-            'registrationError'
-        );
-
-    const loginButton =
-        document.getElementById(
-            'loginButton'
-        );
+    let activeStatusFilter =
+        'all';
 
 
     /* =========================
-       НИЖНЯЯ НАВИГАЦИЯ
+       НАВИГАЦИЯ
        ========================= */
 
     const bottomMapButton =
@@ -1809,7 +2081,6 @@
             'bottomPanelButton'
         );
 
-
     const myWellsPanel =
         document.getElementById(
             'myWellsPanel'
@@ -1820,15 +2091,14 @@
             'userPanel'
         );
 
-
-    const myWellsList =
+    const adminPanel =
         document.getElementById(
-            'myWellsList'
+            'adminPanel'
         );
 
 
     function setActiveNav(
-        activeButton
+        button
     ) {
 
         [
@@ -1836,9 +2106,9 @@
             bottomMyWellsButton,
             bottomPanelButton
         ].forEach(
-            button => {
+            item => {
 
-                button.classList.remove(
+                item.classList.remove(
                     'active'
                 );
 
@@ -1846,7 +2116,7 @@
         );
 
 
-        activeButton.classList.add(
+        button.classList.add(
             'active'
         );
 
@@ -1877,6 +2147,7 @@
         setActiveNav(
             bottomMapButton
         );
+
 
         setTimeout(
             () => {
@@ -1914,6 +2185,10 @@
         );
 
         updatePanelUser();
+
+        updateStatistics();
+
+        renderRecentWells();
 
         userPanel.classList.add(
             'open'
@@ -1969,7 +2244,6 @@
         currentUser =
             user || null;
 
-
         updatePanelUser();
 
     }
@@ -2021,7 +2295,7 @@
 
 
     /* =========================
-       ЗАГРУЗКА КОЛОДЦЕВ
+       ТЕКСТ
        ========================= */
 
     function escapeHtml(value) {
@@ -2074,6 +2348,111 @@
     }
 
 
+    /* =========================
+       ФИЛЬТРАЦИЯ
+       ========================= */
+
+    function getFilteredWells() {
+
+        return allWells.filter(
+            well => {
+
+                const typeMatches =
+                    activeTypeFilter === 'all' ||
+                    well.type === activeTypeFilter;
+
+
+                const statusMatches =
+                    activeStatusFilter === 'all' ||
+                    well.status === activeStatusFilter;
+
+
+                return (
+                    typeMatches &&
+                    statusMatches
+                );
+
+            }
+        );
+
+    }
+
+
+    function renderFilteredWells() {
+
+        wellsLayer.clearLayers();
+
+
+        visibleWells =
+            getFilteredWells();
+
+
+        visibleWells.forEach(
+            well => {
+
+                const marker =
+                    L.marker([
+                        Number(
+                            well.latitude
+                        ),
+                        Number(
+                            well.longitude
+                        )
+                    ]);
+
+
+                let popup =
+                    `<b>${escapeHtml(
+                        getTypeName(
+                            well.type
+                        )
+                    )}</b><br>`;
+
+
+                popup +=
+                    `Статус: ${escapeHtml(
+                        getStatusName(
+                            well.status
+                        )
+                    )}`;
+
+
+                if (
+                    well.description
+                ) {
+
+                    popup +=
+                        `<br>Описание: ${
+                            escapeHtml(
+                                well.description
+                            )
+                        }`;
+
+                }
+
+
+                marker.bindPopup(
+                    popup
+                );
+
+
+                marker.addTo(
+                    wellsLayer
+                );
+
+            }
+        );
+
+
+        updateStatistics();
+
+    }
+
+
+    /* =========================
+       ЗАГРУЗКА КОЛОДЦЕВ
+       ========================= */
+
     async function loadWells() {
 
         try {
@@ -2082,9 +2461,6 @@
                 await apiRequest(
                     'list_wells'
                 );
-
-
-            wellsLayer.clearLayers();
 
 
             const wells =
@@ -2097,61 +2473,7 @@
                 wells;
 
 
-            wells.forEach(
-                well => {
-
-                    const marker =
-                        L.marker([
-                            Number(
-                                well.latitude
-                            ),
-                            Number(
-                                well.longitude
-                            )
-                        ]);
-
-
-                    let popup =
-                        `<b>${escapeHtml(
-                            getTypeName(
-                                well.type
-                            )
-                        )}</b><br>`;
-
-
-                    popup +=
-                        `Статус: ${escapeHtml(
-                            getStatusName(
-                                well.status
-                            )
-                        )}`;
-
-
-                    if (
-                        well.description
-                    ) {
-
-                        popup +=
-                            `<br>Описание: ${
-                                escapeHtml(
-                                    well.description
-                                )
-                            }`;
-
-                    }
-
-
-                    marker.bindPopup(
-                        popup
-                    );
-
-
-                    marker.addTo(
-                        wellsLayer
-                    );
-
-                }
-            );
+            renderFilteredWells();
 
 
             console.log(
@@ -2167,6 +2489,7 @@
                 error
             );
 
+
             safeAlert(
                 'Не удалось загрузить колодцы:\n' +
                 error.message
@@ -2178,18 +2501,199 @@
 
 
     /* =========================
+       СТАТИСТИКА
+       ========================= */
+
+    function updateStatistics() {
+
+        const wells =
+            getFilteredWells();
+
+
+        const active =
+            wells.filter(
+                well =>
+                    well.status === 'active'
+            ).length;
+
+
+        const repair =
+            wells.filter(
+                well =>
+                    well.status === 'needs_repair'
+            ).length;
+
+
+        const broken =
+            wells.filter(
+                well =>
+                    well.status === 'broken'
+            ).length;
+
+
+        const collectors =
+            wells.filter(
+                well =>
+                    well.type === 'collector'
+            ).length;
+
+
+        const rainInlets =
+            wells.filter(
+                well =>
+                    well.type === 'rain_inlet'
+            ).length;
+
+
+        document.getElementById(
+            'statTotal'
+        ).textContent =
+            wells.length;
+
+
+        document.getElementById(
+            'statActive'
+        ).textContent =
+            active;
+
+
+        document.getElementById(
+            'statRepair'
+        ).textContent =
+            repair;
+
+
+        document.getElementById(
+            'statBroken'
+        ).textContent =
+            broken;
+
+
+        document.getElementById(
+            'statCollectors'
+        ).textContent =
+            collectors;
+
+
+        document.getElementById(
+            'statRainInlets'
+        ).textContent =
+            rainInlets;
+
+    }
+
+
+    /* =========================
+       КНОПКИ ФИЛЬТРОВ
+       ========================= */
+
+    document
+        .querySelectorAll(
+            '[data-filter-type]'
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    'click',
+                    () => {
+
+                        activeTypeFilter =
+                            button.dataset.filterType;
+
+
+                        document
+                            .querySelectorAll(
+                                '[data-filter-type]'
+                            )
+                            .forEach(
+                                item => {
+
+                                    item.classList.remove(
+                                        'active'
+                                    );
+
+                                }
+                            );
+
+
+                        button.classList.add(
+                            'active'
+                        );
+
+
+                        renderFilteredWells();
+
+                    }
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(
+            '[data-filter-status]'
+        )
+        .forEach(
+            button => {
+
+                button.addEventListener(
+                    'click',
+                    () => {
+
+                        activeStatusFilter =
+                            button.dataset.filterStatus;
+
+
+                        document
+                            .querySelectorAll(
+                                '[data-filter-status]'
+                            )
+                            .forEach(
+                                item => {
+
+                                    item.classList.remove(
+                                        'active'
+                                    );
+
+                                }
+                            );
+
+
+                        button.classList.add(
+                            'active'
+                        );
+
+
+                        renderFilteredWells();
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* =========================
        МОИ КОЛОДЦЫ
        ========================= */
 
     function renderMyWells() {
 
-        myWellsList.innerHTML =
+        const list =
+            document.getElementById(
+                'myWellsList'
+            );
+
+
+        list.innerHTML =
             '';
 
 
         if (!currentUser) {
 
-            myWellsList.innerHTML =
+            list.innerHTML =
                 `<div class="emptyState">
                     Пользователь не авторизован.
                 </div>`;
@@ -2202,8 +2706,12 @@
         const myWells =
             allWells.filter(
                 well =>
-                    Number(well.user_id) ===
-                    Number(currentUser.id)
+                    Number(
+                        well.user_id
+                    ) ===
+                    Number(
+                        currentUser.id
+                    )
             );
 
 
@@ -2217,7 +2725,7 @@
             myWells.length === 0
         ) {
 
-            myWellsList.innerHTML =
+            list.innerHTML =
                 `<div class="emptyState">
                     Вы пока не добавили ни одного колодца.
                 </div>`;
@@ -2330,7 +2838,7 @@
                 );
 
 
-                myWellsList.appendChild(
+                list.appendChild(
                     item
                 );
 
@@ -2340,13 +2848,212 @@
     }
 
 
+    /* =========================
+       ПОСЛЕДНИЕ КОЛОДЦЫ
+       ========================= */
+
+    function renderRecentWells() {
+
+        const list =
+            document.getElementById(
+                'recentWellsList'
+            );
+
+
+        list.innerHTML =
+            '';
+
+
+        const recent =
+            [...allWells]
+                .sort(
+                    (a, b) =>
+                        new Date(
+                            b.created_at || 0
+                        ) -
+                        new Date(
+                            a.created_at || 0
+                        )
+                )
+                .slice(0, 5);
+
+
+        if (
+            recent.length === 0
+        ) {
+
+            list.innerHTML =
+                `<div class="emptyState">
+                    Пока нет добавленных колодцев.
+                </div>`;
+
+            return;
+
+        }
+
+
+        recent.forEach(
+            well => {
+
+                const item =
+                    document.createElement(
+                        'div'
+                    );
+
+
+                item.className =
+                    'recentItem';
+
+
+                const date =
+                    well.created_at
+                        ? new Date(
+                            well.created_at
+                        ).toLocaleString(
+                            'ru-RU',
+                            {
+                                day: '2-digit',
+                                month: '2-digit',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            }
+                        )
+                        : '';
+
+
+                item.innerHTML = `
+
+                    <div class="recentItemTitle">
+                        ${escapeHtml(
+                            getTypeName(
+                                well.type
+                            )
+                        )}
+                    </div>
+
+                    <div class="recentItemMeta">
+                        ${escapeHtml(
+                            getStatusName(
+                                well.status
+                            )
+                        )}
+                        ${date ? ' · ' + date : ''}
+                    </div>
+
+                `;
+
+
+                item.addEventListener(
+                    'click',
+                    () => {
+
+                        showMap();
+
+
+                        map.setView(
+                            [
+                                Number(
+                                    well.latitude
+                                ),
+                                Number(
+                                    well.longitude
+                                )
+                            ],
+                            18
+                        );
+
+
+                        setTimeout(
+                            () => {
+
+                                wellsLayer.eachLayer(
+                                    marker => {
+
+                                        const position =
+                                            marker.getLatLng();
+
+
+                                        if (
+                                            Math.abs(
+                                                position.lat -
+                                                Number(
+                                                    well.latitude
+                                                )
+                                            ) < 0.000001 &&
+                                            Math.abs(
+                                                position.lng -
+                                                Number(
+                                                    well.longitude
+                                                )
+                                            ) < 0.000001
+                                        ) {
+
+                                            marker.openPopup();
+
+                                        }
+
+                                    }
+                                );
+
+                            },
+                            250
+                        );
+
+                    }
+                );
+
+
+                list.appendChild(
+                    item
+                );
+
+            }
+        );
+
+    }
+
+
+    /* =========================
+       БЫСТРЫЕ ДЕЙСТВИЯ
+       ========================= */
+
     document
         .getElementById(
-            'panelMapButton'
+            'panelLocationButton'
         )
         .addEventListener(
             'click',
-            showMap
+            () => {
+
+                showMap();
+
+                document
+                    .getElementById(
+                        'locationButton'
+                    )
+                    .click();
+
+            }
+        );
+
+
+    document
+        .getElementById(
+            'panelAddWellButton'
+        )
+        .addEventListener(
+            'click',
+            () => {
+
+                showMap();
+
+                document
+                    .getElementById(
+                        'addWellButton'
+                    )
+                    .click();
+
+            }
         );
 
 
@@ -2365,7 +3072,9 @@
        ========================= */
 
     document
-        .getElementById('locationButton')
+        .getElementById(
+            'locationButton'
+        )
         .addEventListener(
             'click',
             () => {
@@ -2379,6 +3088,7 @@
                     );
 
                     return;
+
                 }
 
 
@@ -2579,7 +3289,9 @@
 
 
     document
-        .getElementById('collectorButton')
+        .getElementById(
+            'collectorButton'
+        )
         .addEventListener(
             'click',
             () => {
@@ -2594,7 +3306,9 @@
 
 
     document
-        .getElementById('rainInletButton')
+        .getElementById(
+            'rainInletButton'
+        )
         .addEventListener(
             'click',
             () => {
@@ -2680,7 +3394,9 @@
 
 
     document
-        .getElementById('cancelWellButton')
+        .getElementById(
+            'cancelWellButton'
+        )
         .addEventListener(
             'click',
             resetWellForm
@@ -2688,7 +3404,9 @@
 
 
     document
-        .getElementById('createWellButton')
+        .getElementById(
+            'createWellButton'
+        )
         .addEventListener(
             'click',
             async () => {
@@ -2700,6 +3418,7 @@
                     );
 
                     return;
+
                 }
 
 
@@ -2713,6 +3432,7 @@
                     );
 
                     return;
+
                 }
 
 
@@ -2874,6 +3594,7 @@
                     'Введите пригласительный код.';
 
                 return;
+
             }
 
 
@@ -2883,6 +3604,7 @@
                     'Введите никнейм.';
 
                 return;
+
             }
 
 
@@ -2894,6 +3616,7 @@
                     'Никнейм должен содержать минимум 3 символа.';
 
                 return;
+
             }
 
 
@@ -2917,12 +3640,6 @@
                                 nickname
                         }
                     );
-
-
-                console.log(
-                    'Регистрация:',
-                    data
-                );
 
 
                 setCurrentUser(
@@ -2973,11 +3690,6 @@
     /* =========================
        АДМИНКА
        ========================= */
-
-    const adminPanel =
-        document.getElementById(
-            'adminPanel'
-        );
 
     const adminBackButton =
         document.getElementById(
@@ -3217,15 +3929,10 @@
 
 
     /* =========================
-       АВТОРИЗАЦИЯ ПРИ ЗАПУСКЕ
+       АВТОРИЗАЦИЯ
        ========================= */
 
     async function initApp() {
-
-        console.log(
-            'Запуск приложения...'
-        );
-
 
         try {
 
@@ -3233,12 +3940,6 @@
                 await apiRequest(
                     'get_user'
                 );
-
-
-            console.log(
-                'Ответ авторизации:',
-                data
-            );
 
 
             if (
@@ -3258,20 +3959,10 @@
                 await loadWells();
 
 
-                console.log(
-                    'Существующий пользователь авторизован.'
-                );
-
-
             } else {
 
                 registrationScreen.style.display =
                     'flex';
-
-
-                console.log(
-                    'Пользователь не зарегистрирован.'
-                );
 
             }
 
@@ -3296,10 +3987,6 @@
 
     }
 
-
-    /* =========================
-       СТАРТ
-       ========================= */
 
     initApp();
 
