@@ -2,18 +2,22 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Карта колодцев</title>
 
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
+    <!-- MAPBOX -->
     <link
+        href="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.css"
         rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     >
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.js"></script>
 
     <style>
         * {
@@ -83,6 +87,32 @@
         #addWellButton.active {
             background: white;
             color: #111;
+        }
+
+        /* =========================
+           MAPBOX
+           ========================= */
+
+        .mapboxgl-popup-content {
+            color: #111;
+            border-radius: 12px;
+            padding: 13px 15px;
+            font-family: Arial, sans-serif;
+        }
+
+        .mapboxgl-popup-close-button {
+            font-size: 20px;
+            padding: 4px 8px;
+        }
+
+        .mapboxgl-ctrl-group {
+            border-radius: 12px !important;
+            overflow: hidden;
+        }
+
+        .mapboxgl-ctrl-group button {
+            width: 38px;
+            height: 38px;
         }
 
         /* =========================
@@ -218,10 +248,6 @@
         /* =========================
            МОИ КОЛОДЦЫ
            ========================= */
-
-        #myWellsPanel {
-            composes: fullPanel;
-        }
 
         #myWellsList {
             flex: 1;
@@ -991,7 +1017,6 @@
 
 <div id="map"></div>
 
-
 <button
     id="locationButton"
     class="map-button"
@@ -1071,10 +1096,7 @@
 
     </div>
 
-
     <div id="userPanelContent">
-
-        <!-- Профиль -->
 
         <div class="profileCard">
 
@@ -1107,8 +1129,6 @@
         </div>
 
 
-        <!-- Быстрые действия -->
-
         <div class="panelSection">
 
             <div class="panelSectionTitle">
@@ -1119,17 +1139,13 @@
                 id="panelLocationButton"
                 class="panelItem"
             >
-                <div class="panelItemIcon">
-                    📍
-                </div>
+                <div class="panelItemIcon">📍</div>
 
                 <div class="panelItemText">
                     Моё местоположение
                 </div>
 
-                <div class="panelItemArrow">
-                    ›
-                </div>
+                <div class="panelItemArrow">›</div>
             </button>
 
 
@@ -1137,23 +1153,17 @@
                 id="panelAddWellButton"
                 class="panelItem"
             >
-                <div class="panelItemIcon">
-                    ＋
-                </div>
+                <div class="panelItemIcon">＋</div>
 
                 <div class="panelItemText">
                     Добавить колодец
                 </div>
 
-                <div class="panelItemArrow">
-                    ›
-                </div>
+                <div class="panelItemArrow">›</div>
             </button>
 
         </div>
 
-
-        <!-- Фильтры -->
 
         <div class="panelSection">
 
@@ -1244,8 +1254,6 @@
         </div>
 
 
-        <!-- Статистика -->
-
         <div class="panelSection">
 
             <div class="panelSectionTitle">
@@ -1255,106 +1263,39 @@
             <div class="statsGrid">
 
                 <div class="statCard">
-
-                    <div
-                        id="statTotal"
-                        class="statValue"
-                    >
-                        0
-                    </div>
-
-                    <div class="statLabel">
-                        Всего
-                    </div>
-
+                    <div id="statTotal" class="statValue">0</div>
+                    <div class="statLabel">Всего</div>
                 </div>
 
-
                 <div class="statCard">
-
-                    <div
-                        id="statActive"
-                        class="statValue"
-                    >
-                        0
-                    </div>
-
-                    <div class="statLabel">
-                        Рабочие
-                    </div>
-
+                    <div id="statActive" class="statValue">0</div>
+                    <div class="statLabel">Рабочие</div>
                 </div>
 
-
                 <div class="statCard">
-
-                    <div
-                        id="statRepair"
-                        class="statValue"
-                    >
-                        0
-                    </div>
-
-                    <div class="statLabel">
-                        Требуют ремонта
-                    </div>
-
+                    <div id="statRepair" class="statValue">0</div>
+                    <div class="statLabel">Требуют ремонта</div>
                 </div>
 
-
                 <div class="statCard">
-
-                    <div
-                        id="statBroken"
-                        class="statValue"
-                    >
-                        0
-                    </div>
-
-                    <div class="statLabel">
-                        Неисправные
-                    </div>
-
+                    <div id="statBroken" class="statValue">0</div>
+                    <div class="statLabel">Неисправные</div>
                 </div>
 
-
                 <div class="statCard">
-
-                    <div
-                        id="statCollectors"
-                        class="statValue"
-                    >
-                        0
-                    </div>
-
-                    <div class="statLabel">
-                        Коллекторы
-                    </div>
-
+                    <div id="statCollectors" class="statValue">0</div>
+                    <div class="statLabel">Коллекторы</div>
                 </div>
 
-
                 <div class="statCard">
-
-                    <div
-                        id="statRainInlets"
-                        class="statValue"
-                    >
-                        0
-                    </div>
-
-                    <div class="statLabel">
-                        Дождеприёмники
-                    </div>
-
+                    <div id="statRainInlets" class="statValue">0</div>
+                    <div class="statLabel">Дождеприёмники</div>
                 </div>
 
             </div>
 
         </div>
 
-
-        <!-- Последние -->
 
         <div class="panelSection">
 
@@ -1370,8 +1311,6 @@
         </div>
 
 
-        <!-- Навигация -->
-
         <div class="panelSection">
 
             <div class="panelSectionTitle">
@@ -1383,24 +1322,18 @@
                 class="panelItem"
             >
 
-                <div class="panelItemIcon">
-                    💧
-                </div>
+                <div class="panelItemIcon">💧</div>
 
                 <div class="panelItemText">
                     Мои колодцы
                 </div>
 
-                <div class="panelItemArrow">
-                    ›
-                </div>
+                <div class="panelItemArrow">›</div>
 
             </button>
 
         </div>
 
-
-        <!-- Админ -->
 
         <div class="panelSection">
 
@@ -1414,17 +1347,13 @@
                 style="display:none;"
             >
 
-                <div class="panelItemIcon">
-                    ⚙️
-                </div>
+                <div class="panelItemIcon">⚙️</div>
 
                 <div class="panelItemText">
                     Администрирование
                 </div>
 
-                <div class="panelItemArrow">
-                    ›
-                </div>
+                <div class="panelItemArrow">›</div>
 
             </button>
 
@@ -1708,7 +1637,6 @@
         id="bottomMapButton"
         class="bottomNavButton active"
     >
-
         <div class="bottomNavIcon">
             🗺️
         </div>
@@ -1716,7 +1644,6 @@
         <div class="bottomNavLabel">
             Карта
         </div>
-
     </button>
 
 
@@ -1724,7 +1651,6 @@
         id="bottomMyWellsButton"
         class="bottomNavButton"
     >
-
         <div class="bottomNavIcon">
             💧
         </div>
@@ -1732,7 +1658,6 @@
         <div class="bottomNavLabel">
             Мои колодцы
         </div>
-
     </button>
 
 
@@ -1740,7 +1665,6 @@
         id="bottomPanelButton"
         class="bottomNavButton"
     >
-
         <div class="bottomNavIcon">
             ☰
         </div>
@@ -1748,7 +1672,6 @@
         <div class="bottomNavLabel">
             Панель
         </div>
-
     </button>
 
 </nav>
@@ -1761,12 +1684,20 @@
     'use strict';
 
 
+    /* =========================
+       НАСТРОЙКИ
+       ========================= */
+
     const API_URL =
         'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api';
 
 
+    const MAPBOX_TOKEN =
+        'pk.eyJ1IjoidWdseWtvbG9kZWMiLCJhIjoiY211cW1qd3huMDJhYjM0c2Q3dTl2bjdndCJ9.ZAvl2BhVyop3rBo2hru3yA';
+
+
     /* =========================
-       ОШИБКИ
+       DOM
        ========================= */
 
     const fatalError =
@@ -1778,6 +1709,19 @@
     const fatalReload =
         document.getElementById('fatalReload');
 
+    const registrationScreen =
+        document.getElementById('registrationScreen');
+
+    const registrationError =
+        document.getElementById('registrationError');
+
+    const loginButton =
+        document.getElementById('loginButton');
+
+
+    /* =========================
+       ОШИБКИ
+       ========================= */
 
     function showFatalError(message) {
 
@@ -2001,30 +1945,39 @@
 
 
     /* =========================
-       КАРТА
+       MAPBOX
        ========================= */
 
+    mapboxgl.accessToken =
+        MAPBOX_TOKEN;
+
+
     const map =
-        L.map('map')
-        .setView(
-            [51.1605, 71.4704],
-            12
-        );
+        new mapboxgl.Map({
+
+            container: 'map',
+
+            style:
+                'mapbox://styles/mapbox/standard',
+
+            center: [
+                71.4704,
+                51.1605
+            ],
+
+            zoom: 12,
+
+            attributionControl: true
+
+        });
 
 
-    const wellsLayer =
-        L.layerGroup()
-        .addTo(map);
-
-
-    L.tileLayer(
-        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {
-            maxZoom: 19,
-            attribution:
-                '&copy; OpenStreetMap contributors'
-        }
-    ).addTo(map);
+    map.addControl(
+        new mapboxgl.NavigationControl({
+            showCompass: false
+        }),
+        'top-right'
+    );
 
 
     /* =========================
@@ -2040,8 +1993,8 @@
     let visibleWells =
         [];
 
-    let userMarker =
-        null;
+    let wellMarkers =
+        [];
 
     let addingWell =
         false;
@@ -2060,6 +2013,345 @@
 
     let activeStatusFilter =
         'all';
+
+    let currentLocation =
+        null;
+
+    let locationRequestInProgress =
+        false;
+
+
+    /* =========================
+       ГЕОЛОКАЦИЯ — MAPBOX СЛОИ
+       ========================= */
+
+    function createAccuracyCircle(
+        latitude,
+        longitude,
+        accuracy
+    ) {
+
+        const radius =
+            Math.max(
+                Number(accuracy) || 0,
+                1
+            );
+
+        const points = 64;
+
+        const coordinates = [];
+
+        const earthRadius = 6378137;
+
+        const latRad =
+            latitude * Math.PI / 180;
+
+        for (
+            let i = 0;
+            i <= points;
+            i++
+        ) {
+
+            const angle =
+                i / points *
+                Math.PI *
+                2;
+
+            const dx =
+                radius *
+                Math.cos(angle);
+
+            const dy =
+                radius *
+                Math.sin(angle);
+
+            const lat =
+                latitude +
+                (
+                    dy /
+                    earthRadius
+                ) *
+                180 /
+                Math.PI;
+
+            const lng =
+                longitude +
+                (
+                    dx /
+                    (
+                        earthRadius *
+                        Math.cos(latRad)
+                    )
+                ) *
+                180 /
+                Math.PI;
+
+            coordinates.push([
+                lng,
+                lat
+            ]);
+
+        }
+
+        return {
+            type: 'Feature',
+            geometry: {
+                type: 'Polygon',
+                coordinates: [
+                    coordinates
+                ]
+            },
+            properties: {}
+        };
+
+    }
+
+
+    function updateUserLocationOnMap(
+        latitude,
+        longitude,
+        accuracy
+    ) {
+
+        currentLocation = {
+            latitude,
+            longitude,
+            accuracy
+        };
+
+
+        const point =
+            {
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: [
+                        longitude,
+                        latitude
+                    ]
+                },
+                properties: {}
+            };
+
+
+        const circle =
+            createAccuracyCircle(
+                latitude,
+                longitude,
+                accuracy
+            );
+
+
+        if (
+            map.getSource(
+                'user-location'
+            )
+        ) {
+
+            map.getSource(
+                'user-location'
+            ).setData(
+                point
+            );
+
+            map.getSource(
+                'user-accuracy'
+            ).setData(
+                circle
+            );
+
+            return;
+
+        }
+
+
+        map.addSource(
+            'user-location',
+            {
+                type: 'geojson',
+                data: point
+            }
+        );
+
+
+        map.addSource(
+            'user-accuracy',
+            {
+                type: 'geojson',
+                data: circle
+            }
+        );
+
+
+        map.addLayer({
+            id: 'user-accuracy-fill',
+            type: 'fill',
+            source: 'user-accuracy',
+            paint: {
+                'fill-color':
+                    '#2196F3',
+                'fill-opacity':
+                    0.12
+            }
+        });
+
+
+        map.addLayer({
+            id: 'user-accuracy-line',
+            type: 'line',
+            source: 'user-accuracy',
+            paint: {
+                'line-color':
+                    '#2196F3',
+                'line-width':
+                    1.5,
+                'line-opacity':
+                    0.35
+            }
+        });
+
+
+        map.addLayer({
+            id: 'user-location-dot',
+            type: 'circle',
+            source: 'user-location',
+            paint: {
+                'circle-radius': 8,
+                'circle-color':
+                    '#2196F3',
+                'circle-stroke-color':
+                    '#FFFFFF',
+                'circle-stroke-width': 3
+            }
+        });
+
+    }
+
+
+    function requestUserLocation(
+        shouldCenter = true
+    ) {
+
+        if (
+            locationRequestInProgress
+        ) {
+            return;
+        }
+
+
+        if (
+            !navigator.geolocation
+        ) {
+
+            safeAlert(
+                'Ваш браузер не поддерживает геолокацию.'
+            );
+
+            return;
+
+        }
+
+
+        locationRequestInProgress =
+            true;
+
+
+        navigator.geolocation.getCurrentPosition(
+
+            position => {
+
+                locationRequestInProgress =
+                    false;
+
+
+                const latitude =
+                    position.coords.latitude;
+
+                const longitude =
+                    position.coords.longitude;
+
+                const accuracy =
+                    position.coords.accuracy;
+
+
+                updateUserLocationOnMap(
+                    latitude,
+                    longitude,
+                    accuracy
+                );
+
+
+                if (shouldCenter) {
+
+                    map.flyTo({
+                        center: [
+                            longitude,
+                            latitude
+                        ],
+                        zoom: 17,
+                        duration: 1000
+                    });
+
+                }
+
+            },
+
+            error => {
+
+                locationRequestInProgress =
+                    false;
+
+
+                console.error(
+                    'Геолокация:',
+                    error
+                );
+
+
+                if (
+                    error.code ===
+                    error.PERMISSION_DENIED
+                ) {
+
+                    console.log(
+                        'Пользователь запретил геолокацию.'
+                    );
+
+                } else {
+
+                    console.log(
+                        'Не удалось определить местоположение.'
+                    );
+
+                }
+
+            },
+
+            {
+                enableHighAccuracy: true,
+                timeout: 12000,
+                maximumAge: 30000
+            }
+
+        );
+
+    }
+
+
+    /* =========================
+       ПОЛУЧАЕМ GPS ПОСЛЕ ЗАГРУЗКИ КАРТЫ
+       ========================= */
+
+    map.on(
+        'load',
+        () => {
+
+            requestUserLocation(
+                true
+            );
+
+        }
+    );
 
 
     /* =========================
@@ -2151,7 +2443,9 @@
 
         setTimeout(
             () => {
-                map.invalidateSize();
+
+                map.resize();
+
             },
             50
         );
@@ -2378,9 +2672,33 @@
     }
 
 
+    /* =========================
+       ОЧИСТКА МАРКЕРОВ
+       ========================= */
+
+    function clearWellMarkers() {
+
+        wellMarkers.forEach(
+            marker => {
+
+                marker.remove();
+
+            }
+        );
+
+
+        wellMarkers = [];
+
+    }
+
+
+    /* =========================
+       РЕНДЕР КОЛОДЦЕВ
+       ========================= */
+
     function renderFilteredWells() {
 
-        wellsLayer.clearLayers();
+        clearWellMarkers();
 
 
         visibleWells =
@@ -2390,18 +2708,35 @@
         visibleWells.forEach(
             well => {
 
+                const latitude =
+                    Number(
+                        well.latitude
+                    );
+
+                const longitude =
+                    Number(
+                        well.longitude
+                    );
+
+
                 const marker =
-                    L.marker([
-                        Number(
-                            well.latitude
-                        ),
-                        Number(
-                            well.longitude
-                        )
+                    new mapboxgl.Marker({
+                        color:
+                            well.status === 'active'
+                                ? '#22c55e'
+                                : well.status === 'needs_repair'
+                                    ? '#eab308'
+                                    : well.status === 'broken'
+                                        ? '#ef4444'
+                                        : '#555'
+                    })
+                    .setLngLat([
+                        longitude,
+                        latitude
                     ]);
 
 
-                let popup =
+                let popupHtml =
                     `<b>${escapeHtml(
                         getTypeName(
                             well.type
@@ -2409,7 +2744,7 @@
                     )}</b><br>`;
 
 
-                popup +=
+                popupHtml +=
                     `Статус: ${escapeHtml(
                         getStatusName(
                             well.status
@@ -2421,7 +2756,7 @@
                     well.description
                 ) {
 
-                    popup +=
+                    popupHtml +=
                         `<br>Описание: ${
                             escapeHtml(
                                 well.description
@@ -2431,13 +2766,31 @@
                 }
 
 
-                marker.bindPopup(
-                    popup
-                );
+                popupHtml +=
+                    `<br><small>` +
+                    `${latitude.toFixed(6)}, ` +
+                    `${longitude.toFixed(6)}` +
+                    `</small>`;
 
 
-                marker.addTo(
-                    wellsLayer
+                const popup =
+                    new mapboxgl.Popup({
+                        offset: 28
+                    })
+                    .setHTML(
+                        popupHtml
+                    );
+
+
+                marker
+                    .setPopup(
+                        popup
+                    )
+                    .addTo(map);
+
+
+                wellMarkers.push(
+                    marker
                 );
 
             }
@@ -2473,7 +2826,20 @@
                 wells;
 
 
-            renderFilteredWells();
+            if (map.loaded()) {
+
+                renderFilteredWells();
+
+            } else {
+
+                map.once(
+                    'load',
+                    () => {
+                        renderFilteredWells();
+                    }
+                );
+
+            }
 
 
             console.log(
@@ -2584,7 +2950,7 @@
 
 
     /* =========================
-       КНОПКИ ФИЛЬТРОВ
+       ФИЛЬТРЫ
        ========================= */
 
     document
@@ -2678,6 +3044,70 @@
     /* =========================
        МОИ КОЛОДЦЫ
        ========================= */
+
+    function openWellOnMap(well) {
+
+        showMap();
+
+
+        const latitude =
+            Number(
+                well.latitude
+            );
+
+        const longitude =
+            Number(
+                well.longitude
+            );
+
+
+        map.flyTo({
+            center: [
+                longitude,
+                latitude
+            ],
+            zoom: 18,
+            duration: 800
+        });
+
+
+        setTimeout(
+            () => {
+
+                const marker =
+                    wellMarkers.find(
+                        item => {
+
+                            const position =
+                                item.getLngLat();
+
+                            return (
+                                Math.abs(
+                                    position.lat -
+                                    latitude
+                                ) < 0.000001 &&
+                                Math.abs(
+                                    position.lng -
+                                    longitude
+                                ) < 0.000001
+                            );
+
+                        }
+                    );
+
+
+                if (marker) {
+
+                    marker.togglePopup();
+
+                }
+
+            },
+            900
+        );
+
+    }
+
 
     function renderMyWells() {
 
@@ -2782,56 +3212,8 @@
                     'click',
                     () => {
 
-                        showMap();
-
-
-                        map.setView(
-                            [
-                                Number(
-                                    well.latitude
-                                ),
-                                Number(
-                                    well.longitude
-                                )
-                            ],
-                            18
-                        );
-
-
-                        setTimeout(
-                            () => {
-
-                                wellsLayer.eachLayer(
-                                    marker => {
-
-                                        const position =
-                                            marker.getLatLng();
-
-
-                                        if (
-                                            Math.abs(
-                                                position.lat -
-                                                Number(
-                                                    well.latitude
-                                                )
-                                            ) < 0.000001 &&
-                                            Math.abs(
-                                                position.lng -
-                                                Number(
-                                                    well.longitude
-                                                )
-                                            ) < 0.000001
-                                        ) {
-
-                                            marker.openPopup();
-
-                                        }
-
-                                    }
-                                );
-
-                            },
-                            250
+                        openWellOnMap(
+                            well
                         );
 
                     }
@@ -2947,56 +3329,8 @@
                     'click',
                     () => {
 
-                        showMap();
-
-
-                        map.setView(
-                            [
-                                Number(
-                                    well.latitude
-                                ),
-                                Number(
-                                    well.longitude
-                                )
-                            ],
-                            18
-                        );
-
-
-                        setTimeout(
-                            () => {
-
-                                wellsLayer.eachLayer(
-                                    marker => {
-
-                                        const position =
-                                            marker.getLatLng();
-
-
-                                        if (
-                                            Math.abs(
-                                                position.lat -
-                                                Number(
-                                                    well.latitude
-                                                )
-                                            ) < 0.000001 &&
-                                            Math.abs(
-                                                position.lng -
-                                                Number(
-                                                    well.longitude
-                                                )
-                                            ) < 0.000001
-                                        ) {
-
-                                            marker.openPopup();
-
-                                        }
-
-                                    }
-                                );
-
-                            },
-                            250
+                        openWellOnMap(
+                            well
                         );
 
                     }
@@ -3027,11 +3361,9 @@
 
                 showMap();
 
-                document
-                    .getElementById(
-                        'locationButton'
-                    )
-                    .click();
+                requestUserLocation(
+                    true
+                );
 
             }
         );
@@ -3068,7 +3400,7 @@
 
 
     /* =========================
-       ГЕОЛОКАЦИЯ
+       КНОПКА МОЕГО МЕСТОПОЛОЖЕНИЯ
        ========================= */
 
     document
@@ -3079,89 +3411,8 @@
             'click',
             () => {
 
-                if (
-                    !navigator.geolocation
-                ) {
-
-                    safeAlert(
-                        'Ваш браузер не поддерживает геолокацию.'
-                    );
-
-                    return;
-
-                }
-
-
-                navigator.geolocation.getCurrentPosition(
-
-                    position => {
-
-                        const latitude =
-                            position.coords.latitude;
-
-                        const longitude =
-                            position.coords.longitude;
-
-
-                        map.setView(
-                            [
-                                latitude,
-                                longitude
-                            ],
-                            17
-                        );
-
-
-                        if (userMarker) {
-
-                            userMarker.setLatLng([
-                                latitude,
-                                longitude
-                            ]);
-
-                        } else {
-
-                            userMarker =
-                                L.circleMarker(
-                                    [
-                                        latitude,
-                                        longitude
-                                    ],
-                                    {
-                                        radius: 8,
-                                        color: '#1976d2',
-                                        fillColor: '#2196f3',
-                                        fillOpacity: 1,
-                                        weight: 3
-                                    }
-                                )
-                                .addTo(map);
-
-                        }
-
-                    },
-
-                    error => {
-
-                        console.error(
-                            'Геолокация:',
-                            error
-                        );
-
-
-                        safeAlert(
-                            'Не удалось определить местоположение.\n\n' +
-                            'Проверьте разрешение на геолокацию для Telegram.'
-                        );
-
-                    },
-
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 0
-                    }
-
+                requestUserLocation(
+                    true
                 );
 
             }
@@ -3234,11 +3485,11 @@
 
 
             selectedWellLatitude =
-                event.latlng.lat;
+                event.lngLat.lat;
 
 
             selectedWellLongitude =
-                event.latlng.lng;
+                event.lngLat.lng;
 
 
             selectedWellType =
