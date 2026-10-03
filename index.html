@@ -1609,6 +1609,20 @@
 
         </div>
 
+                <div class="wellField">
+
+            <label for="wellApproxAddress">
+                Адрес для ориентира
+            </label>
+
+            <input
+                type="text"
+                id="wellApproxAddress"
+                placeholder="Например: Тархана, 17"
+                maxlength="200"
+            >
+
+        </div>
 
         <div class="wellField">
 
@@ -3946,6 +3960,10 @@
                         'wellDescription'
                     ).value.trim();
 
+                const approxAddress =
+    document.getElementById(
+        'wellApproxAddress'
+    ).value.trim();
 
                 const workRequirements = {
 
@@ -3998,11 +4016,15 @@
                                     status,
 
                                 description:
-                                    description ||
-                                    null,
+    description ||
+    null,
 
-                                workRequirements:
-                                    workRequirements
+approxAddress:
+    approxAddress ||
+    null,
+
+workRequirements:
+    workRequirements
                             }
                         );
 
