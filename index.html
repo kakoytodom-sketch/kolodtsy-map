@@ -1442,7 +1442,7 @@
     <button
         id="adminUsersButton"
         class="generateInviteButton"
-        onclick="alert('Кнопка работает')"
+        
     >
         👥 Управление пользователями
     </button>
@@ -4790,6 +4790,95 @@
 
             }
         );
+async function loadAdminUsers() {
+
+    const list =
+        document.getElementById(
+            'adminUsersList'
+        );
+
+    list.style.display = 'block';
+
+    list.innerHTML =
+        '<div class="inviteItem">Загрузка пользователей...</div>';
+
+    try {
+
+        const data =
+            await apiRequest(
+                'list_users'
+            );
+
+        const users =
+            data.users || [];
+
+        if (!users.length) {
+
+            list.innerHTML =
+                '<div class="inviteItem">Пользователей пока нет.</div>';
+
+            return;
+        }
+
+        list.innerHTML =
+            users
+                .map(
+                    user => {
+
+                        const roleLabel =
+                            user.role === 'admin'
+                                ? 'Администратор'
+                                : 'Пользователь';
+
+                        const icon =
+                            user.role === 'admin'
+                                ? '👑'
+                                : '👤';
+
+                        return `
+                            <div
+                                class="inviteItem"
+                                data-user-id="${user.id}"
+                            >
+
+                                <div class="inviteCode">
+                                    ${icon} ${user.nickname}
+                                </div>
+
+                                <div class="inviteStatus">
+                                    ${roleLabel}
+                                </div>
+
+                                <div class="inviteStatus">
+                                    Колодцев: ${user.well_count}
+                                </div>
+
+                            </div>
+                        `;
+
+                    }
+                )
+                .join('');
+
+    } catch (error) {
+
+        console.error(
+            'Ошибка загрузки пользователей:',
+            error
+        );
+
+        list.innerHTML = `
+            <div class="inviteItem">
+                Ошибка загрузки пользователей:
+                ${error.message}
+            </div>
+        `;
+
+    }
+
+}
+
+
 document
     .getElementById(
         'adminUsersButton'
@@ -4808,8 +4897,7 @@ document
                 'none'
             ) {
 
-                list.style.display =
-                    'block';
+                await loadAdminUsers();
 
             } else {
 
