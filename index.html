@@ -797,7 +797,8 @@
         }
 
         .wellField select,
-        .wellField textarea {
+        .wellField textarea,
+        .wellField input[type="text"] {
             width: 100%;
 
             border: 1px solid #303030;
@@ -819,6 +820,22 @@
             min-height: 100px;
             padding: 12px;
             resize: none;
+        }
+
+        .wellField input[type="text"] {
+            height: 48px;
+            padding: 0 12px;
+        }
+
+        .wellField input[type="text"]::placeholder,
+        .wellField textarea::placeholder {
+            color: #666;
+        }
+
+        .wellField input[type="text"]:focus,
+        .wellField textarea:focus,
+        .wellField select:focus {
+            border-color: #777;
         }
 
         .workList {
@@ -1447,7 +1464,7 @@
 
     <div class="wellFormBox">
 
-        <h2>
+        <h2 id="wellFormTitle">
             Новый колодец
         </h2>
 
@@ -1609,7 +1626,8 @@
 
         </div>
 
-                <div class="wellField">
+
+        <div class="wellField">
 
             <label for="wellApproxAddress">
                 Адрес для ориентира
@@ -1623,6 +1641,7 @@
             >
 
         </div>
+
 
         <div class="wellField">
 
@@ -2056,8 +2075,10 @@
 
     let selectedWellType =
         null;
-let editingWellId =
-    null;
+
+    let editingWellId =
+        null;
+
     let activeTypeFilter =
         'all';
 
@@ -2851,39 +2872,98 @@ let editingWellId =
                 }
 
 
-                if (well.approx_address) {
+                if (
+                    well.approx_address
+                ) {
 
-    popupHtml +=
-        `<br><strong>Ориентир:</strong> ` +
-        `${escapeHtml(well.approx_address)}`;
+                    popupHtml +=
+                        `<br><strong>Ориентир:</strong> ` +
+                        `${escapeHtml(
+                            well.approx_address
+                        )}`;
 
-}
+                }
+
+
+                /* =========================
+                   КНОПКИ УПРАВЛЕНИЯ
+                   ========================= */
 
                 if (
-    currentUser &&
-    (
-        currentUser.role === 'admin' ||
-        Number(currentUser.id) === Number(well.user_id)
-    )
-) {
+                    currentUser &&
+                    (
+                        currentUser.role === 'admin' ||
+                        Number(currentUser.id) === Number(well.user_id)
+                    )
+                ) {
 
-    popupHtml +=
-        `<br><button
-            class="deleteWellButton"
-            data-well-id="${well.id}"
-            style="
-                margin-top:10px;
-                width:100%;
-                padding:8px;
-                border:none;
-                border-radius:8px;
-                background:#ef4444;
-                color:white;
-                cursor:pointer;
-            "
-        >Удалить колодец</button>`;
+                    popupHtml +=
+                        `<br>
+                        <button
+                            class="editWellButton"
+                            data-well-id="${well.id}"
+                            style="
+                                margin-top:10px;
+                                width:100%;
+                                padding:8px;
+                                border:none;
+                                border-radius:8px;
+                                background:#2563eb;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >Редактировать</button>
 
-}
+                        <button
+                            class="deleteWellButton"
+                            data-well-id="${well.id}"
+                            style="
+                                margin-top:8px;
+                                width:100%;
+                                padding:8px;
+                                border:none;
+                                border-radius:8px;
+                                background:#ef4444;
+                                color:white;
+                                cursor:pointer;
+                            "
+                        >Удалить колодец</button>`;
+
+                }
+
+
+                popupHtml +=
+                    `<br><small>` +
+                    `${latitude.toFixed(6)}, ` +
+                    `${longitude.toFixed(6)}` +
+                    `</small>`;
+
+
+                const popup =
+                    new mapboxgl.Popup({
+                        offset: 28
+                    })
+                    .setHTML(
+                        popupHtml
+                    );
+
+
+                marker
+                    .setPopup(
+                        popup
+                    )
+                    .addTo(map);
+
+
+                wellMarkers.push(
+                    marker
+                );
+
+            }
+        );
+
+    }
+
 
     /* =========================
        ЗАГРУЗКА КОЛОДЦЕВ
@@ -3516,6 +3596,16 @@ let editingWellId =
             'wellForm'
         );
 
+    const wellFormTitle =
+        document.getElementById(
+            'wellFormTitle'
+        );
+
+    const createWellButton =
+        document.getElementById(
+            'createWellButton'
+        );
+
     const selectedTypeElement =
         document.getElementById(
             'selectedType'
@@ -3557,13 +3647,139 @@ let editingWellId =
     }
 
 
+    /* =========================
+       ОТКРЫТИЕ ФОРМЫ СОЗДАНИЯ
+       ========================= */
+
     function openWellForm() {
 
-        selectedWellType =
-            null;
+        if (
+            editingWellId === null
+        ) {
 
-        selectedTypeElement.textContent =
-            'Тип не выбран';
+            selectedWellType =
+                null;
+
+            selectedTypeElement.textContent =
+                'Тип не выбран';
+
+        }
+
+
+        updateWellCoordinatesDisplay();
+
+
+        wellForm.style.display =
+            'flex';
+
+    }
+
+
+    /* =========================
+       ОТКРЫТИЕ ФОРМЫ РЕДАКТИРОВАНИЯ
+       ========================= */
+
+    function openEditWellForm(well) {
+
+        editingWellId =
+            Number(
+                well.id
+            );
+
+
+        selectedWellLatitude =
+            Number(
+                well.latitude
+            );
+
+
+        selectedWellLongitude =
+            Number(
+                well.longitude
+            );
+
+
+        selectedWellType =
+            well.type || null;
+
+
+        if (
+            selectedWellType === 'collector'
+        ) {
+
+            selectedTypeElement.textContent =
+                'Тип: Коллектор';
+
+        } else if (
+            selectedWellType === 'rain_inlet'
+        ) {
+
+            selectedTypeElement.textContent =
+                'Тип: Дождеприёмник';
+
+        } else {
+
+            selectedTypeElement.textContent =
+                'Тип не выбран';
+
+        }
+
+
+        document.getElementById(
+            'wellStatus'
+        ).value =
+            well.status || 'active';
+
+
+        document.getElementById(
+            'wellDescription'
+        ).value =
+            well.description || '';
+
+
+        document.getElementById(
+            'wellApproxAddress'
+        ).value =
+            well.approx_address || '';
+
+
+        const workRequirements =
+            well.work_requirements &&
+            typeof well.work_requirements === 'object'
+                ? well.work_requirements
+                : {};
+
+
+        document.getElementById(
+            'workConcrete'
+        ).checked =
+            workRequirements.concrete === true;
+
+
+        document.getElementById(
+            'workCover'
+        ).checked =
+            workRequirements.cover === true;
+
+
+        document.getElementById(
+            'workKit'
+        ).checked =
+            workRequirements.kit === true;
+
+
+        document.getElementById(
+            'workKcp'
+        ).checked =
+            workRequirements.kcp === true;
+
+
+        wellFormTitle.textContent =
+            'Редактирование колодца';
+
+
+        createWellButton.textContent =
+            'Сохранить изменения';
 
 
         updateWellCoordinatesDisplay();
@@ -3627,6 +3843,9 @@ let editingWellId =
 
             if (currentLocation) {
 
+                editingWellId =
+                    null;
+
                 selectedWellLatitude =
                     currentLocation.latitude;
 
@@ -3657,6 +3876,9 @@ let editingWellId =
                         false
                     );
 
+
+                editingWellId =
+                    null;
 
                 selectedWellLatitude =
                     location.latitude;
@@ -3738,6 +3960,10 @@ let editingWellId =
                 return;
 
             }
+
+
+            editingWellId =
+                null;
 
 
             selectedWellType =
@@ -3825,6 +4051,10 @@ let editingWellId =
         );
 
 
+    /* =========================
+       СБРОС ФОРМЫ
+       ========================= */
+
     function resetWellForm() {
 
         wellForm.style.display =
@@ -3845,6 +4075,9 @@ let editingWellId =
             null;
 
         selectedWellType =
+            null;
+
+        editingWellId =
             null;
 
 
@@ -3889,6 +4122,20 @@ let editingWellId =
             '';
 
 
+        document.getElementById(
+            'wellApproxAddress'
+        ).value =
+            '';
+
+
+        wellFormTitle.textContent =
+            'Новый колодец';
+
+
+        createWellButton.textContent =
+            'Создать колодец';
+
+
         selectedTypeElement.textContent =
             'Тип не выбран';
 
@@ -3909,96 +4156,143 @@ let editingWellId =
         );
 
 
-    document
-        .getElementById(
-            'createWellButton'
-        )
-        .addEventListener(
-            'click',
-            async () => {
+    /* =========================
+       СОЗДАНИЕ / РЕДАКТИРОВАНИЕ
+       ========================= */
 
-                if (!selectedWellType) {
+    createWellButton.addEventListener(
+        'click',
+        async () => {
 
-                    safeAlert(
-                        'Сначала выберите тип объекта.'
+            if (!selectedWellType) {
+
+                safeAlert(
+                    'Сначала выберите тип объекта.'
+                );
+
+                return;
+
+            }
+
+
+            if (
+                selectedWellLatitude === null ||
+                selectedWellLongitude === null
+            ) {
+
+                safeAlert(
+                    'Не выбраны координаты.'
+                );
+
+                return;
+
+            }
+
+
+            const status =
+                document.getElementById(
+                    'wellStatus'
+                ).value;
+
+
+            const description =
+                document.getElementById(
+                    'wellDescription'
+                ).value.trim();
+
+
+            const approxAddress =
+                document.getElementById(
+                    'wellApproxAddress'
+                ).value.trim();
+
+
+            const workRequirements = {
+
+                concrete:
+                    document.getElementById(
+                        'workConcrete'
+                    ).checked,
+
+                cover:
+                    document.getElementById(
+                        'workCover'
+                    ).checked,
+
+                kit:
+                    document.getElementById(
+                        'workKit'
+                    ).checked,
+
+                kcp:
+                    document.getElementById(
+                        'workKcp'
+                    ).checked
+
+            };
+
+
+            const isEditing =
+                editingWellId !== null;
+
+
+            createWellButton.disabled =
+                true;
+
+
+            createWellButton.textContent =
+                'Сохранение...';
+
+
+            try {
+
+                let data;
+
+
+                if (isEditing) {
+
+                    data =
+                        await apiRequest(
+                            'update_well',
+                            {
+                                wellId:
+                                    editingWellId,
+
+                                latitude:
+                                    selectedWellLatitude,
+
+                                longitude:
+                                    selectedWellLongitude,
+
+                                type:
+                                    selectedWellType,
+
+                                status:
+                                    status,
+
+                                description:
+                                    description ||
+                                    null,
+
+                                approxAddress:
+                                    approxAddress ||
+                                    null,
+
+                                workRequirements:
+                                    workRequirements
+                            }
+                        );
+
+
+                    console.log(
+                        'Редактирование колодца:',
+                        data
                     );
 
-                    return;
 
-                }
+                } else {
 
-
-                if (
-                    selectedWellLatitude === null ||
-                    selectedWellLongitude === null
-                ) {
-
-                    safeAlert(
-                        'Не выбраны координаты.'
-                    );
-
-                    return;
-
-                }
-
-
-                const createButton =
-                    document.getElementById(
-                        'createWellButton'
-                    );
-
-
-                const status =
-                    document.getElementById(
-                        'wellStatus'
-                    ).value;
-
-
-                const description =
-                    document.getElementById(
-                        'wellDescription'
-                    ).value.trim();
-
-                const approxAddress =
-    document.getElementById(
-        'wellApproxAddress'
-    ).value.trim();
-
-                const workRequirements = {
-
-                    concrete:
-                        document.getElementById(
-                            'workConcrete'
-                        ).checked,
-
-                    cover:
-                        document.getElementById(
-                            'workCover'
-                        ).checked,
-
-                    kit:
-                        document.getElementById(
-                            'workKit'
-                        ).checked,
-
-                    kcp:
-                        document.getElementById(
-                            'workKcp'
-                        ).checked
-
-                };
-
-
-                createButton.disabled =
-                    true;
-
-                createButton.textContent =
-                    'Сохранение...';
-
-
-                try {
-
-                    const data =
+                    data =
                         await apiRequest(
                             'create_well',
                             {
@@ -4015,15 +4309,15 @@ let editingWellId =
                                     status,
 
                                 description:
-    description ||
-    null,
+                                    description ||
+                                    null,
 
-approxAddress:
-    approxAddress ||
-    null,
+                                approxAddress:
+                                    approxAddress ||
+                                    null,
 
-workRequirements:
-    workRequirements
+                                workRequirements:
+                                    workRequirements
                             }
                         );
 
@@ -4033,43 +4327,71 @@ workRequirements:
                         data
                     );
 
-
-                    resetWellForm();
-
-
-                    await loadWells();
+                }
 
 
-                    safeAlert(
-                        'Колодец успешно создан.'
-                    );
+                resetWellForm();
 
 
-                } catch (error) {
-
-                    console.error(
-                        'Ошибка создания колодца:',
-                        error
-                    );
+                await loadWells();
 
 
-                    safeAlert(
-                        error.message ||
-                        'Не удалось создать колодец.'
-                    );
+                safeAlert(
+                    isEditing
+                        ? 'Колодец успешно изменён.'
+                        : 'Колодец успешно создан.'
+                );
 
-                } finally {
 
-                    createButton.disabled =
-                        false;
+            } catch (error) {
 
-                    createButton.textContent =
+                console.error(
+                    isEditing
+                        ? 'Ошибка редактирования колодца:'
+                        : 'Ошибка создания колодца:',
+                    error
+                );
+
+
+                safeAlert(
+                    error.message ||
+                    (
+                        isEditing
+                            ? 'Не удалось изменить колодец.'
+                            : 'Не удалось создать колодец.'
+                    )
+                );
+
+
+            } finally {
+
+                createWellButton.disabled =
+                    false;
+
+
+                /*
+                   Если операция завершилась ошибкой,
+                   оставляем правильную подпись режима.
+                */
+
+                if (
+                    editingWellId !== null
+                ) {
+
+                    createWellButton.textContent =
+                        'Сохранить изменения';
+
+                } else {
+
+                    createWellButton.textContent =
                         'Создать колодец';
 
                 }
 
             }
-        );
+
+        }
+    );
 
 
     /* =========================
@@ -4501,100 +4823,178 @@ workRequirements:
 
     }
 
+
+    /* =========================
+       РЕДАКТИРОВАНИЕ КОЛОДЦА
+       ========================= */
+
     document.addEventListener(
-    'click',
-    async (event) => {
+        'click',
+        event => {
 
-        const button =
-            event.target.closest(
-                '.deleteWellButton'
-            );
-
-        if (!button) {
-            return;
-        }
-
-        const wellId =
-            Number(
-                button.dataset.wellId
-            );
-
-        if (
-            !Number.isInteger(
-                wellId
-            ) ||
-            wellId <= 0
-        ) {
-
-            safeAlert(
-                'Некорректный ID колодца.'
-            );
-
-            return;
-        }
+            const button =
+                event.target.closest(
+                    '.editWellButton'
+                );
 
 
-        const confirmed =
-            confirm(
-                'Удалить этот колодец?\n\n' +
-                'Это действие нельзя отменить.'
-            );
-
-        if (!confirmed) {
-            return;
-        }
+            if (!button) {
+                return;
+            }
 
 
-        button.disabled = true;
+            const wellId =
+                Number(
+                    button.dataset.wellId
+                );
 
-        button.textContent =
-            'Удаление...';
+
+            if (
+                !Number.isInteger(
+                    wellId
+                ) ||
+                wellId <= 0
+            ) {
+
+                safeAlert(
+                    'Некорректный ID колодца.'
+                );
+
+                return;
+
+            }
 
 
-        try {
-
-            await apiRequest(
-                'delete_well',
-                {
-                    wellId:
+            const well =
+                allWells.find(
+                    item =>
+                        Number(
+                            item.id
+                        ) ===
                         wellId
-                }
+                );
+
+
+            if (!well) {
+
+                safeAlert(
+                    'Не удалось найти данные этого колодца.'
+                );
+
+                return;
+
+            }
+
+
+            openEditWellForm(
+                well
             );
-
-
-            await loadWells();
-
-
-            safeAlert(
-                'Колодец удалён.'
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                'Ошибка удаления колодца:',
-                error
-            );
-
-
-            safeAlert(
-                error.message ||
-                'Не удалось удалить колодец.'
-            );
-
 
         }
+    );
 
-    }
-);
+
+    /* =========================
+       УДАЛЕНИЕ КОЛОДЦА
+       ========================= */
+
+    document.addEventListener(
+        'click',
+        async event => {
+
+            const button =
+                event.target.closest(
+                    '.deleteWellButton'
+                );
+
+
+            if (!button) {
+                return;
+            }
+
+
+            const wellId =
+                Number(
+                    button.dataset.wellId
+                );
+
+
+            if (
+                !Number.isInteger(
+                    wellId
+                ) ||
+                wellId <= 0
+            ) {
+
+                safeAlert(
+                    'Некорректный ID колодца.'
+                );
+
+                return;
+            }
+
+
+            const confirmed =
+                confirm(
+                    'Удалить этот колодец?\n\n' +
+                    'Это действие нельзя отменить.'
+                );
+
+
+            if (!confirmed) {
+                return;
+            }
+
+
+            button.disabled =
+                true;
+
+            button.textContent =
+                'Удаление...';
+
+
+            try {
+
+                await apiRequest(
+                    'delete_well',
+                    {
+                        wellId:
+                            wellId
+                    }
+                );
+
+
+                await loadWells();
+
+
+                safeAlert(
+                    'Колодец удалён.'
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    'Ошибка удаления колодца:',
+                    error
+                );
+
+
+                safeAlert(
+                    error.message ||
+                    'Не удалось удалить колодец.'
+                );
+
+            }
+
+        }
+    );
+
 
     initApp();
 
 })();
 
-    
-    
 </script>
 
 </body>
