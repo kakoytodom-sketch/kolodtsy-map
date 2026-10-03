@@ -2858,6 +2858,32 @@
 
 }
 
+                if (
+    currentUser &&
+    (
+        currentUser.role === 'admin' ||
+        Number(currentUser.id) === Number(well.user_id)
+    )
+) {
+
+    popupHtml +=
+        `<br><button
+            class="deleteWellButton"
+            data-well-id="${well.id}"
+            style="
+                margin-top:10px;
+                width:100%;
+                padding:8px;
+                border:none;
+                border-radius:8px;
+                background:#ef4444;
+                color:white;
+                cursor:pointer;
+            "
+        >Удалить колодец</button>`;
+
+}
+                
 popupHtml +=
     `<br><small>` +
     `${latitude.toFixed(6)}, ` +
@@ -4510,11 +4536,100 @@ workRequirements:
 
     }
 
+    document.addEventListener(
+    'click',
+    async (event) => {
+
+        const button =
+            event.target.closest(
+                '.deleteWellButton'
+            );
+
+        if (!button) {
+            return;
+        }
+
+        const wellId =
+            Number(
+                button.dataset.wellId
+            );
+
+        if (
+            !Number.isInteger(
+                wellId
+            ) ||
+            wellId <= 0
+        ) {
+
+            safeAlert(
+                'Некорректный ID колодца.'
+            );
+
+            return;
+        }
+
+
+        const confirmed =
+            confirm(
+                'Удалить этот колодец?\n\n' +
+                'Это действие нельзя отменить.'
+            );
+
+        if (!confirmed) {
+            return;
+        }
+
+
+        button.disabled = true;
+
+        button.textContent =
+            'Удаление...';
+
+
+        try {
+
+            await apiRequest(
+                'delete_well',
+                {
+                    wellId:
+                        wellId
+                }
+            );
+
+
+            await loadWells();
+
+
+            safeAlert(
+                'Колодец удалён.'
+            );
+
+
+        } catch (error) {
+
+            console.error(
+                'Ошибка удаления колодца:',
+                error
+            );
+
+
+            safeAlert(
+                error.message ||
+                'Не удалось удалить колодец.'
+            );
+
+
+        }
+
+    }
+);
 
     initApp();
 
 })();
 
+    
+    
 </script>
 
 </body>
