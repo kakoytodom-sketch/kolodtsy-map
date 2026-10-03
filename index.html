@@ -2056,7 +2056,8 @@
 
     let selectedWellType =
         null;
-
+let editingWellId =
+    null;
     let activeTypeFilter =
         'all';
 
@@ -2867,11 +2868,27 @@
 ) {
 
     popupHtml +=
-        `<br><button
-            class="deleteWellButton"
+        `<br>
+        <button
+            class="editWellButton"
             data-well-id="${well.id}"
             style="
                 margin-top:10px;
+                width:100%;
+                padding:8px;
+                border:none;
+                border-radius:8px;
+                background:#2563eb;
+                color:white;
+                cursor:pointer;
+            "
+        >Редактировать</button>
+
+        <button
+            class="deleteWellButton"
+            data-well-id="${well.id}"
+            style="
+                margin-top:8px;
                 width:100%;
                 padding:8px;
                 border:none;
@@ -2881,6 +2898,8 @@
                 cursor:pointer;
             "
         >Удалить колодец</button>`;
+
+}
 
 }
                 
