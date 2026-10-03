@@ -1,997 +1,241 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>Карта колодцев</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <!-- MAPBOX -->
-    <link
-        href="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.css"
-        rel="stylesheet"
-    >
-
-    <script src="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.js"></script>
-
-    <style>
-        * {
-            box-sizing: border-box;
-        }
-
-        html,
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
-            background: #000;
-        }
-
-        body {
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        button,
-        input,
-        select,
-        textarea {
-            font-family: inherit;
-        }
-
-        #map {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-        }
-
-        /* =========================
-           КНОПКИ КАРТЫ
-           ========================= */
-
-        .map-button {
-            position: absolute;
-            z-index: 1000;
-            right: 15px;
-            width: 52px;
-            height: 52px;
-            border: none;
-            border-radius: 50%;
-            background: #111;
-            color: white;
-            font-size: 27px;
-            box-shadow: 0 3px 14px rgba(0,0,0,0.35);
-            cursor: pointer;
-        }
-
-        #locationButton {
-            bottom: 88px;
-        }
-
-        #addWellButton {
-            bottom: 153px;
-        }
-
-        .map-button:active {
-            transform: scale(0.95);
-        }
-
-        #addWellButton.active {
-            background: white;
-            color: #111;
-        }
-
-        /* =========================
-           MAPBOX
-           ========================= */
-
-        .mapboxgl-popup-content {
-            color: #111;
-            border-radius: 12px;
-            padding: 13px 15px;
-            font-family: Arial, sans-serif;
-        }
-
-        .mapboxgl-popup-close-button {
-            font-size: 20px;
-            padding: 4px 8px;
-        }
-
-        .mapboxgl-ctrl-group {
-            border-radius: 12px !important;
-            overflow: hidden;
-        }
-
-        .mapboxgl-ctrl-group button {
-            width: 38px;
-            height: 38px;
-        }
-
-        /* =========================
-           НИЖНЯЯ НАВИГАЦИЯ
-           ========================= */
-
-        #bottomNavigation {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 5000;
-
-            height: 72px;
-
-            display: flex;
-            align-items: stretch;
-
-            background: rgba(8, 8, 8, 0.96);
-            border-top: 1px solid rgba(255,255,255,0.10);
-
-            padding:
-                5px
-                8px
-                calc(5px + env(safe-area-inset-bottom))
-                8px;
-
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-        }
-
-        .bottomNavButton {
-            flex: 1;
-            min-width: 0;
-
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: transparent;
-            color: #777;
-
-            cursor: pointer;
-        }
-
-        .bottomNavButton.active {
-            color: white;
-            background: rgba(255,255,255,0.09);
-        }
-
-        .bottomNavIcon {
-            width: 24px;
-            height: 24px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 21px;
-            line-height: 1;
-        }
-
-        .bottomNavLabel {
-            font-size: 11px;
-            line-height: 1;
-            white-space: nowrap;
-        }
-
-        /* =========================
-           ОБЩИЕ ЭКРАНЫ
-           ========================= */
-
-        .fullPanel {
-            position: fixed;
-            inset: 0;
-            z-index: 4000;
-
-            display: none;
-            flex-direction: column;
-
-            background: #080808;
-            color: white;
-        }
-
-        .fullPanel.open {
-            display: flex;
-        }
-
-        .sectionHeader {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
-            padding:
-                18px
-                16px
-                14px;
-
-            border-bottom: 1px solid #222;
-        }
-
-        .sectionHeaderTitle {
-            margin: 0;
-            font-size: 22px;
-            font-weight: 600;
-        }
-
-        .sectionHeaderSubtitle {
-            margin-top: 4px;
-            color: #777;
-            font-size: 13px;
-        }
-
-        .sectionCloseButton {
-            width: 42px;
-            height: 42px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: #191919;
-            color: white;
-
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        /* =========================
-           МОИ КОЛОДЦЫ
-           ========================= */
-
-        #myWellsList {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px 15px 95px;
-        }
-
-        .myWellItem {
-            margin-bottom: 10px;
-            padding: 15px;
-
-            border: 1px solid #242424;
-            border-radius: 15px;
-
-            background: #111;
-            cursor: pointer;
-        }
-
-        .myWellItem:active {
-            background: #191919;
-        }
-
-        .myWellItemTitle {
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .myWellItemStatus {
-            margin-top: 5px;
-            color: #aaa;
-            font-size: 13px;
-        }
-
-        .myWellItemCoordinates {
-            margin-top: 7px;
-            color: #666;
-            font-size: 12px;
-        }
-
-        .emptyState {
-            padding: 50px 20px;
-            text-align: center;
-            color: #777;
-            line-height: 1.5;
-        }
-
-        /* =========================
-           ПАНЕЛЬ
-           ========================= */
-
-        #userPanelContent {
-            flex: 1;
-            overflow-y: auto;
-            padding: 15px 15px 100px;
-        }
-
-        .profileCard {
-            padding: 18px;
-
-            border: 1px solid #242424;
-            border-radius: 18px;
-
-            background: #111;
-        }
-
-        .profileTop {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .profileAvatar {
-            width: 54px;
-            height: 54px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            border-radius: 16px;
-            background: #1d1d1d;
-
-            font-size: 27px;
-        }
-
-        .profileNickname {
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        .profileRole {
-            margin-top: 4px;
-            color: #777;
-            font-size: 13px;
-        }
-
-        .panelSection {
-            margin-top: 15px;
-        }
-
-        .panelSectionTitle {
-            margin: 0 0 9px;
-            padding-left: 3px;
-
-            color: #777;
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .panelItem {
-            width: 100%;
-
-            display: flex;
-            align-items: center;
-            gap: 12px;
-
-            padding: 15px;
-
-            border: 1px solid #242424;
-            border-radius: 14px;
-
-            background: #111;
-            color: white;
-
-            text-align: left;
-            font-size: 15px;
-
-            cursor: pointer;
-        }
-
-        .panelItem + .panelItem {
-            margin-top: 8px;
-        }
-
-        .panelItemIcon {
-            width: 24px;
-            text-align: center;
-            font-size: 20px;
-        }
-
-        .panelItemText {
-            flex: 1;
-        }
-
-        .panelItemArrow {
-            color: #666;
-            font-size: 18px;
-        }
-
-        .adminPanelItem {
-            border-color: #343434;
-        }
-
-        /* =========================
-           ФИЛЬТРЫ
-           ========================= */
-
-        .filterBlock {
-            padding: 15px;
-
-            border: 1px solid #242424;
-            border-radius: 16px;
-
-            background: #111;
-        }
-
-        .filterLabel {
-            margin-bottom: 8px;
-
-            color: #888;
-            font-size: 12px;
-        }
-
-        .filterButtons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-        }
-
-        .filterButton {
-            padding: 9px 11px;
-
-            border: 1px solid #303030;
-            border-radius: 10px;
-
-            background: #191919;
-            color: #aaa;
-
-            font-size: 13px;
-            cursor: pointer;
-        }
-
-        .filterButton.active {
-            background: white;
-            color: #111;
-            border-color: white;
-        }
-
-        /* =========================
-           СТАТИСТИКА
-           ========================= */
-
-        .statsGrid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 9px;
-        }
-
-        .statCard {
-            padding: 15px;
-
-            border: 1px solid #242424;
-            border-radius: 15px;
-
-            background: #111;
-        }
-
-        .statValue {
-            font-size: 25px;
-            font-weight: 600;
-        }
-
-        .statLabel {
-            margin-top: 4px;
-            color: #777;
-            font-size: 12px;
-        }
-
-        /* =========================
-           ПОСЛЕДНИЕ КОЛОДЦЫ
-           ========================= */
-
-        .recentList {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .recentItem {
-            padding: 13px;
-
-            border: 1px solid #242424;
-            border-radius: 13px;
-
-            background: #111;
-            cursor: pointer;
-        }
-
-        .recentItemTitle {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .recentItemMeta {
-            margin-top: 4px;
-
-            color: #777;
-            font-size: 12px;
-        }
-
-        /* =========================
-           РЕГИСТРАЦИЯ
-           ========================= */
-
-        #registrationScreen {
-            position: fixed;
-            inset: 0;
-            z-index: 10000;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            background: #080808;
-            color: white;
-        }
-
-        .registrationBox {
-            width: calc(100% - 40px);
-            max-width: 360px;
-
-            padding: 30px 20px;
-
-            text-align: center;
-
-            background: #111;
-            border: 1px solid #252525;
-            border-radius: 20px;
-
-            box-shadow: 0 8px 30px rgba(0,0,0,0.35);
-        }
-
-        .registrationBox .logo {
-            font-size: 56px;
-            margin-bottom: 10px;
-        }
-
-        .registrationBox h1 {
-            margin: 0 0 10px;
-            font-size: 24px;
-            color: white;
-        }
-
-        .registrationBox p {
-            margin: 0 0 25px;
-            font-size: 15px;
-            line-height: 1.4;
-            color: #777;
-        }
-
-        .registrationBox input {
-            width: 100%;
-            height: 50px;
-
-            margin-bottom: 12px;
-            padding: 0 15px;
-
-            border: 1px solid #303030;
-            border-radius: 12px;
-
-            background: #191919;
-            color: white;
-
-            font-size: 16px;
-            outline: none;
-        }
-
-        .registrationBox input::placeholder {
-            color: #666;
-        }
-
-        .registrationBox input:focus {
-            border-color: #777;
-        }
-
-        #loginButton {
-            width: 100%;
-            height: 50px;
-
-            margin-top: 5px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: white;
-            color: #111;
-
-            font-size: 16px;
-            font-weight: 600;
-
-            cursor: pointer;
-        }
-
-        #registrationError {
-            min-height: 20px;
-            margin-top: 12px;
-
-            color: #ff6666;
-            font-size: 14px;
-        }
-
-        /* =========================
-           АДМИНКА
-           ========================= */
-
-        .adminPanel {
-            position: fixed;
-            inset: 0;
-            z-index: 6000;
-
-            background: #080808;
-            color: white;
-
-            display: none;
-            overflow-y: auto;
-        }
-
-        .adminPanel.open {
-            display: block;
-        }
-
-        .adminPanelHeader {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-
-            padding: 15px;
-
-            border-bottom: 1px solid #242424;
-        }
-
-        .adminPanelHeader h2 {
-            margin: 0;
-            font-size: 20px;
-        }
-
-        .adminBackButton {
-            width: 42px;
-            height: 42px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: #191919;
-            color: white;
-
-            font-size: 22px;
-            cursor: pointer;
-        }
-
-        .adminPanelContent {
-            padding: 20px 15px 100px;
-        }
-
-        .adminPanelSubtitle {
-            margin-top: 0;
-            color: #777;
-            font-size: 14px;
-        }
-
-        .generateInviteButton {
-            width: 100%;
-            padding: 15px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: white;
-            color: #111;
-
-            font-size: 16px;
-            font-weight: 600;
-
-            cursor: pointer;
-        }
-
-        .inviteResult {
-            margin-top: 20px;
-            padding: 15px;
-
-            border-radius: 12px;
-            background: #151515;
-
-            font-size: 16px;
-            word-break: break-word;
-        }
-
-        .adminSectionTitle {
-            margin: 25px 0 12px;
-            font-size: 17px;
-            color: white;
-        }
-
-        .inviteList {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .inviteItem {
-            padding: 14px;
-            border-radius: 12px;
-            background: #151515;
-        }
-
-        .inviteCode {
-            font-size: 16px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .inviteStatus {
-            margin-top: 5px;
-            font-size: 13px;
-            color: #777;
-        }
-
-        /* =========================
-           ФОРМА КОЛОДЦА
-           ========================= */
-
-        #wellForm {
-            position: fixed;
-            inset: 0;
-            z-index: 9000;
-
-            display: none;
-            align-items: center;
-            justify-content: center;
-
-            padding: 20px;
-
-            background: rgba(0,0,0,0.65);
-
-            overflow-y: auto;
-        }
-
-        .wellFormBox {
-            width: 100%;
-            max-width: 380px;
-
-            padding: 24px 20px;
-
-            background: #111;
-            border: 1px solid #292929;
-            border-radius: 20px;
-
-            box-shadow: 0 8px 30px rgba(0,0,0,0.45);
-
-            color: white;
-        }
-
-        .wellFormBox h2 {
-            margin: 0 0 6px;
-            font-size: 22px;
-        }
-
-        .wellFormSubtitle {
-            margin: 0 0 20px;
-            color: #777;
-            font-size: 14px;
-        }
-
-        .selectedType {
-            padding: 13px 15px;
-            margin-bottom: 18px;
-
-            border-radius: 12px;
-            background: #1b1b1b;
-
-            font-size: 15px;
-            color: #ddd;
-        }
-
-        .wellField {
-            margin-bottom: 18px;
-        }
-
-        .wellField label {
-            display: block;
-            margin-bottom: 7px;
-
-            font-size: 14px;
-            font-weight: 600;
-            color: #ccc;
-        }
-
-        .wellField select,
-        .wellField textarea,
-        .wellField input[type="text"] {
-            width: 100%;
-
-            border: 1px solid #303030;
-            border-radius: 12px;
-
-            background: #191919;
-            color: white;
-
-            font-size: 16px;
-            outline: none;
-        }
-
-        .wellField select {
-            height: 48px;
-            padding: 0 12px;
-        }
-
-        .wellField textarea {
-            min-height: 100px;
-            padding: 12px;
-            resize: none;
-        }
-
-        .wellField input[type="text"] {
-            height: 48px;
-            padding: 0 12px;
-        }
-
-        .wellField input[type="text"]::placeholder,
-        .wellField textarea::placeholder {
-            color: #666;
-        }
-
-        .wellField input[type="text"]:focus,
-        .wellField textarea:focus,
-        .wellField select:focus {
-            border-color: #777;
-        }
-
-        .workList {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .workOption {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-
-            padding: 12px;
-
-            border-radius: 12px;
-            background: #191919;
-
-            cursor: pointer;
-        }
-
-        .workOption input {
-            width: 20px;
-            height: 20px;
-            margin: 0;
-            flex-shrink: 0;
-        }
-
-        .coordinatesBox {
-            padding: 12px;
-
-            border-radius: 12px;
-            background: #191919;
-
-            font-size: 13px;
-            line-height: 1.6;
-
-            color: #888;
-        }
-
-        .changeLocationButton {
-            width: 100%;
-            height: 46px;
-
-            margin-top: 10px;
-
-            border: 1px solid #303030;
-            border-radius: 12px;
-
-            background: #191919;
-            color: white;
-
-            font-size: 15px;
-            font-weight: 600;
-
-            cursor: pointer;
-        }
-
-        .changeLocationButton:active {
-            background: #242424;
-        }
-
-        .wellFormButtons {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-
-            margin-top: 22px;
-        }
-
-        .createWellButton {
-            width: 100%;
-            height: 50px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: white;
-            color: #111;
-
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .cancelWellButton {
-            width: 100%;
-            height: 48px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: #222;
-            color: white;
-
-            font-size: 16px;
-        }
-
-        /* =========================
-           ОШИБКА
-           ========================= */
-
-        #fatalError {
-            position: fixed;
-            inset: 0;
-            z-index: 30000;
-
-            display: none;
-            align-items: center;
-            justify-content: center;
-
-            padding: 20px;
-
-            background: #111;
-            color: white;
-        }
-
-        .fatalErrorBox {
-            width: 100%;
-            max-width: 420px;
-
-            padding: 24px;
-
-            background: #222;
-            border-radius: 18px;
-        }
-
-        .fatalErrorBox h2 {
-            margin-top: 0;
-        }
-
-        .fatalErrorText {
-            white-space: pre-wrap;
-            word-break: break-word;
-
-            color: #ff7777;
-
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .fatalReload {
-            width: 100%;
-            height: 48px;
-
-            margin-top: 15px;
-
-            border: none;
-            border-radius: 12px;
-
-            background: white;
-            color: #111;
-
-            font-size: 16px;
-            font-weight: 600;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Карта колодцев</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.30.0/mapbox-gl.js"></script>
+
+<style>
+* { box-sizing: border-box; }
+
+html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; background: #000;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+body { -webkit-tap-highlight-color: transparent; }
+button, input, select, textarea { font-family: inherit; }
+button { transition: transform .12s, background .15s, opacity .15s; }
+button:disabled { opacity: .55; }
+
+#map { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+@keyframes panelIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== ЗАГРУЗКА ===== */
+#loadingScreen {
+    position: fixed; inset: 0; z-index: 20000;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
+    background: #080808; color: #888; font-size: 15px;
+    transition: opacity .25s;
+}
+#loadingScreen.hide { opacity: 0; pointer-events: none; }
+.loadingLogo { font-size: 46px; }
+.spinner {
+    width: 34px; height: 34px; border-radius: 50%;
+    border: 3px solid #262626; border-top-color: #fff;
+    animation: spin .8s linear infinite;
+}
+
+/* ===== КНОПКИ КАРТЫ ===== */
+.map-button {
+    position: absolute; z-index: 1000; right: 15px; width: 52px; height: 52px;
+    border: 1px solid rgba(255,255,255,.12); border-radius: 50%;
+    background: #111; color: #fff; font-size: 26px;
+    box-shadow: 0 3px 14px rgba(0,0,0,.4); cursor: pointer;
+}
+#locationButton { bottom: 88px; }
+#addWellButton { bottom: 153px; }
+.map-button:active { transform: scale(.94); }
+#addWellButton.active { background: #fff; color: #111; }
+
+/* ===== MAPBOX ===== */
+.mapboxgl-popup-content { color: #111; border-radius: 12px; padding: 13px 15px; font-size: 14px; line-height: 1.45; }
+.mapboxgl-popup-close-button { font-size: 20px; padding: 4px 8px; }
+.mapboxgl-ctrl-group { border-radius: 12px !important; overflow: hidden; }
+.mapboxgl-ctrl-group button { width: 38px; height: 38px; }
+
+.wellMarker { width: 24px; height: 24px; cursor: pointer; }
+.wellMarker span {
+    display: block; width: 100%; height: 100%;
+    background: var(--c); border: 3px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,.55);
+}
+.wellMarker.collector span { border-radius: 50%; }
+.wellMarker.inlet span { border-radius: 4px; transform: rotate(45deg) scale(.82); }
+
+.popBtn { display: block; width: 100%; margin-top: 8px; padding: 9px; border: none; border-radius: 8px; color: #fff; font-size: 14px; cursor: pointer; }
+.popBtn.edit { background: #2563eb; }
+.popBtn.del { background: #ef4444; }
+
+/* ===== НИЖНЯЯ НАВИГАЦИЯ ===== */
+#bottomNavigation {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 5000;
+    height: 72px; display: flex; align-items: stretch;
+    background: rgba(8,8,8,.96); border-top: 1px solid rgba(255,255,255,.1);
+    padding: 5px 8px calc(5px + env(safe-area-inset-bottom)) 8px;
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+}
+.bottomNavButton {
+    flex: 1; min-width: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 3px;
+    border: none; border-radius: 12px; background: transparent; color: #777; cursor: pointer;
+}
+.bottomNavButton.active { color: #fff; background: rgba(255,255,255,.09); }
+.bottomNavButton:active { transform: scale(.96); }
+.bottomNavIcon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 21px; line-height: 1; }
+.bottomNavLabel { font-size: 11px; line-height: 1; white-space: nowrap; }
+
+/* ===== ПАНЕЛИ ===== */
+.fullPanel { position: fixed; inset: 0; z-index: 4000; display: none; flex-direction: column; background: #080808; color: #fff; }
+.fullPanel.open { display: flex; animation: panelIn .2s ease; }
+
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; padding: 18px 16px 14px; border-bottom: 1px solid #222; }
+.sectionHeaderTitle { margin: 0; font-size: 22px; font-weight: 600; }
+.sectionHeaderSubtitle { margin-top: 4px; color: #777; font-size: 13px; }
+.sectionCloseButton { width: 42px; height: 42px; border: none; border-radius: 12px; background: #191919; color: #fff; font-size: 22px; cursor: pointer; }
+.sectionCloseButton:active, .adminBackButton:active { background: #262626; }
+
+#myWellsList { flex: 1; overflow-y: auto; padding: 15px 15px 95px; }
+
+.myWellItem, .recentItem, .userWellItem { border: 1px solid #242424; background: #111; cursor: pointer; }
+.myWellItem { margin-bottom: 10px; padding: 15px; border-radius: 15px; }
+.myWellItem:active, .recentItem:active, .userWellItem:active { background: #191919; }
+.myWellItemTitle { font-size: 16px; font-weight: 600; }
+.myWellItemStatus { margin-top: 5px; color: #aaa; font-size: 13px; }
+.myWellItemCoordinates { margin-top: 7px; color: #666; font-size: 12px; }
+.emptyState { padding: 40px 20px; text-align: center; color: #777; line-height: 1.5; }
+
+#userPanelContent { flex: 1; overflow-y: auto; padding: 15px 15px 100px; }
+.profileCard { padding: 18px; border: 1px solid #242424; border-radius: 18px; background: #111; }
+.profileTop { display: flex; align-items: center; gap: 14px; }
+.profileAvatar { width: 54px; height: 54px; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #1d1d1d; font-size: 27px; }
+.profileNickname { font-size: 18px; font-weight: 600; }
+.profileRole { margin-top: 4px; color: #777; font-size: 13px; }
+
+.panelSection { margin-top: 18px; }
+.panelSectionTitle { margin: 0 0 9px; padding-left: 3px; color: #777; font-size: 12px; text-transform: uppercase; letter-spacing: .5px; }
+.panelItem { width: 100%; display: flex; align-items: center; gap: 12px; padding: 15px; border: 1px solid #242424; border-radius: 14px; background: #111; color: #fff; text-align: left; font-size: 15px; cursor: pointer; }
+.panelItem:active { background: #191919; transform: scale(.99); }
+.panelItem + .panelItem { margin-top: 8px; }
+.panelItemIcon { width: 24px; text-align: center; font-size: 20px; }
+.panelItemText { flex: 1; }
+.panelItemArrow { color: #666; font-size: 18px; }
+.adminPanelItem { border-color: #343434; }
+
+/* ===== ФИЛЬТРЫ ===== */
+.filterBlock { padding: 15px; border: 1px solid #242424; border-radius: 16px; background: #111; }
+.filterLabel { margin-bottom: 8px; color: #888; font-size: 12px; }
+.filterButtons { display: flex; flex-wrap: wrap; gap: 7px; }
+.filterButton { padding: 9px 11px; border: 1px solid #303030; border-radius: 10px; background: #191919; color: #aaa; font-size: 13px; cursor: pointer; }
+.filterButton.active { background: #fff; color: #111; border-color: #fff; }
+
+/* ===== СТАТИСТИКА ===== */
+.statsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.statCard { padding: 15px; border: 1px solid #242424; border-radius: 15px; background: #111; }
+.statValue { font-size: 25px; font-weight: 600; }
+.statLabel { margin-top: 4px; color: #777; font-size: 12px; }
+
+.recentList { display: flex; flex-direction: column; gap: 8px; }
+.recentItem { padding: 13px; border-radius: 13px; }
+.recentItemTitle { font-size: 14px; font-weight: 600; }
+.recentItemMeta { margin-top: 4px; color: #777; font-size: 12px; }
+
+/* ===== РЕГИСТРАЦИЯ ===== */
+#registrationScreen { position: fixed; inset: 0; z-index: 10000; display: none; align-items: center; justify-content: center; background: #080808; color: #fff; }
+.registrationBox { width: calc(100% - 40px); max-width: 360px; padding: 30px 20px; text-align: center; background: #111; border: 1px solid #252525; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,.35); animation: panelIn .25s ease; }
+.registrationBox .logo { font-size: 56px; margin-bottom: 10px; }
+.registrationBox h1 { margin: 0 0 10px; font-size: 24px; color: #fff; }
+.registrationBox p { margin: 0 0 25px; font-size: 15px; line-height: 1.4; color: #777; }
+.registrationBox input { width: 100%; height: 50px; margin-bottom: 12px; padding: 0 15px; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 16px; outline: none; }
+.registrationBox input::placeholder { color: #666; }
+.registrationBox input:focus { border-color: #777; }
+#loginButton { width: 100%; height: 50px; margin-top: 5px; border: none; border-radius: 12px; background: #fff; color: #111; font-size: 16px; font-weight: 600; cursor: pointer; }
+#registrationError { min-height: 20px; margin-top: 12px; color: #ff6666; font-size: 14px; }
+
+/* ===== АДМИНКА ===== */
+.adminPanel { position: fixed; inset: 0; z-index: 6000; background: #080808; color: #fff; display: none; overflow-y: auto; }
+.adminPanel.open { display: block; animation: panelIn .2s ease; }
+.adminPanelHeader { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; gap: 12px; padding: 15px; background: #080808; border-bottom: 1px solid #242424; }
+.adminPanelHeader h2 { margin: 0; font-size: 20px; }
+.adminBackButton { width: 42px; height: 42px; border: none; border-radius: 12px; background: #191919; color: #fff; font-size: 22px; cursor: pointer; }
+.adminPanelContent { padding: 20px 15px 100px; }
+.adminPanelSubtitle { margin-top: 0; color: #777; font-size: 14px; }
+.generateInviteButton { width: 100%; padding: 15px; border: none; border-radius: 12px; background: #fff; color: #111; font-size: 16px; font-weight: 600; cursor: pointer; }
+.generateInviteButton:active { transform: scale(.99); }
+.inviteResult { margin-top: 20px; padding: 15px; border-radius: 12px; background: #151515; font-size: 16px; word-break: break-word; }
+.inviteResult:empty { display: none; }
+.adminSectionTitle { margin: 25px 0 12px; font-size: 17px; color: #fff; }
+.inviteList { display: flex; flex-direction: column; gap: 10px; }
+.inviteItem { padding: 14px; border-radius: 12px; background: #151515; }
+.inviteCode { font-size: 16px; font-weight: 600; letter-spacing: 1px; }
+.inviteStatus { margin-top: 5px; font-size: 13px; color: #777; }
+
+#adminUsersList { margin-top: 12px; }
+.adminUserItem { display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1px solid #202020; }
+.adminUserItem:active { background: #1c1c1c; }
+.adminUserItem .grow { flex: 1; min-width: 0; }
+.adminUserItem .inviteCode { letter-spacing: 0; overflow: hidden; text-overflow: ellipsis; }
+.roleBadge { padding: 3px 8px; border-radius: 8px; background: #222; color: #aaa; font-size: 11px; white-space: nowrap; }
+.roleBadge.admin { background: #fff; color: #111; }
+
+.adminUserDetails { margin-top: 12px; }
+.adminUserDetailsCard { padding: 18px; border-radius: 14px; background: #151515; border: 1px solid #202020; }
+.adminUserDetailsBack { margin-bottom: 15px; padding: 0; border: none; background: none; color: #aaa; font-size: 15px; cursor: pointer; }
+.adminUserDetailsName { font-size: 20px; font-weight: 600; margin-bottom: 4px; word-break: break-word; }
+.adminUserDetailsRow { margin-top: 12px; color: #888; font-size: 13px; }
+.adminUserDetailsValue { margin-top: 3px; color: #fff; font-size: 16px; }
+.adminEditBlock { margin-top: 20px; padding-top: 4px; border-top: 1px solid #242424; }
+.adminEditBlock label { display: block; margin: 14px 0 6px; color: #888; font-size: 13px; }
+.adminEditBlock input, .adminEditBlock select { width: 100%; height: 46px; padding: 0 12px; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 16px; outline: none; }
+.adminEditBlock input:focus, .adminEditBlock select:focus { border-color: #777; }
+.adminEditBlock select:disabled { opacity: .5; }
+.adminSaveButton { width: 100%; height: 48px; margin-top: 16px; border: none; border-radius: 12px; background: #fff; color: #111; font-size: 16px; font-weight: 600; cursor: pointer; }
+.adminMessage { min-height: 18px; margin-top: 10px; font-size: 14px; }
+.adminMessage.ok { color: #4ade80; }
+.adminMessage.err { color: #ff6666; }
+.adminHint { margin-top: 6px; color: #666; font-size: 12px; }
+.userWellsList { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.userWellItem { padding: 12px; border-radius: 12px; }
+
+/* ===== ФОРМА КОЛОДЦА ===== */
+#wellForm { position: fixed; inset: 0; z-index: 9000; display: none; align-items: flex-start; justify-content: center; padding: 20px; background: rgba(0,0,0,.65); overflow-y: auto; }
+.wellFormBox { width: 100%; max-width: 380px; margin: auto; padding: 24px 20px; background: #111; border: 1px solid #292929; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,.45); color: #fff; animation: panelIn .2s ease; }
+.wellFormBox h2 { margin: 0 0 6px; font-size: 22px; }
+.wellFormSubtitle { margin: 0 0 20px; color: #777; font-size: 14px; }
+.selectedType { padding: 13px 15px; margin-bottom: 18px; border-radius: 12px; background: #1b1b1b; font-size: 15px; color: #ddd; }
+.wellField { margin-bottom: 18px; }
+.wellField > label { display: block; margin-bottom: 7px; font-size: 14px; font-weight: 600; color: #ccc; }
+.wellField select, .wellField textarea, .wellField input[type="text"] { width: 100%; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 16px; outline: none; }
+.wellField select, .wellField input[type="text"] { height: 48px; padding: 0 12px; }
+.wellField textarea { min-height: 100px; padding: 12px; resize: none; }
+.wellField ::placeholder { color: #666; }
+.wellField input[type="text"]:focus, .wellField textarea:focus, .wellField select:focus { border-color: #777; }
+.typeButtons { display: flex; flex-direction: column; gap: 10px; }
+.typeButtons button { height: 48px; border: 1px solid transparent; border-radius: 12px; background: #222; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.typeButtons button.active { background: #fff; color: #111; }
+.workList { display: flex; flex-direction: column; gap: 10px; }
+.workOption { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 12px; background: #191919; cursor: pointer; }
+.workOption input { width: 20px; height: 20px; margin: 0; flex-shrink: 0; }
+.coordinatesBox { padding: 12px; border-radius: 12px; background: #191919; font-size: 13px; line-height: 1.6; color: #888; }
+.changeLocationButton { width: 100%; height: 46px; margin-top: 10px; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+.changeLocationButton:active { background: #242424; }
+.wellFormButtons { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
+.createWellButton { width: 100%; height: 50px; border: none; border-radius: 12px; background: #fff; color: #111; font-size: 16px; font-weight: 600; }
+.cancelWellButton { width: 100%; height: 48px; border: none; border-radius: 12px; background: #222; color: #fff; font-size: 16px; }
+
+/* ===== ОШИБКА ===== */
+#fatalError { position: fixed; inset: 0; z-index: 30000; display: none; align-items: center; justify-content: center; padding: 20px; background: #111; color: #fff; }
+.fatalErrorBox { width: 100%; max-width: 420px; padding: 24px; background: #222; border-radius: 18px; }
+.fatalErrorBox h2 { margin-top: 0; }
+.fatalErrorText { white-space: pre-wrap; word-break: break-word; color: #ff7777; font-size: 14px; line-height: 1.5; max-height: 50vh; overflow-y: auto; }
+.fatalReload { width: 100%; height: 48px; margin-top: 15px; border: none; border-radius: 12px; background: #fff; color: #111; font-size: 16px; font-weight: 600; }
+</style>
 </head>
 
 <body>
@@ -1000,4330 +244,1670 @@
     <div class="fatalErrorBox">
         <h2>Ошибка запуска</h2>
         <div id="fatalErrorText" class="fatalErrorText"></div>
-        <button id="fatalReload" class="fatalReload">
-            Перезагрузить
-        </button>
+        <button id="fatalReload" class="fatalReload">Перезагрузить</button>
     </div>
 </div>
 
+<!-- ЗАГРУЗКА -->
+<div id="loadingScreen">
+    <div class="loadingLogo">💧</div>
+    <div class="spinner"></div>
+    <div>Загрузка…</div>
+</div>
 
-<!-- =========================
-     РЕГИСТРАЦИЯ
-     ========================= -->
-
+<!-- РЕГИСТРАЦИЯ (показывается только после ответа сервера, что пользователь не найден) -->
 <div id="registrationScreen">
-
     <div class="registrationBox">
-
         <div class="logo">💧</div>
-
         <h1>Карта колодцев</h1>
-
-        <p>
-            Введите пригласительный код<br>
-            для доступа к приложению
-        </p>
-
-        <input
-            id="inviteCodeInput"
-            type="text"
-            placeholder="Пригласительный код"
-            autocomplete="off"
-        >
-
-        <input
-            id="nicknameInput"
-            type="text"
-            placeholder="Ваш никнейм"
-            autocomplete="off"
-            maxlength="30"
-        >
-
-        <button id="loginButton">
-            Войти
-        </button>
-
+        <p>Введите пригласительный код<br>для доступа к приложению</p>
+        <input id="inviteCodeInput" type="text" placeholder="Пригласительный код" autocomplete="off">
+        <input id="nicknameInput" type="text" placeholder="Ваш никнейм" autocomplete="off" maxlength="30">
+        <button id="loginButton">Войти</button>
         <div id="registrationError"></div>
-
     </div>
-
 </div>
 
-
-<!-- =========================
-     КАРТА
-     ========================= -->
-
+<!-- КАРТА -->
 <div id="map"></div>
+<button id="locationButton" class="map-button" aria-label="Моё местоположение">📍</button>
+<button id="addWellButton" class="map-button" aria-label="Добавить колодец">＋</button>
 
-<button
-    id="locationButton"
-    class="map-button"
-    aria-label="Моё местоположение"
->
-    📍
-</button>
-
-<button
-    id="addWellButton"
-    class="map-button"
-    aria-label="Добавить колодец"
->
-    ＋
-</button>
-
-
-<!-- =========================
-     МОИ КОЛОДЦЫ
-     ========================= -->
-
+<!-- МОИ КОЛОДЦЫ -->
 <div id="myWellsPanel" class="fullPanel">
-
     <div class="sectionHeader">
-
         <div>
-            <h2 class="sectionHeaderTitle">
-                Мои колодцы
-            </h2>
-
-            <div
-                id="myWellsSubtitle"
-                class="sectionHeaderSubtitle"
-            >
-                Загруженные объекты
-            </div>
+            <h2 class="sectionHeaderTitle">Мои колодцы</h2>
+            <div id="myWellsSubtitle" class="sectionHeaderSubtitle">Загруженные объекты</div>
         </div>
-
-        <button
-            id="myWellsCloseButton"
-            class="sectionCloseButton"
-        >
-            ×
-        </button>
-
+        <button id="myWellsCloseButton" class="sectionCloseButton">×</button>
     </div>
-
     <div id="myWellsList"></div>
-
 </div>
 
-
-<!-- =========================
-     ПАНЕЛЬ
-     ========================= -->
-
+<!-- ПАНЕЛЬ -->
 <div id="userPanel" class="fullPanel">
-
     <div class="sectionHeader">
-
         <div>
-            <h2 class="sectionHeaderTitle">
-                Панель
-            </h2>
-
-            <div class="sectionHeaderSubtitle">
-                Профиль и управление
-            </div>
+            <h2 class="sectionHeaderTitle">Панель</h2>
+            <div class="sectionHeaderSubtitle">Профиль и управление</div>
         </div>
-
-        <button
-            id="userPanelCloseButton"
-            class="sectionCloseButton"
-        >
-            ×
-        </button>
-
+        <button id="userPanelCloseButton" class="sectionCloseButton">×</button>
     </div>
 
     <div id="userPanelContent">
 
         <div class="profileCard">
-
             <div class="profileTop">
-
-                <div class="profileAvatar">
-                    💧
-                </div>
-
+                <div class="profileAvatar">💧</div>
                 <div>
-
-                    <div
-                        id="panelNickname"
-                        class="profileNickname"
-                    >
-                        Пользователь
-                    </div>
-
-                    <div
-                        id="panelRole"
-                        class="profileRole"
-                    >
-                        Пользователь
-                    </div>
-
+                    <div id="panelNickname" class="profileNickname">Пользователь</div>
+                    <div id="panelRole" class="profileRole">Пользователь</div>
                 </div>
-
             </div>
-
         </div>
 
-
         <div class="panelSection">
-
-            <div class="panelSectionTitle">
-                Быстрые действия
-            </div>
-
-            <button
-                id="panelLocationButton"
-                class="panelItem"
-            >
-                <div class="panelItemIcon">📍</div>
-
-                <div class="panelItemText">
-                    Моё местоположение
-                </div>
-
-                <div class="panelItemArrow">›</div>
+            <div class="panelSectionTitle">Быстрые действия</div>
+            <button id="panelLocationButton" class="panelItem">
+                <div class="panelItemIcon">📍</div><div class="panelItemText">Моё местоположение</div><div class="panelItemArrow">›</div>
             </button>
-
-
-            <button
-                id="panelAddWellButton"
-                class="panelItem"
-            >
-                <div class="panelItemIcon">＋</div>
-
-                <div class="panelItemText">
-                    Добавить колодец
-                </div>
-
-                <div class="panelItemArrow">›</div>
+            <button id="panelAddWellButton" class="panelItem">
+                <div class="panelItemIcon">＋</div><div class="panelItemText">Добавить колодец</div><div class="panelItemArrow">›</div>
             </button>
-
         </div>
 
-
         <div class="panelSection">
-
-            <div class="panelSectionTitle">
-                Фильтры
-            </div>
-
+            <div class="panelSectionTitle">Фильтры</div>
             <div class="filterBlock">
-
-                <div class="filterLabel">
-                    Тип объекта
-                </div>
-
+                <div class="filterLabel">Тип объекта</div>
                 <div class="filterButtons">
-
-                    <button
-                        class="filterButton active"
-                        data-filter-type="all"
-                    >
-                        Все
-                    </button>
-
-                    <button
-                        class="filterButton"
-                        data-filter-type="collector"
-                    >
-                        Коллекторы
-                    </button>
-
-                    <button
-                        class="filterButton"
-                        data-filter-type="rain_inlet"
-                    >
-                        Дождеприёмники
-                    </button>
-
+                    <button class="filterButton active" data-filter-type="all">Все</button>
+                    <button class="filterButton" data-filter-type="collector">Коллекторы</button>
+                    <button class="filterButton" data-filter-type="rain_inlet">Дождеприёмники</button>
                 </div>
-
-
-                <div
-                    class="filterLabel"
-                    style="margin-top:15px;"
-                >
-                    Состояние
-                </div>
-
+                <div class="filterLabel" style="margin-top:15px;">Состояние</div>
                 <div class="filterButtons">
-
-                    <button
-                        class="filterButton active"
-                        data-filter-status="all"
-                    >
-                        Все
-                    </button>
-
-                    <button
-                        class="filterButton"
-                        data-filter-status="active"
-                    >
-                        Рабочие
-                    </button>
-
-                    <button
-                        class="filterButton"
-                        data-filter-status="needs_repair"
-                    >
-                        Ремонт
-                    </button>
-
-                    <button
-                        class="filterButton"
-                        data-filter-status="broken"
-                    >
-                        Неисправные
-                    </button>
-
-                    <button
-                        class="filterButton"
-                        data-filter-status="not_used"
-                    >
-                        Не используются
-                    </button>
-
+                    <button class="filterButton active" data-filter-status="all">Все</button>
+                    <button class="filterButton" data-filter-status="active">Рабочие</button>
+                    <button class="filterButton" data-filter-status="needs_repair">Ремонт</button>
+                    <button class="filterButton" data-filter-status="broken">Неисправные</button>
+                    <button class="filterButton" data-filter-status="not_used">Не используются</button>
                 </div>
-
             </div>
-
         </div>
 
-
         <div class="panelSection">
-
-            <div class="panelSectionTitle">
-                Статистика
-            </div>
-
+            <div class="panelSectionTitle">Статистика</div>
             <div class="statsGrid">
-
-                <div class="statCard">
-                    <div id="statTotal" class="statValue">0</div>
-                    <div class="statLabel">Всего</div>
-                </div>
-
-                <div class="statCard">
-                    <div id="statActive" class="statValue">0</div>
-                    <div class="statLabel">Рабочие</div>
-                </div>
-
-                <div class="statCard">
-                    <div id="statRepair" class="statValue">0</div>
-                    <div class="statLabel">Требуют ремонта</div>
-                </div>
-
-                <div class="statCard">
-                    <div id="statBroken" class="statValue">0</div>
-                    <div class="statLabel">Неисправные</div>
-                </div>
-
-                <div class="statCard">
-                    <div id="statCollectors" class="statValue">0</div>
-                    <div class="statLabel">Коллекторы</div>
-                </div>
-
-                <div class="statCard">
-                    <div id="statRainInlets" class="statValue">0</div>
-                    <div class="statLabel">Дождеприёмники</div>
-                </div>
-
+                <div class="statCard"><div id="statTotal" class="statValue">0</div><div class="statLabel">Всего</div></div>
+                <div class="statCard"><div id="statActive" class="statValue">0</div><div class="statLabel">Рабочие</div></div>
+                <div class="statCard"><div id="statRepair" class="statValue">0</div><div class="statLabel">Требуют ремонта</div></div>
+                <div class="statCard"><div id="statBroken" class="statValue">0</div><div class="statLabel">Неисправные</div></div>
+                <div class="statCard"><div id="statCollectors" class="statValue">0</div><div class="statLabel">Коллекторы</div></div>
+                <div class="statCard"><div id="statRainInlets" class="statValue">0</div><div class="statLabel">Дождеприёмники</div></div>
             </div>
-
         </div>
 
-
         <div class="panelSection">
-
-            <div class="panelSectionTitle">
-                Последние добавленные
-            </div>
-
-            <div
-                id="recentWellsList"
-                class="recentList"
-            ></div>
-
+            <div class="panelSectionTitle">Последние добавленные</div>
+            <div id="recentWellsList" class="recentList"></div>
         </div>
 
-
         <div class="panelSection">
-
-            <div class="panelSectionTitle">
-                Разделы
-            </div>
-
-            <button
-                id="panelMyWellsButton"
-                class="panelItem"
-            >
-
-                <div class="panelItemIcon">💧</div>
-
-                <div class="panelItemText">
-                    Мои колодцы
-                </div>
-
-                <div class="panelItemArrow">›</div>
-
+            <div class="panelSectionTitle">Разделы</div>
+            <button id="panelMyWellsButton" class="panelItem">
+                <div class="panelItemIcon">💧</div><div class="panelItemText">Мои колодцы</div><div class="panelItemArrow">›</div>
             </button>
-
         </div>
 
-
         <div class="panelSection">
-
-            <div class="panelSectionTitle">
-                Администрирование
-            </div>
-
-            <button
-                id="panelAdminButton"
-                class="panelItem adminPanelItem"
-                style="display:none;"
-            >
-
-                <div class="panelItemIcon">⚙️</div>
-
-                <div class="panelItemText">
-                    Администрирование
-                </div>
-
-                <div class="panelItemArrow">›</div>
-
+            <div class="panelSectionTitle">Администрирование</div>
+            <button id="panelAdminButton" class="panelItem adminPanelItem" style="display:none;">
+                <div class="panelItemIcon">⚙️</div><div class="panelItemText">Администрирование</div><div class="panelItemArrow">›</div>
             </button>
-
         </div>
 
     </div>
-
 </div>
 
-
-<!-- =========================
-     АДМИНКА
-     ========================= -->
-
+<!-- АДМИНКА -->
 <div id="adminPanel" class="adminPanel">
-
     <div class="adminPanelHeader">
-
-        <button
-            id="adminBackButton"
-            class="adminBackButton"
-        >
-            ←
-        </button>
-
-        <h2>
-            Администрирование
-        </h2>
-
+        <button id="adminBackButton" class="adminBackButton">←</button>
+        <h2>Администрирование</h2>
     </div>
 
     <div class="adminPanelContent">
+        <p class="adminPanelSubtitle">Управление доступом к приложению</p>
 
-    <p class="adminPanelSubtitle">
-        Управление доступом к приложению
-    </p>
+        <h3 class="adminSectionTitle">Пользователи</h3>
 
+        <button id="adminUsersButton" class="generateInviteButton">👥 Управление пользователями</button>
 
-    <!-- =========================
-         ПОЛЬЗОВАТЕЛИ
-         ========================= -->
+        <div id="adminUsersList" class="inviteList" style="display:none;"></div>
+        <div id="adminUserDetails" class="adminUserDetails" style="display:none;"></div>
 
-    <h3 class="adminSectionTitle">
-        Пользователи
-    </h3>
+        <h3 class="adminSectionTitle">Приглашения</h3>
 
-    <button
-        id="adminUsersButton"
-        class="generateInviteButton"
-        
-    >
-        👥 Управление пользователями
-    </button>
+        <button id="generateInviteButton" class="generateInviteButton">+ Создать приглашение</button>
+        <div id="inviteResult" class="inviteResult"></div>
 
-
-    <div
-        id="adminUsersList"
-        class="inviteList"
-        style="display:none;"
-    ></div>
-<div
-    id="adminUserDetails"
-    style="display:none;"
-></div>
-
-    <!-- =========================
-         ПРИГЛАШЕНИЯ
-         ========================= -->
-
-    <button
-        id="generateInviteButton"
-        class="generateInviteButton"
-    >
-        + Создать приглашение
-    </button>
-
-    <div
-        id="inviteResult"
-        class="inviteResult"
-    ></div>
-
-    <h3 class="adminSectionTitle">
-        Приглашения
-    </h3>
-
-    <div
-        id="inviteList"
-        class="inviteList"
-    ></div>
-
-</div>
+        <div id="inviteList" class="inviteList" style="margin-top:14px;"></div>
+    </div>
 </div>
 
-
-<!-- =========================
-     ФОРМА КОЛОДЦА
-     ========================= -->
-
+<!-- ФОРМА КОЛОДЦА -->
 <div id="wellForm">
-
     <div class="wellFormBox">
+        <h2 id="wellFormTitle">Новый колодец</h2>
+        <p class="wellFormSubtitle">Информация об объекте</p>
 
-        <h2 id="wellFormTitle">
-            Новый колодец
-        </h2>
-
-        <p class="wellFormSubtitle">
-            Информация об объекте
-        </p>
-
-        <div
-            id="selectedType"
-            class="selectedType"
-        >
-            Тип не выбран
-        </div>
-
+        <div id="selectedType" class="selectedType">Тип не выбран</div>
 
         <div class="wellField">
-
-            <label>
-                Тип объекта
-            </label>
-
-            <div
-                style="
-                    display:flex;
-                    flex-direction:column;
-                    gap:10px;
-                "
-            >
-
-                <button
-                    id="collectorButton"
-                    type="button"
-                    style="
-                        height:48px;
-                        border:none;
-                        border-radius:12px;
-                        background:#222;
-                        color:white;
-                        font-size:16px;
-                        font-weight:600;
-                    "
-                >
-                    Коллектор
-                </button>
-
-                <button
-                    id="rainInletButton"
-                    type="button"
-                    style="
-                        height:48px;
-                        border:none;
-                        border-radius:12px;
-                        background:#222;
-                        color:white;
-                        font-size:16px;
-                        font-weight:600;
-                    "
-                >
-                    Дождеприёмник
-                </button>
-
+            <label>Тип объекта</label>
+            <div class="typeButtons">
+                <button id="collectorButton" type="button">Коллектор</button>
+                <button id="rainInletButton" type="button">Дождеприёмник</button>
             </div>
-
         </div>
 
-
         <div class="wellField">
-
-            <label for="wellStatus">
-                Состояние
-            </label>
-
+            <label for="wellStatus">Состояние</label>
             <select id="wellStatus">
-
-                <option value="active">
-                    Рабочее
-                </option>
-
-                <option value="needs_repair">
-                    Требует ремонта
-                </option>
-
-                <option value="broken">
-                    Неисправен
-                </option>
-
-                <option value="not_used">
-                    Не используется
-                </option>
-
+                <option value="active">Рабочее</option>
+                <option value="needs_repair">Требует ремонта</option>
+                <option value="broken">Неисправен</option>
+                <option value="not_used">Не используется</option>
             </select>
-
         </div>
 
-
         <div class="wellField">
-
-            <label>
-                Требуемые работы
-            </label>
-
+            <label>Требуемые работы</label>
             <div class="workList">
-
-                <label class="workOption">
-                    <input
-                        type="checkbox"
-                        id="workConcrete"
-                    >
-                    <span>
-                        Требуется бетонирование
-                    </span>
-                </label>
-
-                <label class="workOption">
-                    <input
-                        type="checkbox"
-                        id="workCover"
-                    >
-                    <span>
-                        Требуется замена крышки
-                    </span>
-                </label>
-
-                <label class="workOption">
-                    <input
-                        type="checkbox"
-                        id="workKit"
-                    >
-                    <span>
-                        Требуется замена комплекта
-                    </span>
-                </label>
-
-                <label class="workOption">
-                    <input
-                        type="checkbox"
-                        id="workKcp"
-                    >
-                    <span>
-                        Требуется замена КЦП
-                    </span>
-                </label>
-
+                <label class="workOption"><input type="checkbox" id="workConcrete"><span>Требуется бетонирование</span></label>
+                <label class="workOption"><input type="checkbox" id="workCover"><span>Требуется замена крышки</span></label>
+                <label class="workOption"><input type="checkbox" id="workKit"><span>Требуется замена комплекта</span></label>
+                <label class="workOption"><input type="checkbox" id="workKcp"><span>Требуется замена КЦП</span></label>
             </div>
-
         </div>
-
 
         <div class="wellField">
-
-            <label for="wellDescription">
-                Описание
-            </label>
-
-            <textarea
-                id="wellDescription"
-                placeholder="Дополнительная информация..."
-            ></textarea>
-
+            <label for="wellDescription">Описание</label>
+            <textarea id="wellDescription" placeholder="Дополнительная информация..."></textarea>
         </div>
-
 
         <div class="wellField">
-
-            <label for="wellApproxAddress">
-                Адрес для ориентира
-            </label>
-
-            <input
-                type="text"
-                id="wellApproxAddress"
-                placeholder="Например: Тархана, 17"
-                maxlength="200"
-            >
-
+            <label for="wellApproxAddress">Адрес для ориентира</label>
+            <input type="text" id="wellApproxAddress" placeholder="Например: Тархана, 17" maxlength="200">
         </div>
-
 
         <div class="wellField">
-
-            <label>
-                Координаты
-            </label>
-
-            <div
-                id="wellCoordinates"
-                class="coordinatesBox"
-            >
-                Координаты не выбраны
-            </div>
-
-            <button
-                id="changeLocationButton"
-                type="button"
-                class="changeLocationButton"
-            >
-                📍 Изменить место на карте
-            </button>
-
+            <label>Координаты</label>
+            <div id="wellCoordinates" class="coordinatesBox">Координаты не выбраны</div>
+            <button id="changeLocationButton" type="button" class="changeLocationButton">📍 Изменить место на карте</button>
         </div>
-
 
         <div class="wellFormButtons">
-
-            <button
-                id="createWellButton"
-                class="createWellButton"
-            >
-                Создать колодец
-            </button>
-
-            <button
-                id="cancelWellButton"
-                class="cancelWellButton"
-            >
-                Отмена
-            </button>
-
+            <button id="createWellButton" class="createWellButton">Создать колодец</button>
+            <button id="cancelWellButton" class="cancelWellButton">Отмена</button>
         </div>
-
     </div>
-
 </div>
 
-
-<!-- =========================
-     НИЖНЯЯ НАВИГАЦИЯ
-     ========================= -->
-
+<!-- НИЖНЯЯ НАВИГАЦИЯ -->
 <nav id="bottomNavigation">
-
-    <button
-        id="bottomMapButton"
-        class="bottomNavButton active"
-    >
-        <div class="bottomNavIcon">
-            🗺️
-        </div>
-
-        <div class="bottomNavLabel">
-            Карта
-        </div>
+    <button id="bottomMapButton" class="bottomNavButton active">
+        <div class="bottomNavIcon">🗺️</div><div class="bottomNavLabel">Карта</div>
     </button>
-
-
-    <button
-        id="bottomMyWellsButton"
-        class="bottomNavButton"
-    >
-        <div class="bottomNavIcon">
-            💧
-        </div>
-
-        <div class="bottomNavLabel">
-            Мои колодцы
-        </div>
+    <button id="bottomMyWellsButton" class="bottomNavButton">
+        <div class="bottomNavIcon">💧</div><div class="bottomNavLabel">Мои колодцы</div>
     </button>
-
-
-    <button
-        id="bottomPanelButton"
-        class="bottomNavButton"
-    >
-        <div class="bottomNavIcon">
-            ☰
-        </div>
-
-        <div class="bottomNavLabel">
-            Панель
-        </div>
+    <button id="bottomPanelButton" class="bottomNavButton">
+        <div class="bottomNavIcon">☰</div><div class="bottomNavLabel">Панель</div>
     </button>
-
 </nav>
 
 
 <script>
-
 (() => {
 
-    'use strict';
+'use strict';
+
+/* =========================
+   НАСТРОЙКИ
+   ========================= */
+
+const API_URL = 'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api';
+
+const MAPBOX_TOKEN =
+    'pk.eyJ1IjoidWdseWtvbG9kZWMiLCJhIjoiY211cW1qd3huMDJhYjM0c2Q3dTl2bjdndCJ9.ZAvl2BhVyop3rBo2hru3yA';
+
+const $ = id => document.getElementById(id);
 
 
-    /* =========================
-       НАСТРОЙКИ
-       ========================= */
+/* =========================
+   DOM
+   ========================= */
 
-    const API_URL =
-        'https://hcexvxmoddlmoronkobl.supabase.co/functions/v1/swift-api';
-
-
-    const MAPBOX_TOKEN =
-        'pk.eyJ1IjoidWdseWtvbG9kZWMiLCJhIjoiY211cW1qd3huMDJhYjM0c2Q3dTl2bjdndCJ9.ZAvl2BhVyop3rBo2hru3yA';
-
-
-    /* =========================
-       DOM
-       ========================= */
-
-    const fatalError =
-        document.getElementById('fatalError');
-
-    const fatalErrorText =
-        document.getElementById('fatalErrorText');
-
-    const fatalReload =
-        document.getElementById('fatalReload');
-
-    const registrationScreen =
-        document.getElementById('registrationScreen');
-
-    const registrationError =
-        document.getElementById('registrationError');
-
-    const loginButton =
-        document.getElementById('loginButton');
+const fatalError = $('fatalError');
+const fatalErrorText = $('fatalErrorText');
+const fatalReload = $('fatalReload');
+const loadingScreen = $('loadingScreen');
+const registrationScreen = $('registrationScreen');
+const registrationError = $('registrationError');
+const loginButton = $('loginButton');
 
 
-    /* =========================
-       ОШИБКИ
-       ========================= */
+/* =========================
+   ЭКРАН ЗАГРУЗКИ
+   ========================= */
 
-    function showFatalError(message) {
+function hideLoading() {
+    loadingScreen.classList.add('hide');
+    setTimeout(() => { loadingScreen.style.display = 'none'; }, 300);
+}
 
-        console.error(message);
 
-        fatalErrorText.textContent =
-            String(message);
+/* =========================
+   ОШИБКИ
+   ========================= */
 
-        fatalError.style.display =
-            'flex';
+function showFatalError(message) {
+    console.error(message);
+    fatalErrorText.textContent = String(message);
+    fatalError.style.display = 'flex';
+    loadingScreen.style.display = 'none';
+}
 
+window.addEventListener('error', event => {
+    if (event.error) {
+        showFatalError(event.error.stack || event.error.message || event.message);
+    } else {
+        showFatalError(event.message || 'Неизвестная ошибка JavaScript');
+    }
+});
+
+window.addEventListener('unhandledrejection', event => {
+    const reason = event.reason;
+    showFatalError(reason?.stack || reason?.message || String(reason));
+});
+
+fatalReload.addEventListener('click', () => location.reload());
+
+
+/* =========================
+   TELEGRAM
+   ========================= */
+
+const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+
+if (!tg) {
+    showFatalError('Telegram WebApp API не загрузился.\n\nОткрой приложение именно через Telegram.');
+    return;
+}
+
+try {
+    tg.ready();
+    tg.expand();
+} catch (error) {
+    showFatalError('Не удалось запустить Telegram WebApp:\n\n' + error.message);
+    return;
+}
+
+const initData = tg.initData || '';
+
+if (!initData) {
+    showFatalError('Telegram не передал initData.\n\nОткрой Mini App через кнопку бота в Telegram.');
+    return;
+}
+
+function safeAlert(message) {
+    try {
+        if (tg && typeof tg.showAlert === 'function') {
+            tg.showAlert(String(message));
+        } else {
+            alert(String(message));
+        }
+    } catch {
+        alert(String(message));
+    }
+}
+
+
+/* =========================
+   API
+   ========================= */
+
+async function apiRequest(action, extra = {}) {
+
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ initData, action, ...extra })
+    });
+
+    const text = await response.text();
+
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error('Сервер вернул некорректный ответ:\n' + text.slice(0, 500));
     }
 
+    if (!response.ok || !data.ok) {
+        throw new Error(data.error || `Ошибка сервера: ${response.status}`);
+    }
 
-    window.addEventListener(
-        'error',
-        event => {
-
-            if (event.error) {
-
-                showFatalError(
-                    event.error.stack ||
-                    event.error.message ||
-                    event.message
-                );
-
-            } else {
-
-                showFatalError(
-                    event.message ||
-                    'Неизвестная ошибка JavaScript'
-                );
-
-            }
-
-        }
-    );
+    return data;
+}
 
 
-    window.addEventListener(
-        'unhandledrejection',
-        event => {
+/* =========================
+   MAPBOX
+   ========================= */
 
-            const reason =
-                event.reason;
+mapboxgl.accessToken = MAPBOX_TOKEN;
 
-            showFatalError(
-                reason?.stack ||
-                reason?.message ||
-                String(reason)
-            );
+const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/standard',
+    language: 'ru',
+    center: [71.4704, 51.1605],
+    zoom: 12,
+    attributionControl: true
+});
 
-        }
-    );
-
-
-    fatalReload.addEventListener(
-        'click',
-        () => {
-            location.reload();
-        }
-    );
+map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
 
 
-    /* =========================
-       TELEGRAM
-       ========================= */
+/* =========================
+   ПЕРЕМЕННЫЕ
+   ========================= */
 
-    const tg =
-        window.Telegram &&
-        window.Telegram.WebApp
-            ? window.Telegram.WebApp
-            : null;
+let currentUser = null;
+let allWells = [];
+let visibleWells = [];
+let wellMarkers = [];
+let addingWell = false;
+let selectingWellLocation = false;
+let selectedWellLatitude = null;
+let selectedWellLongitude = null;
+let selectedWellType = null;
+let editingWellId = null;
+let activeTypeFilter = 'all';
+let activeStatusFilter = 'all';
+let currentLocation = null;
+let locationRequestInProgress = false;
+let adminUsers = [];
 
 
-    if (!tg) {
+/* =========================
+   ГЕОЛОКАЦИЯ — MAPBOX СЛОИ
+   ========================= */
 
-        showFatalError(
-            'Telegram WebApp API не загрузился.\n\n' +
-            'Открой приложение именно через Telegram.'
-        );
+function createAccuracyCircle(latitude, longitude, accuracy) {
 
+    const radius = Math.max(Number(accuracy) || 0, 1);
+    const points = 64;
+    const coordinates = [];
+    const earthRadius = 6378137;
+    const latRad = latitude * Math.PI / 180;
+
+    for (let i = 0; i <= points; i++) {
+
+        const angle = i / points * Math.PI * 2;
+        const dx = radius * Math.cos(angle);
+        const dy = radius * Math.sin(angle);
+
+        const lat = latitude + (dy / earthRadius) * 180 / Math.PI;
+        const lng = longitude + (dx / (earthRadius * Math.cos(latRad))) * 180 / Math.PI;
+
+        coordinates.push([lng, lat]);
+    }
+
+    return {
+        type: 'Feature',
+        geometry: { type: 'Polygon', coordinates: [coordinates] },
+        properties: {}
+    };
+}
+
+
+function updateUserLocationOnMap(latitude, longitude, accuracy) {
+
+    currentLocation = { latitude, longitude, accuracy };
+
+    const point = {
+        type: 'Feature',
+        geometry: { type: 'Point', coordinates: [longitude, latitude] },
+        properties: {}
+    };
+
+    const circle = createAccuracyCircle(latitude, longitude, accuracy);
+
+    if (map.getSource('user-location')) {
+        map.getSource('user-location').setData(point);
+        map.getSource('user-accuracy').setData(circle);
         return;
     }
 
+    map.addSource('user-location', { type: 'geojson', data: point });
+    map.addSource('user-accuracy', { type: 'geojson', data: circle });
+
+    map.addLayer({
+        id: 'user-accuracy-fill', type: 'fill', source: 'user-accuracy',
+        paint: { 'fill-color': '#2196F3', 'fill-opacity': 0.12 }
+    });
+
+    map.addLayer({
+        id: 'user-accuracy-line', type: 'line', source: 'user-accuracy',
+        paint: { 'line-color': '#2196F3', 'line-width': 1.5, 'line-opacity': 0.35 }
+    });
+
+    map.addLayer({
+        id: 'user-location-dot', type: 'circle', source: 'user-location',
+        paint: {
+            'circle-radius': 8,
+            'circle-color': '#2196F3',
+            'circle-stroke-color': '#FFFFFF',
+            'circle-stroke-width': 3
+        }
+    });
+}
+
+
+function requestUserLocation(shouldCenter = true, silent = false) {
+
+    if (locationRequestInProgress) {
+        return Promise.resolve(currentLocation);
+    }
+
+    if (!navigator.geolocation) {
+        if (!silent) safeAlert('Ваш браузер не поддерживает геолокацию.');
+        return Promise.reject(new Error('Геолокация не поддерживается.'));
+    }
+
+    locationRequestInProgress = true;
+
+    return new Promise((resolve, reject) => {
+
+        navigator.geolocation.getCurrentPosition(
+
+            position => {
+
+                locationRequestInProgress = false;
+
+                const latitude = position.coords.latitude;
+                const longitude = position.coords.longitude;
+                const accuracy = position.coords.accuracy;
+
+                updateUserLocationOnMap(latitude, longitude, accuracy);
+
+                if (shouldCenter) {
+                    map.flyTo({ center: [longitude, latitude], zoom: 17, duration: 700 });
+                }
+
+                resolve({ latitude, longitude, accuracy });
+            },
+
+            error => {
+
+                locationRequestInProgress = false;
+
+                console.error('Геолокация:', error);
+
+                if (!silent) {
+                    if (error.code === error.PERMISSION_DENIED) {
+                        safeAlert('Доступ к местоположению запрещён. Разрешите геолокацию для Telegram.');
+                    } else {
+                        safeAlert('Не удалось определить местоположение.');
+                    }
+                }
+
+                reject(error);
+            },
+
+            { enableHighAccuracy: true, timeout: 12000, maximumAge: 30000 }
+        );
+    });
+}
+
+map.on('load', () => {
+    requestUserLocation(true, true).catch(() => {});
+});
+
+
+/* =========================
+   НАВИГАЦИЯ
+   ========================= */
+
+const bottomMapButton = $('bottomMapButton');
+const bottomMyWellsButton = $('bottomMyWellsButton');
+const bottomPanelButton = $('bottomPanelButton');
+const myWellsPanel = $('myWellsPanel');
+const userPanel = $('userPanel');
+const adminPanel = $('adminPanel');
+
+function setActiveNav(button) {
+    [bottomMapButton, bottomMyWellsButton, bottomPanelButton]
+        .forEach(item => item.classList.remove('active'));
+    button.classList.add('active');
+}
+
+function closeAllPanels() {
+    myWellsPanel.classList.remove('open');
+    userPanel.classList.remove('open');
+    adminPanel.classList.remove('open');
+}
+
+function showMap() {
+    closeAllPanels();
+    setActiveNav(bottomMapButton);
+    setTimeout(() => map.resize(), 50);
+}
+
+function showMyWells() {
+    closeAllPanels();
+    setActiveNav(bottomMyWellsButton);
+    renderMyWells();
+    myWellsPanel.classList.add('open');
+}
+
+function showUserPanel() {
+    closeAllPanels();
+    setActiveNav(bottomPanelButton);
+    updatePanelUser();
+    updateStatistics();
+    renderRecentWells();
+    userPanel.classList.add('open');
+}
+
+bottomMapButton.addEventListener('click', showMap);
+bottomMyWellsButton.addEventListener('click', showMyWells);
+bottomPanelButton.addEventListener('click', showUserPanel);
+$('myWellsCloseButton').addEventListener('click', showMap);
+$('userPanelCloseButton').addEventListener('click', showMap);
+
+
+/* =========================
+   ПОЛЬЗОВАТЕЛЬ
+   ========================= */
+
+function setCurrentUser(user) {
+    currentUser = user || null;
+    updatePanelUser();
+}
+
+function updatePanelUser() {
+
+    if (!currentUser) return;
+
+    $('panelNickname').textContent = currentUser.nickname || 'Пользователь';
+    $('panelRole').textContent = currentUser.role === 'admin' ? 'Администратор' : 'Пользователь';
+
+    // Только для UX: реальная проверка прав выполняется на сервере
+    $('panelAdminButton').style.display = currentUser.role === 'admin' ? 'flex' : 'none';
+}
+
+
+/* =========================
+   ТЕКСТ
+   ========================= */
+
+function escapeHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+function getTypeName(type) {
+    if (type === 'collector') return 'Коллектор';
+    if (type === 'rain_inlet') return 'Дождеприёмник';
+    return 'Не указан';
+}
+
+function getStatusName(status) {
+    if (status === 'active') return 'Рабочее';
+    if (status === 'needs_repair') return 'Требует ремонта';
+    if (status === 'broken') return 'Неисправен';
+    if (status === 'not_used') return 'Не используется';
+    return status || 'Не указан';
+}
+
+function getStatusColor(status) {
+    if (status === 'active') return '#22c55e';
+    if (status === 'needs_repair') return '#eab308';
+    if (status === 'broken') return '#ef4444';
+    return '#6b7280';
+}
+
+function formatDate(value, withTime = false) {
+    if (!value) return '';
+    const options = withTime
+        ? { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }
+        : { day: '2-digit', month: '2-digit', year: 'numeric' };
+    return new Date(value).toLocaleString('ru-RU', options);
+}
+
+
+/* =========================
+   ФИЛЬТРАЦИЯ
+   ========================= */
+
+function getFilteredWells() {
+    return allWells.filter(well =>
+        (activeTypeFilter === 'all' || well.type === activeTypeFilter) &&
+        (activeStatusFilter === 'all' || well.status === activeStatusFilter)
+    );
+}
+
+
+/* =========================
+   МАРКЕРЫ
+   ========================= */
+
+function clearWellMarkers() {
+    wellMarkers.forEach(marker => marker.remove());
+    wellMarkers = [];
+}
+
+function renderFilteredWells() {
+
+    clearWellMarkers();
+
+    visibleWells = getFilteredWells();
+
+    visibleWells.forEach(well => {
+
+        const latitude = Number(well.latitude);
+        const longitude = Number(well.longitude);
+
+        // Коллектор — круг, дождеприёмник — ромб; цвет = состояние
+        const element = document.createElement('div');
+        element.className = 'wellMarker ' + (well.type === 'rain_inlet' ? 'inlet' : 'collector');
+        element.style.setProperty('--c', getStatusColor(well.status));
+        element.innerHTML = '<span></span>';
+
+        let popupHtml =
+            `<b>${escapeHtml(getTypeName(well.type))}</b><br>` +
+            `Статус: ${escapeHtml(getStatusName(well.status))}`;
+
+        if (well.description) {
+            popupHtml += `<br>Описание: ${escapeHtml(well.description)}`;
+        }
+
+        if (well.approx_address) {
+            popupHtml += `<br><strong>Ориентир:</strong> ${escapeHtml(well.approx_address)}`;
+        }
+
+        // Кнопки только для UX — права проверяет backend
+        if (
+            currentUser &&
+            (currentUser.role === 'admin' || Number(currentUser.id) === Number(well.user_id))
+        ) {
+            popupHtml +=
+                `<button class="popBtn edit editWellButton" data-well-id="${Number(well.id)}">Редактировать</button>` +
+                `<button class="popBtn del deleteWellButton" data-well-id="${Number(well.id)}">Удалить колодец</button>`;
+        }
+
+        popupHtml +=
+            `<br><small>${latitude.toFixed(6)}, ${longitude.toFixed(6)}</small>`;
+
+        const marker = new mapboxgl.Marker({ element })
+            .setLngLat([longitude, latitude])
+            .setPopup(new mapboxgl.Popup({ offset: 18 }).setHTML(popupHtml))
+            .addTo(map);
+
+        wellMarkers.push(marker);
+    });
+}
+
+
+/* =========================
+   ЗАГРУЗКА КОЛОДЦЕВ
+   ========================= */
+
+async function loadWells() {
 
     try {
 
-        tg.ready();
-        tg.expand();
+        const data = await apiRequest('list_wells');
+
+        allWells = Array.isArray(data.wells) ? data.wells : [];
+
+        if (map.loaded()) {
+            renderFilteredWells();
+        } else {
+            map.once('load', () => renderFilteredWells());
+        }
 
     } catch (error) {
 
-        showFatalError(
-            'Не удалось запустить Telegram WebApp:\n\n' +
-            error.message
-        );
+        console.error('Ошибка загрузки колодцев:', error);
+        safeAlert('Не удалось загрузить колодцы:\n' + error.message);
+    }
+}
 
+
+/* =========================
+   СТАТИСТИКА
+   ========================= */
+
+function updateStatistics() {
+
+    const wells = getFilteredWells();
+    const count = fn => wells.filter(fn).length;
+
+    $('statTotal').textContent = wells.length;
+    $('statActive').textContent = count(w => w.status === 'active');
+    $('statRepair').textContent = count(w => w.status === 'needs_repair');
+    $('statBroken').textContent = count(w => w.status === 'broken');
+    $('statCollectors').textContent = count(w => w.type === 'collector');
+    $('statRainInlets').textContent = count(w => w.type === 'rain_inlet');
+}
+
+
+/* =========================
+   ФИЛЬТРЫ
+   ========================= */
+
+function bindFilter(selector, dataKey, assign) {
+    document.querySelectorAll(selector).forEach(button => {
+        button.addEventListener('click', () => {
+            assign(button.dataset[dataKey]);
+            document.querySelectorAll(selector).forEach(item => item.classList.remove('active'));
+            button.classList.add('active');
+            renderFilteredWells();
+            updateStatistics();
+        });
+    });
+}
+
+bindFilter('[data-filter-type]', 'filterType', value => { activeTypeFilter = value; });
+bindFilter('[data-filter-status]', 'filterStatus', value => { activeStatusFilter = value; });
+
+
+/* =========================
+   ОТКРЫТЬ КОЛОДЕЦ НА КАРТЕ
+   ========================= */
+
+function openWellOnMap(well) {
+
+    showMap();
+
+    const latitude = Number(well.latitude);
+    const longitude = Number(well.longitude);
+
+    map.flyTo({ center: [longitude, latitude], zoom: 18, duration: 800 });
+
+    setTimeout(() => {
+
+        const marker = wellMarkers.find(item => {
+            const position = item.getLngLat();
+            return (
+                Math.abs(position.lat - latitude) < 0.000001 &&
+                Math.abs(position.lng - longitude) < 0.000001
+            );
+        });
+
+        if (marker) marker.togglePopup();
+
+    }, 900);
+}
+
+
+/* =========================
+   МОИ КОЛОДЦЫ
+   ========================= */
+
+function renderMyWells() {
+
+    const list = $('myWellsList');
+    list.innerHTML = '';
+
+    if (!currentUser) {
+        list.innerHTML = '<div class="emptyState">Пользователь не авторизован.</div>';
         return;
     }
 
+    const myWells = allWells.filter(well => Number(well.user_id) === Number(currentUser.id));
 
-    const initData =
-        tg.initData || '';
+    $('myWellsSubtitle').textContent = `Всего объектов: ${myWells.length}`;
 
-
-    if (!initData) {
-
-        showFatalError(
-            'Telegram не передал initData.\n\n' +
-            'Открой Mini App через кнопку бота в Telegram.'
-        );
-
+    if (myWells.length === 0) {
+        list.innerHTML = '<div class="emptyState">Вы пока не добавили ни одного колодца.</div>';
         return;
     }
 
+    myWells.forEach(well => {
 
-    function safeAlert(message) {
+        const item = document.createElement('div');
+        item.className = 'myWellItem';
 
-        try {
+        item.innerHTML = `
+            <div class="myWellItemTitle">${escapeHtml(getTypeName(well.type))}</div>
+            <div class="myWellItemStatus">${escapeHtml(getStatusName(well.status))}</div>
+            <div class="myWellItemCoordinates">${Number(well.latitude).toFixed(6)}, ${Number(well.longitude).toFixed(6)}</div>
+        `;
 
-            if (
-                tg &&
-                typeof tg.showAlert === 'function'
-            ) {
+        item.addEventListener('click', () => openWellOnMap(well));
 
-                tg.showAlert(
-                    String(message)
-                );
+        list.appendChild(item);
+    });
+}
 
-            } else {
 
-                alert(
-                    String(message)
-                );
+/* =========================
+   ПОСЛЕДНИЕ КОЛОДЦЫ
+   ========================= */
 
-            }
+function renderRecentWells() {
 
-        } catch {
+    const list = $('recentWellsList');
+    list.innerHTML = '';
 
-            alert(
-                String(message)
-            );
+    const recent = [...allWells]
+        .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+        .slice(0, 5);
 
-        }
-
+    if (recent.length === 0) {
+        list.innerHTML = '<div class="emptyState">Пока нет добавленных колодцев.</div>';
+        return;
     }
 
+    recent.forEach(well => {
 
-    /* =========================
-       API
-       ========================= */
+        const item = document.createElement('div');
+        item.className = 'recentItem';
 
-    async function apiRequest(
-        action,
-        extra = {}
-    ) {
+        const date = well.created_at
+            ? new Date(well.created_at).toLocaleString('ru-RU', {
+                day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit'
+            })
+            : '';
 
-        const response =
-            await fetch(
-                API_URL,
-                {
-                    method: 'POST',
+        item.innerHTML = `
+            <div class="recentItemTitle">${escapeHtml(getTypeName(well.type))}</div>
+            <div class="recentItemMeta">${escapeHtml(getStatusName(well.status))}${date ? ' · ' + date : ''}</div>
+        `;
 
-                    headers: {
-                        'Content-Type':
-                            'application/json'
-                    },
+        item.addEventListener('click', () => openWellOnMap(well));
 
-                    body: JSON.stringify({
-                        initData:
-                            initData,
-
-                        action:
-                            action,
-
-                        ...extra
-                    })
-                }
-            );
+        list.appendChild(item);
+    });
+}
 
 
-        const text =
-            await response.text();
+/* =========================
+   БЫСТРЫЕ ДЕЙСТВИЯ
+   ========================= */
+
+$('panelLocationButton').addEventListener('click', () => {
+    showMap();
+    requestUserLocation(true).catch(() => {});
+});
+
+$('panelAddWellButton').addEventListener('click', () => {
+    showMap();
+    addWellButton.click();
+});
+
+$('panelMyWellsButton').addEventListener('click', showMyWells);
+
+$('locationButton').addEventListener('click', () => {
+    requestUserLocation(true).catch(() => {});
+});
 
 
-        let data;
+/* =========================
+   ФОРМА КОЛОДЦА
+   ========================= */
 
+const addWellButton = $('addWellButton');
+const wellForm = $('wellForm');
+const wellFormTitle = $('wellFormTitle');
+const createWellButton = $('createWellButton');
+const selectedTypeElement = $('selectedType');
+const wellCoordinates = $('wellCoordinates');
+const changeLocationButton = $('changeLocationButton');
+const collectorButton = $('collectorButton');
+const rainInletButton = $('rainInletButton');
 
-        try {
+function updateTypeButtons() {
+    collectorButton.classList.toggle('active', selectedWellType === 'collector');
+    rainInletButton.classList.toggle('active', selectedWellType === 'rain_inlet');
+}
 
-            data =
-                JSON.parse(text);
+function updateWellCoordinatesDisplay() {
 
-        } catch {
-
-            throw new Error(
-                'Сервер вернул некорректный ответ:\n' +
-                text.slice(0, 500)
-            );
-
-        }
-
-
-        if (
-            !response.ok ||
-            !data.ok
-        ) {
-
-            throw new Error(
-                data.error ||
-                `Ошибка сервера: ${response.status}`
-            );
-
-        }
-
-
-        return data;
-
+    if (selectedWellLatitude === null || selectedWellLongitude === null) {
+        wellCoordinates.textContent = 'Координаты не выбраны';
+        return;
     }
 
+    wellCoordinates.innerHTML =
+        'Широта: ' + selectedWellLatitude.toFixed(6) +
+        '<br>Долгота: ' + selectedWellLongitude.toFixed(6);
+}
 
-    /* =========================
-       MAPBOX
-       ========================= */
+function openWellForm() {
 
-    mapboxgl.accessToken =
-        MAPBOX_TOKEN;
-
-
-    const map =
-        new mapboxgl.Map({
-
-            container: 'map',
-
-            style:
-                'mapbox://styles/mapbox/standard',
-
-            language: 'ru',
-
-            center: [
-                71.4704,
-                51.1605
-            ],
-
-            zoom: 12,
-
-            attributionControl: true
-
-        });
-
-
-    map.addControl(
-        new mapboxgl.NavigationControl({
-            showCompass: false
-        }),
-        'top-right'
-    );
-
-
-    /* =========================
-       ПЕРЕМЕННЫЕ
-       ========================= */
-
-    let currentUser =
-        null;
-
-    let allWells =
-        [];
-
-    let visibleWells =
-        [];
-
-    let wellMarkers =
-        [];
-
-    let addingWell =
-        false;
-
-    let selectingWellLocation =
-        false;
-
-    let selectedWellLatitude =
-        null;
-
-    let selectedWellLongitude =
-        null;
-
-    let selectedWellType =
-        null;
-
-    let editingWellId =
-        null;
-
-    let activeTypeFilter =
-        'all';
-
-    let activeStatusFilter =
-        'all';
-
-    let currentLocation =
-        null;
-
-    let locationRequestInProgress =
-        false;
-
-
-    /* =========================
-       ГЕОЛОКАЦИЯ — MAPBOX СЛОИ
-       ========================= */
-
-    function createAccuracyCircle(
-        latitude,
-        longitude,
-        accuracy
-    ) {
-
-        const radius =
-            Math.max(
-                Number(accuracy) || 0,
-                1
-            );
-
-        const points = 64;
-
-        const coordinates = [];
-
-        const earthRadius = 6378137;
-
-        const latRad =
-            latitude * Math.PI / 180;
-
-        for (
-            let i = 0;
-            i <= points;
-            i++
-        ) {
-
-            const angle =
-                i / points *
-                Math.PI *
-                2;
-
-            const dx =
-                radius *
-                Math.cos(angle);
-
-            const dy =
-                radius *
-                Math.sin(angle);
-
-            const lat =
-                latitude +
-                (
-                    dy /
-                    earthRadius
-                ) *
-                180 /
-                Math.PI;
-
-            const lng =
-                longitude +
-                (
-                    dx /
-                    (
-                        earthRadius *
-                        Math.cos(latRad)
-                    )
-                ) *
-                180 /
-                Math.PI;
-
-            coordinates.push([
-                lng,
-                lat
-            ]);
-
-        }
-
-        return {
-            type: 'Feature',
-            geometry: {
-                type: 'Polygon',
-                coordinates: [
-                    coordinates
-                ]
-            },
-            properties: {}
-        };
-
+    if (editingWellId === null) {
+        selectedWellType = null;
+        selectedTypeElement.textContent = 'Тип не выбран';
     }
 
+    updateTypeButtons();
+    updateWellCoordinatesDisplay();
 
-    function updateUserLocationOnMap(
-        latitude,
-        longitude,
-        accuracy
-    ) {
+    wellForm.style.display = 'flex';
+}
 
-        currentLocation = {
-            latitude,
-            longitude,
-            accuracy
-        };
+function openEditWellForm(well) {
 
+    editingWellId = Number(well.id);
+    selectedWellLatitude = Number(well.latitude);
+    selectedWellLongitude = Number(well.longitude);
+    selectedWellType = well.type || null;
 
-        const point =
-            {
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [
-                        longitude,
-                        latitude
-                    ]
-                },
-                properties: {}
-            };
-
-
-        const circle =
-            createAccuracyCircle(
-                latitude,
-                longitude,
-                accuracy
-            );
-
-
-        if (
-            map.getSource(
-                'user-location'
-            )
-        ) {
-
-            map.getSource(
-                'user-location'
-            ).setData(
-                point
-            );
-
-            map.getSource(
-                'user-accuracy'
-            ).setData(
-                circle
-            );
-
-            return;
-
-        }
-
-
-        map.addSource(
-            'user-location',
-            {
-                type: 'geojson',
-                data: point
-            }
-        );
-
-
-        map.addSource(
-            'user-accuracy',
-            {
-                type: 'geojson',
-                data: circle
-            }
-        );
-
-
-        map.addLayer({
-            id: 'user-accuracy-fill',
-            type: 'fill',
-            source: 'user-accuracy',
-            paint: {
-                'fill-color':
-                    '#2196F3',
-                'fill-opacity':
-                    0.12
-            }
-        });
-
-
-        map.addLayer({
-            id: 'user-accuracy-line',
-            type: 'line',
-            source: 'user-accuracy',
-            paint: {
-                'line-color':
-                    '#2196F3',
-                'line-width':
-                    1.5,
-                'line-opacity':
-                    0.35
-            }
-        });
-
-
-        map.addLayer({
-            id: 'user-location-dot',
-            type: 'circle',
-            source: 'user-location',
-            paint: {
-                'circle-radius': 8,
-                'circle-color':
-                    '#2196F3',
-                'circle-stroke-color':
-                    '#FFFFFF',
-                'circle-stroke-width': 3
-            }
-        });
-
+    if (selectedWellType === 'collector') {
+        selectedTypeElement.textContent = 'Тип: Коллектор';
+    } else if (selectedWellType === 'rain_inlet') {
+        selectedTypeElement.textContent = 'Тип: Дождеприёмник';
+    } else {
+        selectedTypeElement.textContent = 'Тип не выбран';
     }
 
+    $('wellStatus').value = well.status || 'active';
+    $('wellDescription').value = well.description || '';
+    $('wellApproxAddress').value = well.approx_address || '';
 
-    function requestUserLocation(
-        shouldCenter = true,
-        silent = false
-    ) {
+    const work =
+        well.work_requirements && typeof well.work_requirements === 'object'
+            ? well.work_requirements
+            : {};
 
-        if (
-            locationRequestInProgress
-        ) {
-            return Promise.resolve(
-                currentLocation
-            );
-        }
+    $('workConcrete').checked = work.concrete === true;
+    $('workCover').checked = work.cover === true;
+    $('workKit').checked = work.kit === true;
+    $('workKcp').checked = work.kcp === true;
 
+    wellFormTitle.textContent = 'Редактирование колодца';
+    createWellButton.textContent = 'Сохранить изменения';
 
-        if (
-            !navigator.geolocation
-        ) {
+    updateTypeButtons();
+    updateWellCoordinatesDisplay();
 
-            if (!silent) {
-                safeAlert(
-                    'Ваш браузер не поддерживает геолокацию.'
-                );
-            }
+    wellForm.style.display = 'flex';
+}
 
-            return Promise.reject(
-                new Error(
-                    'Геолокация не поддерживается.'
-                )
-            );
+function startManualLocationSelection() {
+    wellForm.style.display = 'none';
+    selectingWellLocation = true;
+    safeAlert('Нажмите на карте место, где находится колодец.');
+}
 
-        }
+// Нажатие "+" сначала пытается получить GPS
+addWellButton.addEventListener('click', async () => {
 
-
-        locationRequestInProgress =
-            true;
-
-
-        return new Promise(
-            (
-                resolve,
-                reject
-            ) => {
-
-                navigator.geolocation.getCurrentPosition(
-
-                    position => {
-
-                        locationRequestInProgress =
-                            false;
-
-
-                        const latitude =
-                            position.coords.latitude;
-
-                        const longitude =
-                            position.coords.longitude;
-
-                        const accuracy =
-                            position.coords.accuracy;
-
-
-                        updateUserLocationOnMap(
-                            latitude,
-                            longitude,
-                            accuracy
-                        );
-
-
-                        if (shouldCenter) {
-
-                            map.flyTo({
-                                center: [
-                                    longitude,
-                                    latitude
-                                ],
-                                zoom: 17,
-                                duration: 700
-                            });
-
-                        }
-
-
-                        resolve({
-                            latitude,
-                            longitude,
-                            accuracy
-                        });
-
-                    },
-
-                    error => {
-
-                        locationRequestInProgress =
-                            false;
-
-
-                        console.error(
-                            'Геолокация:',
-                            error
-                        );
-
-
-                        if (!silent) {
-
-                            if (
-                                error.code ===
-                                error.PERMISSION_DENIED
-                            ) {
-
-                                safeAlert(
-                                    'Доступ к местоположению запрещён. Разрешите геолокацию для Telegram.'
-                                );
-
-                            } else {
-
-                                safeAlert(
-                                    'Не удалось определить местоположение.'
-                                );
-
-                            }
-
-                        }
-
-
-                        reject(error);
-
-                    },
-
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 12000,
-                        maximumAge: 30000
-                    }
-
-                );
-
-            }
-        );
-
+    if (addingWell) {
+        addingWell = false;
+        addWellButton.classList.remove('active');
+        return;
     }
 
+    addWellButton.classList.add('active');
 
-    /* =========================
-       ПОЛУЧАЕМ GPS ПОСЛЕ ЗАГРУЗКИ КАРТЫ
-       ========================= */
+    if (currentLocation) {
 
-    map.on(
-        'load',
-        () => {
+        editingWellId = null;
+        selectedWellLatitude = currentLocation.latitude;
+        selectedWellLongitude = currentLocation.longitude;
 
-            requestUserLocation(
-                true,
-                true
-            ).catch(
-                () => {}
-            );
-
-        }
-    );
-
-
-    /* =========================
-       НАВИГАЦИЯ
-       ========================= */
-
-    const bottomMapButton =
-        document.getElementById(
-            'bottomMapButton'
-        );
-
-    const bottomMyWellsButton =
-        document.getElementById(
-            'bottomMyWellsButton'
-        );
-
-    const bottomPanelButton =
-        document.getElementById(
-            'bottomPanelButton'
-        );
-
-    const myWellsPanel =
-        document.getElementById(
-            'myWellsPanel'
-        );
-
-    const userPanel =
-        document.getElementById(
-            'userPanel'
-        );
-
-    const adminPanel =
-        document.getElementById(
-            'adminPanel'
-        );
-
-
-    function setActiveNav(
-        button
-    ) {
-
-        [
-            bottomMapButton,
-            bottomMyWellsButton,
-            bottomPanelButton
-        ].forEach(
-            item => {
-
-                item.classList.remove(
-                    'active'
-                );
-
-            }
-        );
-
-
-        button.classList.add(
-            'active'
-        );
-
+        addWellButton.classList.remove('active');
+        openWellForm();
+        return;
     }
-
-
-    function closeAllPanels() {
-
-        myWellsPanel.classList.remove(
-            'open'
-        );
-
-        userPanel.classList.remove(
-            'open'
-        );
-
-        adminPanel.classList.remove(
-            'open'
-        );
-
-    }
-
-
-    function showMap() {
-
-        closeAllPanels();
-
-        setActiveNav(
-            bottomMapButton
-        );
-
-
-        setTimeout(
-            () => {
-
-                map.resize();
-
-            },
-            50
-        );
-
-    }
-
-
-    function showMyWells() {
-
-        closeAllPanels();
-
-        setActiveNav(
-            bottomMyWellsButton
-        );
-
-        renderMyWells();
-
-        myWellsPanel.classList.add(
-            'open'
-        );
-
-    }
-
-
-    function showUserPanel() {
-
-        closeAllPanels();
-
-        setActiveNav(
-            bottomPanelButton
-        );
-
-        updatePanelUser();
-
-        updateStatistics();
-
-        renderRecentWells();
-
-        userPanel.classList.add(
-            'open'
-        );
-
-    }
-
-
-    bottomMapButton.addEventListener(
-        'click',
-        showMap
-    );
-
-
-    bottomMyWellsButton.addEventListener(
-        'click',
-        showMyWells
-    );
-
-
-    bottomPanelButton.addEventListener(
-        'click',
-        showUserPanel
-    );
-
-
-    document
-        .getElementById(
-            'myWellsCloseButton'
-        )
-        .addEventListener(
-            'click',
-            showMap
-        );
-
-
-    document
-        .getElementById(
-            'userPanelCloseButton'
-        )
-        .addEventListener(
-            'click',
-            showMap
-        );
-
-
-    /* =========================
-       ПОЛЬЗОВАТЕЛЬ
-       ========================= */
-
-    function setCurrentUser(user) {
-
-        currentUser =
-            user || null;
-
-        updatePanelUser();
-
-    }
-
-
-    function updatePanelUser() {
-
-        if (!currentUser) {
-            return;
-        }
-
-
-        document.getElementById(
-            'panelNickname'
-        ).textContent =
-            currentUser.nickname ||
-            'Пользователь';
-
-
-        document.getElementById(
-            'panelRole'
-        ).textContent =
-            currentUser.role === 'admin'
-                ? 'Администратор'
-                : 'Пользователь';
-
-
-        const panelAdminButton =
-            document.getElementById(
-                'panelAdminButton'
-            );
-
-
-        if (
-            currentUser.role === 'admin'
-        ) {
-
-            panelAdminButton.style.display =
-                'flex';
-
-        } else {
-
-            panelAdminButton.style.display =
-                'none';
-
-        }
-
-    }
-
-
-    /* =========================
-       ТЕКСТ
-       ========================= */
-
-    function escapeHtml(value) {
-
-        return String(value)
-            .replaceAll('&', '&amp;')
-            .replaceAll('<', '&lt;')
-            .replaceAll('>', '&gt;')
-            .replaceAll('"', '&quot;')
-            .replaceAll("'", '&#039;');
-
-    }
-
-
-    function getTypeName(type) {
-
-        if (type === 'collector') {
-            return 'Коллектор';
-        }
-
-        if (type === 'rain_inlet') {
-            return 'Дождеприёмник';
-        }
-
-        return 'Не указан';
-
-    }
-
-
-    function getStatusName(status) {
-
-        if (status === 'active') {
-            return 'Рабочее';
-        }
-
-        if (status === 'needs_repair') {
-            return 'Требует ремонта';
-        }
-
-        if (status === 'broken') {
-            return 'Неисправен';
-        }
-
-        if (status === 'not_used') {
-            return 'Не используется';
-        }
-
-        return status || 'Не указан';
-
-    }
-
-
-    /* =========================
-       ФИЛЬТРАЦИЯ
-       ========================= */
-
-    function getFilteredWells() {
-
-        return allWells.filter(
-            well => {
-
-                const typeMatches =
-                    activeTypeFilter === 'all' ||
-                    well.type === activeTypeFilter;
-
-
-                const statusMatches =
-                    activeStatusFilter === 'all' ||
-                    well.status === activeStatusFilter;
-
-
-                return (
-                    typeMatches &&
-                    statusMatches
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================
-       ОЧИСТКА МАРКЕРОВ
-       ========================= */
-
-    function clearWellMarkers() {
-
-        wellMarkers.forEach(
-            marker => {
-
-                marker.remove();
-
-            }
-        );
-
-
-        wellMarkers = [];
-
-    }
-
-
-    /* =========================
-       РЕНДЕР КОЛОДЦЕВ
-       ========================= */
-
-    function renderFilteredWells() {
-
-        clearWellMarkers();
-
-
-        visibleWells =
-            getFilteredWells();
-
-
-        visibleWells.forEach(
-            well => {
-
-                const latitude =
-                    Number(
-                        well.latitude
-                    );
-
-                const longitude =
-                    Number(
-                        well.longitude
-                    );
-
-
-                const marker =
-                    new mapboxgl.Marker({
-                        color:
-                            well.status === 'active'
-                                ? '#22c55e'
-                                : well.status === 'needs_repair'
-                                    ? '#eab308'
-                                    : well.status === 'broken'
-                                        ? '#ef4444'
-                                        : '#555'
-                    })
-                    .setLngLat([
-                        longitude,
-                        latitude
-                    ]);
-
-
-                let popupHtml =
-                    `<b>${escapeHtml(
-                        getTypeName(
-                            well.type
-                        )
-                    )}</b><br>`;
-
-
-                popupHtml +=
-                    `Статус: ${escapeHtml(
-                        getStatusName(
-                            well.status
-                        )
-                    )}`;
-
-
-                if (
-                    well.description
-                ) {
-
-                    popupHtml +=
-                        `<br>Описание: ${
-                            escapeHtml(
-                                well.description
-                            )
-                        }`;
-
-                }
-
-
-                if (
-                    well.approx_address
-                ) {
-
-                    popupHtml +=
-                        `<br><strong>Ориентир:</strong> ` +
-                        `${escapeHtml(
-                            well.approx_address
-                        )}`;
-
-                }
-
-
-                /* =========================
-                   КНОПКИ УПРАВЛЕНИЯ
-                   ========================= */
-
-                if (
-                    currentUser &&
-                    (
-                        currentUser.role === 'admin' ||
-                        Number(currentUser.id) === Number(well.user_id)
-                    )
-                ) {
-
-                    popupHtml +=
-                        `<br>
-                        <button
-                            class="editWellButton"
-                            data-well-id="${well.id}"
-                            style="
-                                margin-top:10px;
-                                width:100%;
-                                padding:8px;
-                                border:none;
-                                border-radius:8px;
-                                background:#2563eb;
-                                color:white;
-                                cursor:pointer;
-                            "
-                        >Редактировать</button>
-
-                        <button
-                            class="deleteWellButton"
-                            data-well-id="${well.id}"
-                            style="
-                                margin-top:8px;
-                                width:100%;
-                                padding:8px;
-                                border:none;
-                                border-radius:8px;
-                                background:#ef4444;
-                                color:white;
-                                cursor:pointer;
-                            "
-                        >Удалить колодец</button>`;
-
-                }
-
-
-                popupHtml +=
-                    `<br><small>` +
-                    `${latitude.toFixed(6)}, ` +
-                    `${longitude.toFixed(6)}` +
-                    `</small>`;
-
-
-                const popup =
-                    new mapboxgl.Popup({
-                        offset: 28
-                    })
-                    .setHTML(
-                        popupHtml
-                    );
-
-
-                marker
-                    .setPopup(
-                        popup
-                    )
-                    .addTo(map);
-
-
-                wellMarkers.push(
-                    marker
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================
-       ЗАГРУЗКА КОЛОДЦЕВ
-       ========================= */
-
-    async function loadWells() {
-
-        try {
-
-            const data =
-                await apiRequest(
-                    'list_wells'
-                );
-
-
-            const wells =
-                Array.isArray(data.wells)
-                    ? data.wells
-                    : [];
-
-
-            allWells =
-                wells;
-
-
-            if (map.loaded()) {
-
-                renderFilteredWells();
-
-            } else {
-
-                map.once(
-                    'load',
-                    () => {
-                        renderFilteredWells();
-                    }
-                );
-
-            }
-
-
-            console.log(
-                'Загружено колодцев:',
-                wells.length
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                'Ошибка загрузки колодцев:',
-                error
-            );
-
-
-            safeAlert(
-                'Не удалось загрузить колодцы:\n' +
-                error.message
-            );
-
-        }
-
-    }
-
-
-    /* =========================
-       СТАТИСТИКА
-       ========================= */
-
-    function updateStatistics() {
-
-        const wells =
-            getFilteredWells();
-
-
-        const active =
-            wells.filter(
-                well =>
-                    well.status === 'active'
-            ).length;
-
-
-        const repair =
-            wells.filter(
-                well =>
-                    well.status === 'needs_repair'
-            ).length;
-
-
-        const broken =
-            wells.filter(
-                well =>
-                    well.status === 'broken'
-            ).length;
-
-
-        const collectors =
-            wells.filter(
-                well =>
-                    well.type === 'collector'
-            ).length;
-
-
-        const rainInlets =
-            wells.filter(
-                well =>
-                    well.type === 'rain_inlet'
-            ).length;
-
-
-        document.getElementById(
-            'statTotal'
-        ).textContent =
-            wells.length;
-
-
-        document.getElementById(
-            'statActive'
-        ).textContent =
-            active;
-
-
-        document.getElementById(
-            'statRepair'
-        ).textContent =
-            repair;
-
-
-        document.getElementById(
-            'statBroken'
-        ).textContent =
-            broken;
-
-
-        document.getElementById(
-            'statCollectors'
-        ).textContent =
-            collectors;
-
-
-        document.getElementById(
-            'statRainInlets'
-        ).textContent =
-            rainInlets;
-
-    }
-
-
-    /* =========================
-       ФИЛЬТРЫ
-       ========================= */
-
-    document
-        .querySelectorAll(
-            '[data-filter-type]'
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    'click',
-                    () => {
-
-                        activeTypeFilter =
-                            button.dataset.filterType;
-
-
-                        document
-                            .querySelectorAll(
-                                '[data-filter-type]'
-                            )
-                            .forEach(
-                                item => {
-
-                                    item.classList.remove(
-                                        'active'
-                                    );
-
-                                }
-                            );
-
-
-                        button.classList.add(
-                            'active'
-                        );
-
-
-                        renderFilteredWells();
-
-                    }
-                );
-
-            }
-        );
-
-
-    document
-        .querySelectorAll(
-            '[data-filter-status]'
-        )
-        .forEach(
-            button => {
-
-                button.addEventListener(
-                    'click',
-                    () => {
-
-                        activeStatusFilter =
-                            button.dataset.filterStatus;
-
-
-                        document
-                            .querySelectorAll(
-                                '[data-filter-status]'
-                            )
-                            .forEach(
-                                item => {
-
-                                    item.classList.remove(
-                                        'active'
-                                    );
-
-                                }
-                            );
-
-
-                        button.classList.add(
-                            'active'
-                        );
-
-
-                        renderFilteredWells();
-
-                    }
-                );
-
-            }
-        );
-
-
-    /* =========================
-       МОИ КОЛОДЦЫ
-       ========================= */
-
-    function openWellOnMap(well) {
-
-        showMap();
-
-
-        const latitude =
-            Number(
-                well.latitude
-            );
-
-        const longitude =
-            Number(
-                well.longitude
-            );
-
-
-        map.flyTo({
-            center: [
-                longitude,
-                latitude
-            ],
-            zoom: 18,
-            duration: 800
-        });
-
-
-        setTimeout(
-            () => {
-
-                const marker =
-                    wellMarkers.find(
-                        item => {
-
-                            const position =
-                                item.getLngLat();
-
-                            return (
-                                Math.abs(
-                                    position.lat -
-                                    latitude
-                                ) < 0.000001 &&
-                                Math.abs(
-                                    position.lng -
-                                    longitude
-                                ) < 0.000001
-                            );
-
-                        }
-                    );
-
-
-                if (marker) {
-
-                    marker.togglePopup();
-
-                }
-
-            },
-            900
-        );
-
-    }
-
-
-    function renderMyWells() {
-
-        const list =
-            document.getElementById(
-                'myWellsList'
-            );
-
-
-        list.innerHTML =
-            '';
-
-
-        if (!currentUser) {
-
-            list.innerHTML =
-                `<div class="emptyState">
-                    Пользователь не авторизован.
-                </div>`;
-
-            return;
-
-        }
-
-
-        const myWells =
-            allWells.filter(
-                well =>
-                    Number(
-                        well.user_id
-                    ) ===
-                    Number(
-                        currentUser.id
-                    )
-            );
-
-
-        document.getElementById(
-            'myWellsSubtitle'
-        ).textContent =
-            `Всего объектов: ${myWells.length}`;
-
-
-        if (
-            myWells.length === 0
-        ) {
-
-            list.innerHTML =
-                `<div class="emptyState">
-                    Вы пока не добавили ни одного колодца.
-                </div>`;
-
-            return;
-
-        }
-
-
-        myWells.forEach(
-            well => {
-
-                const item =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                item.className =
-                    'myWellItem';
-
-
-                item.innerHTML = `
-
-                    <div class="myWellItemTitle">
-                        ${escapeHtml(
-                            getTypeName(
-                                well.type
-                            )
-                        )}
-                    </div>
-
-                    <div class="myWellItemStatus">
-                        ${escapeHtml(
-                            getStatusName(
-                                well.status
-                            )
-                        )}
-                    </div>
-
-                    <div class="myWellItemCoordinates">
-                        ${Number(
-                            well.latitude
-                        ).toFixed(6)},
-                        ${Number(
-                            well.longitude
-                        ).toFixed(6)}
-                    </div>
-
-                `;
-
-
-                item.addEventListener(
-                    'click',
-                    () => {
-
-                        openWellOnMap(
-                            well
-                        );
-
-                    }
-                );
-
-
-                list.appendChild(
-                    item
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================
-       ПОСЛЕДНИЕ КОЛОДЦЫ
-       ========================= */
-
-    function renderRecentWells() {
-
-        const list =
-            document.getElementById(
-                'recentWellsList'
-            );
-
-
-        list.innerHTML =
-            '';
-
-
-        const recent =
-            [...allWells]
-                .sort(
-                    (a, b) =>
-                        new Date(
-                            b.created_at || 0
-                        ) -
-                        new Date(
-                            a.created_at || 0
-                        )
-                )
-                .slice(0, 5);
-
-
-        if (
-            recent.length === 0
-        ) {
-
-            list.innerHTML =
-                `<div class="emptyState">
-                    Пока нет добавленных колодцев.
-                </div>`;
-
-            return;
-
-        }
-
-
-        recent.forEach(
-            well => {
-
-                const item =
-                    document.createElement(
-                        'div'
-                    );
-
-
-                item.className =
-                    'recentItem';
-
-
-                const date =
-                    well.created_at
-                        ? new Date(
-                            well.created_at
-                        ).toLocaleString(
-                            'ru-RU',
-                            {
-                                day: '2-digit',
-                                month: '2-digit',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            }
-                        )
-                        : '';
-
-
-                item.innerHTML = `
-
-                    <div class="recentItemTitle">
-                        ${escapeHtml(
-                            getTypeName(
-                                well.type
-                            )
-                        )}
-                    </div>
-
-                    <div class="recentItemMeta">
-                        ${escapeHtml(
-                            getStatusName(
-                                well.status
-                            )
-                        )}
-                        ${date ? ' · ' + date : ''}
-                    </div>
-
-                `;
-
-
-                item.addEventListener(
-                    'click',
-                    () => {
-
-                        openWellOnMap(
-                            well
-                        );
-
-                    }
-                );
-
-
-                list.appendChild(
-                    item
-                );
-
-            }
-        );
-
-    }
-
-
-    /* =========================
-       БЫСТРЫЕ ДЕЙСТВИЯ
-       ========================= */
-
-    document
-        .getElementById(
-            'panelLocationButton'
-        )
-        .addEventListener(
-            'click',
-            () => {
-
-                showMap();
-
-                requestUserLocation(
-                    true
-                ).catch(
-                    () => {}
-                );
-
-            }
-        );
-
-
-    document
-        .getElementById(
-            'panelAddWellButton'
-        )
-        .addEventListener(
-            'click',
-            () => {
-
-                showMap();
-
-                addWellButton.click();
-
-            }
-        );
-
-
-    document
-        .getElementById(
-            'panelMyWellsButton'
-        )
-        .addEventListener(
-            'click',
-            showMyWells
-        );
-
-
-    /* =========================
-       КНОПКА МОЕГО МЕСТОПОЛОЖЕНИЯ
-       ========================= */
-
-    document
-        .getElementById(
-            'locationButton'
-        )
-        .addEventListener(
-            'click',
-            () => {
-
-                requestUserLocation(
-                    true
-                ).catch(
-                    () => {}
-                );
-
-            }
-        );
-
-
-    /* =========================
-       ФОРМА КОЛОДЦА
-       ========================= */
-
-    const addWellButton =
-        document.getElementById(
-            'addWellButton'
-        );
-
-    const wellForm =
-        document.getElementById(
-            'wellForm'
-        );
-
-    const wellFormTitle =
-        document.getElementById(
-            'wellFormTitle'
-        );
-
-    const createWellButton =
-        document.getElementById(
-            'createWellButton'
-        );
-
-    const selectedTypeElement =
-        document.getElementById(
-            'selectedType'
-        );
-
-    const wellCoordinates =
-        document.getElementById(
-            'wellCoordinates'
-        );
-
-    const changeLocationButton =
-        document.getElementById(
-            'changeLocationButton'
-        );
-
-
-    function updateWellCoordinatesDisplay() {
-
-        if (
-            selectedWellLatitude === null ||
-            selectedWellLongitude === null
-        ) {
-
-            wellCoordinates.textContent =
-                'Координаты не выбраны';
-
-            return;
-
-        }
-
-
-        wellCoordinates.innerHTML =
-            'Широта: ' +
-            selectedWellLatitude.toFixed(6) +
-            '<br>' +
-            'Долгота: ' +
-            selectedWellLongitude.toFixed(6);
-
-    }
-
-
-    /* =========================
-       ОТКРЫТИЕ ФОРМЫ СОЗДАНИЯ
-       ========================= */
-
-    function openWellForm() {
-
-        if (
-            editingWellId === null
-        ) {
-
-            selectedWellType =
-                null;
-
-            selectedTypeElement.textContent =
-                'Тип не выбран';
-
-        }
-
-
-        updateWellCoordinatesDisplay();
-
-
-        wellForm.style.display =
-            'flex';
-
-    }
-
-
-    /* =========================
-       ОТКРЫТИЕ ФОРМЫ РЕДАКТИРОВАНИЯ
-       ========================= */
-
-    function openEditWellForm(well) {
-
-        editingWellId =
-            Number(
-                well.id
-            );
-
-
-        selectedWellLatitude =
-            Number(
-                well.latitude
-            );
-
-
-        selectedWellLongitude =
-            Number(
-                well.longitude
-            );
-
-
-        selectedWellType =
-            well.type || null;
-
-
-        if (
-            selectedWellType === 'collector'
-        ) {
-
-            selectedTypeElement.textContent =
-                'Тип: Коллектор';
-
-        } else if (
-            selectedWellType === 'rain_inlet'
-        ) {
-
-            selectedTypeElement.textContent =
-                'Тип: Дождеприёмник';
-
-        } else {
-
-            selectedTypeElement.textContent =
-                'Тип не выбран';
-
-        }
-
-
-        document.getElementById(
-            'wellStatus'
-        ).value =
-            well.status || 'active';
-
-
-        document.getElementById(
-            'wellDescription'
-        ).value =
-            well.description || '';
-
-
-        document.getElementById(
-            'wellApproxAddress'
-        ).value =
-            well.approx_address || '';
-
-
-        const workRequirements =
-            well.work_requirements &&
-            typeof well.work_requirements === 'object'
-                ? well.work_requirements
-                : {};
-
-
-        document.getElementById(
-            'workConcrete'
-        ).checked =
-            workRequirements.concrete === true;
-
-
-        document.getElementById(
-            'workCover'
-        ).checked =
-            workRequirements.cover === true;
-
-
-        document.getElementById(
-            'workKit'
-        ).checked =
-            workRequirements.kit === true;
-
-
-        document.getElementById(
-            'workKcp'
-        ).checked =
-            workRequirements.kcp === true;
-
-
-        wellFormTitle.textContent =
-            'Редактирование колодца';
-
-
-        createWellButton.textContent =
-            'Сохранить изменения';
-
-
-        updateWellCoordinatesDisplay();
-
-
-        wellForm.style.display =
-            'flex';
-
-    }
-
-
-    function startManualLocationSelection() {
-
-        wellForm.style.display =
-            'none';
-
-
-        selectingWellLocation =
-            true;
-
-
-        safeAlert(
-            'Нажмите на карте место, где находится колодец.'
-        );
-
-    }
-
-
-    /*
-       Нажатие "+" теперь сначала
-       пытается получить GPS.
-    */
-
-    addWellButton.addEventListener(
-        'click',
-        async () => {
-
-            if (addingWell) {
-
-                addingWell =
-                    false;
-
-                addWellButton.classList.remove(
-                    'active'
-                );
-
-                return;
-
-            }
-
-
-            addWellButton.classList.add(
-                'active'
-            );
-
-
-            /*
-               Если координаты уже недавно
-               получены — используем их сразу.
-            */
-
-            if (currentLocation) {
-
-                editingWellId =
-                    null;
-
-                selectedWellLatitude =
-                    currentLocation.latitude;
-
-                selectedWellLongitude =
-                    currentLocation.longitude;
-
-
-                addWellButton.classList.remove(
-                    'active'
-                );
-
-
-                openWellForm();
-
-                return;
-
-            }
-
-
-            /*
-               Иначе получаем GPS.
-            */
-
-            try {
-
-                const location =
-                    await requestUserLocation(
-                        false
-                    );
-
-
-                editingWellId =
-                    null;
-
-                selectedWellLatitude =
-                    location.latitude;
-
-                selectedWellLongitude =
-                    location.longitude;
-
-
-                addWellButton.classList.remove(
-                    'active'
-                );
-
-
-                openWellForm();
-
-            } catch {
-
-                /*
-                   Если GPS не сработал,
-                   переходим к старому режиму:
-                   пользователь выбирает точку руками.
-                */
-
-                addWellButton.classList.add(
-                    'active'
-                );
-
-
-                addingWell =
-                    true;
-
-
-                safeAlert(
-                    'Не удалось определить местоположение.\n\n' +
-                    'Теперь выберите место колодца на карте.'
-                );
-
-            }
-
-        }
-    );
-
-
-    /*
-       Режим ручного выбора координат.
-    */
-
-    map.on(
-        'click',
-        event => {
-
-            if (
-                !addingWell &&
-                !selectingWellLocation
-            ) {
-                return;
-            }
-
-
-            selectedWellLatitude =
-                event.lngLat.lat;
-
-            selectedWellLongitude =
-                event.lngLat.lng;
-
-
-            if (selectingWellLocation) {
-
-                selectingWellLocation =
-                    false;
-
-
-                updateWellCoordinatesDisplay();
-
-
-                openWellForm();
-
-
-                return;
-
-            }
-
-
-            editingWellId =
-                null;
-
-
-            selectedWellType =
-                null;
-
-
-            selectedTypeElement.textContent =
-                'Тип не выбран';
-
-
-            updateWellCoordinatesDisplay();
-
-
-            addingWell =
-                false;
-
-
-            addWellButton.classList.remove(
-                'active'
-            );
-
-
-            openWellForm();
-
-        }
-    );
-
-
-    /*
-       Кнопка изменения места
-    */
-
-    changeLocationButton.addEventListener(
-        'click',
-        startManualLocationSelection
-    );
-
-
-    function chooseWellType(
-        type,
-        title
-    ) {
-
-        selectedWellType =
-            type;
-
-
-        selectedTypeElement.textContent =
-            'Тип: ' + title;
-
-    }
-
-
-    document
-        .getElementById(
-            'collectorButton'
-        )
-        .addEventListener(
-            'click',
-            () => {
-
-                chooseWellType(
-                    'collector',
-                    'Коллектор'
-                );
-
-            }
-        );
-
-
-    document
-        .getElementById(
-            'rainInletButton'
-        )
-        .addEventListener(
-            'click',
-            () => {
-
-                chooseWellType(
-                    'rain_inlet',
-                    'Дождеприёмник'
-                );
-
-            }
-        );
-
-
-    /* =========================
-       СБРОС ФОРМЫ
-       ========================= */
-
-    function resetWellForm() {
-
-        wellForm.style.display =
-            'none';
-
-
-        addingWell =
-            false;
-
-        selectingWellLocation =
-            false;
-
-
-        selectedWellLatitude =
-            null;
-
-        selectedWellLongitude =
-            null;
-
-        selectedWellType =
-            null;
-
-        editingWellId =
-            null;
-
-
-        addWellButton.classList.remove(
-            'active'
-        );
-
-
-        document.getElementById(
-            'wellStatus'
-        ).value =
-            'active';
-
-
-        document.getElementById(
-            'workConcrete'
-        ).checked =
-            false;
-
-
-        document.getElementById(
-            'workCover'
-        ).checked =
-            false;
-
-
-        document.getElementById(
-            'workKit'
-        ).checked =
-            false;
-
-
-        document.getElementById(
-            'workKcp'
-        ).checked =
-            false;
-
-
-        document.getElementById(
-            'wellDescription'
-        ).value =
-            '';
-
-
-        document.getElementById(
-            'wellApproxAddress'
-        ).value =
-            '';
-
-
-        wellFormTitle.textContent =
-            'Новый колодец';
-
-
-        createWellButton.textContent =
-            'Создать колодец';
-
-
-        selectedTypeElement.textContent =
-            'Тип не выбран';
-
-
-        wellCoordinates.textContent =
-            'Координаты не выбраны';
-
-    }
-
-
-    document
-        .getElementById(
-            'cancelWellButton'
-        )
-        .addEventListener(
-            'click',
-            resetWellForm
-        );
-
-
-    /* =========================
-       СОЗДАНИЕ / РЕДАКТИРОВАНИЕ
-       ========================= */
-
-    createWellButton.addEventListener(
-        'click',
-        async () => {
-
-            if (!selectedWellType) {
-
-                safeAlert(
-                    'Сначала выберите тип объекта.'
-                );
-
-                return;
-
-            }
-
-
-            if (
-                selectedWellLatitude === null ||
-                selectedWellLongitude === null
-            ) {
-
-                safeAlert(
-                    'Не выбраны координаты.'
-                );
-
-                return;
-
-            }
-
-
-            const status =
-                document.getElementById(
-                    'wellStatus'
-                ).value;
-
-
-            const description =
-                document.getElementById(
-                    'wellDescription'
-                ).value.trim();
-
-
-            const approxAddress =
-                document.getElementById(
-                    'wellApproxAddress'
-                ).value.trim();
-
-
-            const workRequirements = {
-
-                concrete:
-                    document.getElementById(
-                        'workConcrete'
-                    ).checked,
-
-                cover:
-                    document.getElementById(
-                        'workCover'
-                    ).checked,
-
-                kit:
-                    document.getElementById(
-                        'workKit'
-                    ).checked,
-
-                kcp:
-                    document.getElementById(
-                        'workKcp'
-                    ).checked
-
-            };
-
-
-            const isEditing =
-                editingWellId !== null;
-
-
-            createWellButton.disabled =
-                true;
-
-
-            createWellButton.textContent =
-                'Сохранение...';
-
-
-            try {
-
-                let data;
-
-
-                if (isEditing) {
-
-                    data =
-                        await apiRequest(
-                            'update_well',
-                            {
-                                wellId:
-                                    editingWellId,
-
-                                latitude:
-                                    selectedWellLatitude,
-
-                                longitude:
-                                    selectedWellLongitude,
-
-                                type:
-                                    selectedWellType,
-
-                                status:
-                                    status,
-
-                                description:
-                                    description ||
-                                    null,
-
-                                approxAddress:
-                                    approxAddress ||
-                                    null,
-
-                                workRequirements:
-                                    workRequirements
-                            }
-                        );
-
-
-                    console.log(
-                        'Редактирование колодца:',
-                        data
-                    );
-
-
-                } else {
-
-                    data =
-                        await apiRequest(
-                            'create_well',
-                            {
-                                latitude:
-                                    selectedWellLatitude,
-
-                                longitude:
-                                    selectedWellLongitude,
-
-                                type:
-                                    selectedWellType,
-
-                                status:
-                                    status,
-
-                                description:
-                                    description ||
-                                    null,
-
-                                approxAddress:
-                                    approxAddress ||
-                                    null,
-
-                                workRequirements:
-                                    workRequirements
-                            }
-                        );
-
-
-                    console.log(
-                        'Создание колодца:',
-                        data
-                    );
-
-                }
-
-
-                resetWellForm();
-
-
-                await loadWells();
-
-
-                safeAlert(
-                    isEditing
-                        ? 'Колодец успешно изменён.'
-                        : 'Колодец успешно создан.'
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    isEditing
-                        ? 'Ошибка редактирования колодца:'
-                        : 'Ошибка создания колодца:',
-                    error
-                );
-
-
-                safeAlert(
-                    error.message ||
-                    (
-                        isEditing
-                            ? 'Не удалось изменить колодец.'
-                            : 'Не удалось создать колодец.'
-                    )
-                );
-
-
-            } finally {
-
-                createWellButton.disabled =
-                    false;
-
-
-                /*
-                   Если операция завершилась ошибкой,
-                   оставляем правильную подпись режима.
-                */
-
-                if (
-                    editingWellId !== null
-                ) {
-
-                    createWellButton.textContent =
-                        'Сохранить изменения';
-
-                } else {
-
-                    createWellButton.textContent =
-                        'Создать колодец';
-
-                }
-
-            }
-
-        }
-    );
-
-
-    /* =========================
-       РЕГИСТРАЦИЯ
-       ========================= */
-
-    loginButton.addEventListener(
-        'click',
-        async () => {
-
-            const inviteCode =
-                document
-                    .getElementById(
-                        'inviteCodeInput'
-                    )
-                    .value
-                    .trim();
-
-
-            const nickname =
-                document
-                    .getElementById(
-                        'nicknameInput'
-                    )
-                    .value
-                    .trim();
-
-
-            registrationError.textContent =
-                '';
-
-
-            if (!inviteCode) {
-
-                registrationError.textContent =
-                    'Введите пригласительный код.';
-
-                return;
-
-            }
-
-
-            if (!nickname) {
-
-                registrationError.textContent =
-                    'Введите никнейм.';
-
-                return;
-
-            }
-
-
-            if (
-                nickname.length < 3
-            ) {
-
-                registrationError.textContent =
-                    'Никнейм должен содержать минимум 3 символа.';
-
-                return;
-
-            }
-
-
-            loginButton.disabled =
-                true;
-
-            loginButton.textContent =
-                'Проверка...';
-
-
-            try {
-
-                const data =
-                    await apiRequest(
-                        'redeem_invite',
-                        {
-                            inviteCode:
-                                inviteCode,
-
-                            nickname:
-                                nickname
-                        }
-                    );
-
-
-                setCurrentUser(
-                    data.user
-                );
-
-
-                registrationScreen.style.display =
-                    'none';
-
-
-                await loadWells();
-
-
-                safeAlert(
-                    'Добро пожаловать, ' +
-                    data.user.nickname +
-                    '!'
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    'Ошибка регистрации:',
-                    error
-                );
-
-
-                registrationError.textContent =
-                    error.message ||
-                    'Не удалось выполнить регистрацию.';
-
-            } finally {
-
-                loginButton.disabled =
-                    false;
-
-                loginButton.textContent =
-                    'Войти';
-
-            }
-
-        }
-    );
-
-
-    /* =========================
-       АДМИНКА
-       ========================= */
-
-    const adminBackButton =
-        document.getElementById(
-            'adminBackButton'
-        );
-
-
-    async function loadInvites() {
-
-        const inviteList =
-            document.getElementById(
-                'inviteList'
-            );
-
-
-        inviteList.textContent =
-            'Загрузка...';
-
-
-        try {
-
-            const data =
-                await apiRequest(
-                    'list_invites'
-                );
-
-
-            const invites =
-                Array.isArray(
-                    data.invites
-                )
-                    ? data.invites
-                    : [];
-
-
-            if (
-                invites.length === 0
-            ) {
-
-                inviteList.textContent =
-                    'Приглашений пока нет.';
-
-                return;
-
-            }
-
-
-            inviteList.innerHTML =
-                '';
-
-
-            invites.forEach(
-                invite => {
-
-                    const item =
-                        document.createElement(
-                            'div'
-                        );
-
-
-                    item.className =
-                        'inviteItem';
-
-
-                    const status =
-                        invite.used_at
-                            ? 'Использован'
-                            : 'Свободен';
-
-
-                    const createdDate =
-                        invite.created_at
-                            ? new Date(
-                                invite.created_at
-                            ).toLocaleString(
-                                'ru-RU',
-                                {
-                                    day: '2-digit',
-                                    month: '2-digit',
-                                    year: 'numeric',
-                                    hour: '2-digit',
-                                    minute: '2-digit'
-                                }
-                            )
-                            : '';
-
-
-                    item.innerHTML = `
-
-                        <div class="inviteCode">
-                            ${escapeHtml(
-                                invite.code
-                            )}
-                        </div>
-
-                        <div class="inviteStatus">
-                            ${status}
-                        </div>
-
-                        <div class="inviteStatus">
-                            Создано: ${createdDate}
-                        </div>
-
-                    `;
-
-
-                    inviteList.appendChild(
-                        item
-                    );
-
-                }
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                'Ошибка загрузки приглашений:',
-                error
-            );
-
-
-            inviteList.textContent =
-                'Ошибка: ' +
-                error.message;
-
-        }
-
-    }
-
-
-    document
-        .getElementById(
-            'panelAdminButton'
-        )
-        .addEventListener(
-            'click',
-            () => {
-
-                userPanel.classList.remove(
-                    'open'
-                );
-
-                adminPanel.classList.add(
-                    'open'
-                );
-
-                loadInvites();
-
-            }
-        );
-
-
-    adminBackButton.addEventListener(
-        'click',
-        () => {
-
-            adminPanel.classList.remove(
-                'open'
-            );
-
-            showUserPanel();
-
-        }
-    );
-
-
-    document
-        .getElementById(
-            'generateInviteButton'
-        )
-        .addEventListener(
-            'click',
-            async () => {
-
-                const button =
-                    document.getElementById(
-                        'generateInviteButton'
-                    );
-
-
-                const result =
-                    document.getElementById(
-                        'inviteResult'
-                    );
-
-
-                button.disabled =
-                    true;
-
-                button.textContent =
-                    'Создание...';
-
-                result.textContent =
-                    '';
-
-
-                try {
-
-                    const data =
-                        await apiRequest(
-                            'generate_invite'
-                        );
-
-
-                    result.textContent =
-                        'Код приглашения: ' +
-                        data.invite.code;
-
-
-                    await loadInvites();
-
-
-                } catch (error) {
-
-                    console.error(
-                        error
-                    );
-
-
-                    result.textContent =
-                        'Ошибка: ' +
-                        error.message;
-
-                } finally {
-
-                    button.disabled =
-                        false;
-
-                    button.textContent =
-                        '+ Создать приглашение';
-
-                }
-
-            }
-        );
-async function loadAdminUsers() {
-
-    const list =
-        document.getElementById(
-            'adminUsersList'
-        );
-
-    list.style.display = 'block';
-
-    list.innerHTML =
-        '<div class="inviteItem">Загрузка пользователей...</div>';
 
     try {
 
-        const data =
-            await apiRequest(
-                'list_users'
-            );
+        const location = await requestUserLocation(false);
 
-        const users =
-            data.users || [];
-        window.adminUsers = users;
+        editingWellId = null;
+        selectedWellLatitude = location.latitude;
+        selectedWellLongitude = location.longitude;
 
-        if (!users.length) {
+        addWellButton.classList.remove('active');
+        openWellForm();
 
-            list.innerHTML =
-                '<div class="inviteItem">Пользователей пока нет.</div>';
+    } catch {
 
+        // GPS не сработал — ручной выбор точки на карте
+        addWellButton.classList.add('active');
+        addingWell = true;
+
+        safeAlert(
+            'Не удалось определить местоположение.\n\n' +
+            'Теперь выберите место колодца на карте.'
+        );
+    }
+});
+
+// Ручной выбор координат
+map.on('click', event => {
+
+    if (!addingWell && !selectingWellLocation) return;
+
+    selectedWellLatitude = event.lngLat.lat;
+    selectedWellLongitude = event.lngLat.lng;
+
+    if (selectingWellLocation) {
+        selectingWellLocation = false;
+        updateWellCoordinatesDisplay();
+        openWellForm();
+        return;
+    }
+
+    editingWellId = null;
+    selectedWellType = null;
+    selectedTypeElement.textContent = 'Тип не выбран';
+
+    updateWellCoordinatesDisplay();
+
+    addingWell = false;
+    addWellButton.classList.remove('active');
+
+    openWellForm();
+});
+
+changeLocationButton.addEventListener('click', startManualLocationSelection);
+
+function chooseWellType(type, title) {
+    selectedWellType = type;
+    selectedTypeElement.textContent = 'Тип: ' + title;
+    updateTypeButtons();
+}
+
+collectorButton.addEventListener('click', () => chooseWellType('collector', 'Коллектор'));
+rainInletButton.addEventListener('click', () => chooseWellType('rain_inlet', 'Дождеприёмник'));
+
+
+/* =========================
+   СБРОС ФОРМЫ
+   ========================= */
+
+function resetWellForm() {
+
+    wellForm.style.display = 'none';
+
+    addingWell = false;
+    selectingWellLocation = false;
+    selectedWellLatitude = null;
+    selectedWellLongitude = null;
+    selectedWellType = null;
+    editingWellId = null;
+
+    addWellButton.classList.remove('active');
+
+    $('wellStatus').value = 'active';
+    $('workConcrete').checked = false;
+    $('workCover').checked = false;
+    $('workKit').checked = false;
+    $('workKcp').checked = false;
+    $('wellDescription').value = '';
+    $('wellApproxAddress').value = '';
+
+    wellFormTitle.textContent = 'Новый колодец';
+    createWellButton.textContent = 'Создать колодец';
+    selectedTypeElement.textContent = 'Тип не выбран';
+    wellCoordinates.textContent = 'Координаты не выбраны';
+
+    updateTypeButtons();
+}
+
+$('cancelWellButton').addEventListener('click', resetWellForm);
+
+
+/* =========================
+   СОЗДАНИЕ / РЕДАКТИРОВАНИЕ
+   ========================= */
+
+createWellButton.addEventListener('click', async () => {
+
+    if (!selectedWellType) {
+        safeAlert('Сначала выберите тип объекта.');
+        return;
+    }
+
+    if (selectedWellLatitude === null || selectedWellLongitude === null) {
+        safeAlert('Не выбраны координаты.');
+        return;
+    }
+
+    const payload = {
+        latitude: selectedWellLatitude,
+        longitude: selectedWellLongitude,
+        type: selectedWellType,
+        status: $('wellStatus').value,
+        description: $('wellDescription').value.trim() || null,
+        approxAddress: $('wellApproxAddress').value.trim() || null,
+        workRequirements: {
+            concrete: $('workConcrete').checked,
+            cover: $('workCover').checked,
+            kit: $('workKit').checked,
+            kcp: $('workKcp').checked
+        }
+    };
+
+    const isEditing = editingWellId !== null;
+
+    createWellButton.disabled = true;
+    createWellButton.textContent = 'Сохранение...';
+
+    try {
+
+        if (isEditing) {
+            await apiRequest('update_well', { wellId: editingWellId, ...payload });
+        } else {
+            await apiRequest('create_well', payload);
+        }
+
+        resetWellForm();
+        await loadWells();
+
+        safeAlert(isEditing ? 'Колодец успешно изменён.' : 'Колодец успешно создан.');
+
+    } catch (error) {
+
+        console.error(isEditing ? 'Ошибка редактирования колодца:' : 'Ошибка создания колодца:', error);
+
+        safeAlert(
+            error.message ||
+            (isEditing ? 'Не удалось изменить колодец.' : 'Не удалось создать колодец.')
+        );
+
+    } finally {
+
+        createWellButton.disabled = false;
+
+        createWellButton.textContent =
+            editingWellId !== null ? 'Сохранить изменения' : 'Создать колодец';
+    }
+});
+
+
+/* =========================
+   РЕГИСТРАЦИЯ
+   ========================= */
+
+loginButton.addEventListener('click', async () => {
+
+    const inviteCode = $('inviteCodeInput').value.trim();
+    const nickname = $('nicknameInput').value.trim();
+
+    registrationError.textContent = '';
+
+    if (!inviteCode) {
+        registrationError.textContent = 'Введите пригласительный код.';
+        return;
+    }
+
+    if (!nickname) {
+        registrationError.textContent = 'Введите никнейм.';
+        return;
+    }
+
+    if (nickname.length < 3) {
+        registrationError.textContent = 'Никнейм должен содержать минимум 3 символа.';
+        return;
+    }
+
+    loginButton.disabled = true;
+    loginButton.textContent = 'Проверка...';
+
+    try {
+
+        const data = await apiRequest('redeem_invite', { inviteCode, nickname });
+
+        setCurrentUser(data.user);
+
+        registrationScreen.style.display = 'none';
+
+        await loadWells();
+
+        safeAlert('Добро пожаловать, ' + data.user.nickname + '!');
+
+    } catch (error) {
+
+        console.error('Ошибка регистрации:', error);
+
+        registrationError.textContent = error.message || 'Не удалось выполнить регистрацию.';
+
+    } finally {
+
+        loginButton.disabled = false;
+        loginButton.textContent = 'Войти';
+    }
+});
+
+
+/* =========================
+   АДМИНКА: ПРИГЛАШЕНИЯ
+   ========================= */
+
+const adminBackButton = $('adminBackButton');
+
+async function loadInvites() {
+
+    const inviteList = $('inviteList');
+
+    inviteList.textContent = 'Загрузка...';
+
+    try {
+
+        const data = await apiRequest('list_invites');
+
+        const invites = Array.isArray(data.invites) ? data.invites : [];
+
+        if (invites.length === 0) {
+            inviteList.textContent = 'Приглашений пока нет.';
             return;
         }
 
-        list.innerHTML =
-            users
-                .map(
-                    user => {
+        inviteList.innerHTML = '';
 
-                        const roleLabel =
-                            user.role === 'admin'
-                                ? 'Администратор'
-                                : 'Пользователь';
+        invites.forEach(invite => {
 
-                        const icon =
-                            user.role === 'admin'
-                                ? '👑'
-                                : '👤';
+            const item = document.createElement('div');
+            item.className = 'inviteItem';
 
-                        return `
-    <div
-        class="inviteItem adminUserItem"
-        data-user-id="${user.id}"
-        style="cursor:pointer;"
-    >
+            item.innerHTML = `
+                <div class="inviteCode">${escapeHtml(invite.code)}</div>
+                <div class="inviteStatus">${invite.used_at ? 'Использован' : 'Свободен'}</div>
+                <div class="inviteStatus">Создано: ${escapeHtml(formatDate(invite.created_at, true))}</div>
+            `;
 
-        <div class="inviteCode">
-            ${icon} ${user.nickname}
-        </div>
+            inviteList.appendChild(item);
+        });
 
-        <div class="inviteStatus">
-            ${roleLabel}
-        </div>
+    } catch (error) {
 
-        <div class="inviteStatus">
-            Колодцев: ${user.well_count}
-        </div>
+        console.error('Ошибка загрузки приглашений:', error);
+        inviteList.textContent = 'Ошибка: ' + error.message;
+    }
+}
 
-    </div>
-`;
+$('panelAdminButton').addEventListener('click', () => {
+    userPanel.classList.remove('open');
+    adminPanel.classList.add('open');
+    loadInvites();
+});
 
-                        function showAdminUserDetails(user) {
+adminBackButton.addEventListener('click', () => {
+    adminPanel.classList.remove('open');
+    showUserPanel();
+});
 
-    const list =
-        document.getElementById(
-            'adminUsersList'
-        );
+$('generateInviteButton').addEventListener('click', async () => {
 
-    const details =
-        document.getElementById(
-            'adminUserDetails'
-        );
+    const button = $('generateInviteButton');
+    const result = $('inviteResult');
 
-    list.style.display =
-        'none';
+    button.disabled = true;
+    button.textContent = 'Создание...';
+    result.textContent = '';
 
-    details.style.display =
-        'block';
+    try {
 
-    const roleLabel =
-        user.role === 'admin'
-            ? 'Администратор'
-            : 'Пользователь';
+        const data = await apiRequest('generate_invite');
 
-    const registeredDate =
-        user.created_at
-            ? new Date(
-                user.created_at
-            ).toLocaleDateString(
-                'ru-RU'
-            )
-            : 'Неизвестно';
+        result.textContent = 'Код приглашения: ' + data.invite.code;
 
-    details.innerHTML = `
-        <div class="adminUserDetails">
+        await loadInvites();
 
-            <div class="adminUserDetailsCard">
+    } catch (error) {
 
-                <button
-                    type="button"
-                    id="adminUserDetailsBack"
-                    class="adminUserDetailsBack"
-                >
-                    ← Назад к пользователям
-                </button>
+        console.error(error);
+        result.textContent = 'Ошибка: ' + error.message;
 
-                <div class="adminUserDetailsName">
-                    👤 ${user.nickname}
+    } finally {
+
+        button.disabled = false;
+        button.textContent = '+ Создать приглашение';
+    }
+});
+
+
+/* =========================
+   АДМИНКА: ПОЛЬЗОВАТЕЛИ
+   ========================= */
+
+const adminUsersList = $('adminUsersList');
+const adminUserDetails = $('adminUserDetails');
+
+function showAdminUsersList() {
+    adminUserDetails.style.display = 'none';
+    adminUsersList.style.display = 'flex';
+}
+
+function renderAdminUsers() {
+
+    if (!adminUsers.length) {
+        adminUsersList.innerHTML = '<div class="inviteItem">Пользователей пока нет.</div>';
+        return;
+    }
+
+    adminUsersList.innerHTML = adminUsers.map(user => {
+
+        const isAdmin = user.role === 'admin';
+
+        return `
+            <div class="inviteItem adminUserItem" data-user-id="${Number(user.id)}">
+                <div class="grow">
+                    <div class="inviteCode">${isAdmin ? '👑' : '👤'} ${escapeHtml(user.nickname)}</div>
+                    <div class="inviteStatus">Колодцев: ${Number(user.well_count) || 0}</div>
                 </div>
+                <div class="roleBadge ${isAdmin ? 'admin' : ''}">${isAdmin ? 'Админ' : 'Пользователь'}</div>
+                <div class="panelItemArrow">›</div>
+            </div>
+        `;
+    }).join('');
+}
 
-                <div class="adminUserDetailsRow">
-                    Роль
-                </div>
+async function loadAdminUsers() {
 
-                <div class="adminUserDetailsValue">
-                    ${roleLabel}
-                </div>
+    adminUserDetails.style.display = 'none';
+    adminUsersList.style.display = 'flex';
+    adminUsersList.innerHTML = '<div class="inviteItem">Загрузка пользователей...</div>';
 
-                <div class="adminUserDetailsRow">
-                    Зарегистрирован
-                </div>
+    try {
 
-                <div class="adminUserDetailsValue">
-                    ${registeredDate}
-                </div>
+        const data = await apiRequest('list_users');
 
-                <div class="adminUserDetailsRow">
-                    Колодцев
-                </div>
+        adminUsers = Array.isArray(data.users) ? data.users : [];
 
-                <div class="adminUserDetailsValue">
-                    ${user.well_count}
-                </div>
+        renderAdminUsers();
+
+    } catch (error) {
+
+        console.error('Ошибка загрузки пользователей:', error);
+
+        adminUsersList.innerHTML =
+            `<div class="inviteItem">Ошибка загрузки пользователей: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function showAdminUserDetails(user) {
+
+    const isSelf = currentUser && Number(currentUser.id) === Number(user.id);
+    const isAdmin = user.role === 'admin';
+    const userWells = allWells.filter(well => Number(well.user_id) === Number(user.id));
+
+    adminUsersList.style.display = 'none';
+    adminUserDetails.style.display = 'block';
+
+    adminUserDetails.innerHTML = `
+        <div class="adminUserDetailsCard">
+
+            <button type="button" id="adminUserDetailsBack" class="adminUserDetailsBack">← Назад к пользователям</button>
+
+            <div class="adminUserDetailsName">${isAdmin ? '👑' : '👤'} ${escapeHtml(user.nickname)}</div>
+
+            <div class="adminUserDetailsRow">Роль</div>
+            <div class="adminUserDetailsValue">${isAdmin ? 'Администратор' : 'Пользователь'}</div>
+
+            <div class="adminUserDetailsRow">Зарегистрирован</div>
+            <div class="adminUserDetailsValue">${escapeHtml(formatDate(user.created_at) || 'Неизвестно')}</div>
+
+            <div class="adminUserDetailsRow">Колодцев</div>
+            <div class="adminUserDetailsValue">${userWells.length}</div>
+
+            <div class="adminEditBlock">
+
+                <label for="adminEditNickname">Никнейм</label>
+                <input id="adminEditNickname" type="text" maxlength="30" autocomplete="off" value="${escapeHtml(user.nickname)}">
+                <div class="adminHint">3–30 символов: буквы, цифры, пробел, _ . -</div>
+
+                <label for="adminEditRole">Роль</label>
+                <select id="adminEditRole" ${isSelf ? 'disabled' : ''}>
+                    <option value="user" ${isAdmin ? '' : 'selected'}>Пользователь</option>
+                    <option value="admin" ${isAdmin ? 'selected' : ''}>Администратор</option>
+                </select>
+                ${isSelf ? '<div class="adminHint">Свою роль изменить нельзя.</div>' : ''}
+
+                <button type="button" id="adminSaveUser" class="adminSaveButton">Сохранить</button>
+                <div id="adminUserMessage" class="adminMessage"></div>
 
             </div>
+
+            <div class="adminUserDetailsRow" style="margin-top:20px;">Колодцы пользователя</div>
+            <div id="adminUserWells" class="userWellsList"></div>
 
         </div>
     `;
 
-    document
-        .getElementById(
-            'adminUserDetailsBack'
-        )
-        .addEventListener(
-            'click',
-            () => {
+    // Колодцы пользователя
+    const wellsBox = $('adminUserWells');
 
-                details.style.display =
-                    'none';
+    if (userWells.length === 0) {
+        wellsBox.innerHTML = '<div class="inviteStatus">Колодцев пока нет.</div>';
+    } else {
+        userWells.forEach(well => {
 
-                list.style.display =
-                    'block';
+            const item = document.createElement('div');
+            item.className = 'userWellItem';
 
-            }
-        );
+            item.innerHTML = `
+                <div class="recentItemTitle">${escapeHtml(getTypeName(well.type))}</div>
+                <div class="recentItemMeta">${escapeHtml(getStatusName(well.status))}${well.approx_address ? ' · ' + escapeHtml(well.approx_address) : ''}</div>
+            `;
+
+            item.addEventListener('click', () => openWellOnMap(well));
+
+            wellsBox.appendChild(item);
+        });
+    }
+
+    $('adminUserDetailsBack').addEventListener('click', showAdminUsersList);
+
+    $('adminSaveUser').addEventListener('click', () => saveAdminUser(user, isSelf));
 }
-                    }
-                )
-                .join('');
+
+async function saveAdminUser(user, isSelf) {
+
+    const button = $('adminSaveUser');
+    const message = $('adminUserMessage');
+
+    const nickname = $('adminEditNickname').value.trim();
+    const role = $('adminEditRole').value;
+
+    message.className = 'adminMessage';
+    message.textContent = '';
+
+    if (nickname.length < 3 || nickname.length > 30) {
+        message.className = 'adminMessage err';
+        message.textContent = 'Никнейм должен содержать от 3 до 30 символов.';
+        return;
+    }
+
+    const payload = { userId: user.id, nickname };
+
+    if (!isSelf) payload.role = role;
+
+    button.disabled = true;
+    button.textContent = 'Сохранение...';
+
+    try {
+
+        const data = await apiRequest('update_user', payload);
+
+        const index = adminUsers.findIndex(item => Number(item.id) === Number(user.id));
+
+        let updated = user;
+
+        if (index !== -1) {
+            adminUsers[index] = { ...adminUsers[index], ...data.user };
+            updated = adminUsers[index];
+        }
+
+        // Если админ изменил себя — обновляем профиль
+        if (isSelf) {
+            setCurrentUser({ ...currentUser, nickname: updated.nickname });
+        }
+
+        renderAdminUsers();
+        showAdminUserDetails(updated);
+
+        const newMessage = $('adminUserMessage');
+        newMessage.className = 'adminMessage ok';
+        newMessage.textContent = data.changed === false ? 'Изменений нет.' : 'Сохранено.';
 
     } catch (error) {
 
-        console.error(
-            'Ошибка загрузки пользователей:',
-            error
-        );
+        message.className = 'adminMessage err';
+        message.textContent = error.message || 'Не удалось сохранить.';
 
-        list.innerHTML = `
-            <div class="inviteItem">
-                Ошибка загрузки пользователей:
-                ${error.message}
-            </div>
-        `;
+        button.disabled = false;
+        button.textContent = 'Сохранить';
+    }
+}
 
+$('adminUsersButton').addEventListener('click', async () => {
+
+    const visible =
+        adminUsersList.style.display !== 'none' ||
+        adminUserDetails.style.display !== 'none';
+
+    if (visible) {
+        adminUsersList.style.display = 'none';
+        adminUserDetails.style.display = 'none';
+    } else {
+        await loadAdminUsers();
+    }
+});
+
+adminUsersList.addEventListener('click', event => {
+
+    const item = event.target.closest('.adminUserItem');
+
+    if (!item) return;
+
+    const userId = Number(item.dataset.userId);
+    const user = adminUsers.find(u => Number(u.id) === userId);
+
+    if (user) showAdminUserDetails(user);
+});
+
+
+/* =========================
+   РЕДАКТИРОВАНИЕ / УДАЛЕНИЕ КОЛОДЦА (из popup)
+   ========================= */
+
+document.addEventListener('click', event => {
+
+    const button = event.target.closest('.editWellButton');
+
+    if (!button) return;
+
+    const wellId = Number(button.dataset.wellId);
+
+    if (!Number.isInteger(wellId) || wellId <= 0) {
+        safeAlert('Некорректный ID колодца.');
+        return;
     }
 
-}
+    const well = allWells.find(item => Number(item.id) === wellId);
 
-
-document
-    .getElementById(
-        'adminUsersButton'
-    )
-    .addEventListener(
-        'click',
-        async () => {
-
-            const list =
-                document.getElementById(
-                    'adminUsersList'
-                );
-
-            if (
-                list.style.display ===
-                'none'
-            ) {
-
-                await loadAdminUsers();
-
-            } else {
-
-                list.style.display =
-                    'none';
-
-            }
-
-        }
-    );
-    .adminUserDetails {
-    margin-top: 15px;
-}
-
-.adminUserDetailsCard {
-    padding: 18px;
-    border-radius: 14px;
-    background: #151515;
-}
-
-.adminUserDetailsBack {
-    margin-bottom: 15px;
-    padding: 0;
-    border: none;
-    background: none;
-    color: #aaa;
-    font-size: 15px;
-    cursor: pointer;
-}
-
-.adminUserDetailsName {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.adminUserDetailsRow {
-    margin-top: 12px;
-    color: #aaa;
-    font-size: 14px;
-}
-
-.adminUserDetailsValue {
-    margin-top: 4px;
-    color: white;
-    font-size: 16px;
-}
-document
-    .getElementById(
-        'adminUsersList'
-    )
-    .addEventListener(
-        'click',
-        event => {
-
-            const item =
-                event.target.closest(
-                    '.adminUserItem'
-                );
-
-            if (!item) {
-                return;
-            }
-
-            const userId =
-                Number(
-                    item.dataset.userId
-                );
-
-            const users =
-                window.adminUsers || [];
-
-            const user =
-                users.find(
-                    u =>
-                        Number(u.id) ===
-                        userId
-                );
-
-            if (!user) {
-                return;
-            }
-
-            showAdminUserDetails(
-                user
-            );
-
-        }
-    );
-    
-    /* =========================
-       АВТОРИЗАЦИЯ
-       ========================= */
-
-    async function initApp() {
-
-        try {
-
-            const data =
-                await apiRequest(
-                    'get_user'
-                );
-
-
-            if (
-                data.user &&
-                data.user.exists === true
-            ) {
-
-                setCurrentUser(
-                    data.user.user
-                );
-
-
-                registrationScreen.style.display =
-                    'none';
-
-
-                await loadWells();
-
-
-            } else {
-
-                registrationScreen.style.display =
-                    'flex';
-
-            }
-
-
-        } catch (error) {
-
-            console.error(
-                'Ошибка авторизации:',
-                error
-            );
-
-
-           registrationError.textContent =
-    'ОШИБКА: ' +
-    error.message;
-
-alert(
-    'Ошибка авторизации:\n\n' +
-    error.message
-);
-
-
-            registrationScreen.style.display =
-                'flex';
-
-        }
-
+    if (!well) {
+        safeAlert('Не удалось найти данные этого колодца.');
+        return;
     }
 
+    openEditWellForm(well);
+});
 
-    /* =========================
-       РЕДАКТИРОВАНИЕ КОЛОДЦА
-       ========================= */
+document.addEventListener('click', async event => {
 
-    document.addEventListener(
-        'click',
-        event => {
+    const button = event.target.closest('.deleteWellButton');
 
-            const button =
-                event.target.closest(
-                    '.editWellButton'
-                );
+    if (!button) return;
 
+    const wellId = Number(button.dataset.wellId);
 
-            if (!button) {
-                return;
-            }
+    if (!Number.isInteger(wellId) || wellId <= 0) {
+        safeAlert('Некорректный ID колодца.');
+        return;
+    }
 
+    if (!confirm('Удалить этот колодец?\n\nЭто действие нельзя отменить.')) return;
 
-            const wellId =
-                Number(
-                    button.dataset.wellId
-                );
+    button.disabled = true;
+    button.textContent = 'Удаление...';
 
+    try {
 
-            if (
-                !Number.isInteger(
-                    wellId
-                ) ||
-                wellId <= 0
-            ) {
+        await apiRequest('delete_well', { wellId });
 
-                safeAlert(
-                    'Некорректный ID колодца.'
-                );
+        await loadWells();
 
-                return;
+        safeAlert('Колодец удалён.');
 
-            }
+    } catch (error) {
 
+        console.error('Ошибка удаления колодца:', error);
 
-            const well =
-                allWells.find(
-                    item =>
-                        Number(
-                            item.id
-                        ) ===
-                        wellId
-                );
+        safeAlert(error.message || 'Не удалось удалить колодец.');
+
+        button.disabled = false;
+        button.textContent = 'Удалить колодец';
+    }
+});
 
 
-            if (!well) {
+/* =========================
+   ЗАПУСК
+   ========================= */
 
-                safeAlert(
-                    'Не удалось найти данные этого колодца.'
-                );
+async function initApp() {
 
-                return;
+    try {
 
-            }
+        const data = await apiRequest('get_user');
 
+        if (data.user && data.user.exists === true) {
 
-            openEditWellForm(
-                well
-            );
+            setCurrentUser(data.user.user);
 
+            registrationScreen.style.display = 'none';
+
+            await loadWells();
+
+        } else {
+
+            // Регистрация показывается только после ответа сервера
+            registrationScreen.style.display = 'flex';
         }
-    );
 
+        hideLoading();
 
-    /* =========================
-       УДАЛЕНИЕ КОЛОДЦА
-       ========================= */
+    } catch (error) {
 
-    document.addEventListener(
-        'click',
-        async event => {
+        console.error('Ошибка авторизации:', error);
 
-            const button =
-                event.target.closest(
-                    '.deleteWellButton'
-                );
+        showFatalError('Ошибка авторизации:\n\n' + error.message);
+    }
+}
 
-
-            if (!button) {
-                return;
-            }
-
-
-            const wellId =
-                Number(
-                    button.dataset.wellId
-                );
-
-
-            if (
-                !Number.isInteger(
-                    wellId
-                ) ||
-                wellId <= 0
-            ) {
-
-                safeAlert(
-                    'Некорректный ID колодца.'
-                );
-
-                return;
-            }
-
-
-            const confirmed =
-                confirm(
-                    'Удалить этот колодец?\n\n' +
-                    'Это действие нельзя отменить.'
-                );
-
-
-            if (!confirmed) {
-                return;
-            }
-
-
-            button.disabled =
-                true;
-
-            button.textContent =
-                'Удаление...';
-
-
-            try {
-
-                await apiRequest(
-                    'delete_well',
-                    {
-                        wellId:
-                            wellId
-                    }
-                );
-
-
-                await loadWells();
-
-
-                safeAlert(
-                    'Колодец удалён.'
-                );
-
-
-            } catch (error) {
-
-                console.error(
-                    'Ошибка удаления колодца:',
-                    error
-                );
-
-
-                safeAlert(
-                    error.message ||
-                    'Не удалось удалить колодец.'
-                );
-
-            }
-
-        }
-    );
-
-
-    initApp();
+initApp();
 
 })();
-
 </script>
 
 </body>
