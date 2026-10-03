@@ -1453,7 +1453,10 @@
         class="inviteList"
         style="display:none;"
     ></div>
-
+<div
+    id="adminUserDetails"
+    style="display:none;"
+></div>
 
     <!-- =========================
          ПРИГЛАШЕНИЯ
@@ -4811,6 +4814,7 @@ async function loadAdminUsers() {
 
         const users =
             data.users || [];
+        window.adminUsers = users;
 
         if (!users.length) {
 
@@ -4836,26 +4840,122 @@ async function loadAdminUsers() {
                                 : '👤';
 
                         return `
-                            <div
-                                class="inviteItem"
-                                data-user-id="${user.id}"
-                            >
+    <div
+        class="inviteItem adminUserItem"
+        data-user-id="${user.id}"
+        style="cursor:pointer;"
+    >
 
-                                <div class="inviteCode">
-                                    ${icon} ${user.nickname}
-                                </div>
+        <div class="inviteCode">
+            ${icon} ${user.nickname}
+        </div>
 
-                                <div class="inviteStatus">
-                                    ${roleLabel}
-                                </div>
+        <div class="inviteStatus">
+            ${roleLabel}
+        </div>
 
-                                <div class="inviteStatus">
-                                    Колодцев: ${user.well_count}
-                                </div>
+        <div class="inviteStatus">
+            Колодцев: ${user.well_count}
+        </div>
 
-                            </div>
-                        `;
+    </div>
+`;
 
+                        function showAdminUserDetails(user) {
+
+    const list =
+        document.getElementById(
+            'adminUsersList'
+        );
+
+    const details =
+        document.getElementById(
+            'adminUserDetails'
+        );
+
+    list.style.display =
+        'none';
+
+    details.style.display =
+        'block';
+
+    const roleLabel =
+        user.role === 'admin'
+            ? 'Администратор'
+            : 'Пользователь';
+
+    const registeredDate =
+        user.created_at
+            ? new Date(
+                user.created_at
+            ).toLocaleDateString(
+                'ru-RU'
+            )
+            : 'Неизвестно';
+
+    details.innerHTML = `
+        <div class="adminUserDetails">
+
+            <div class="adminUserDetailsCard">
+
+                <button
+                    type="button"
+                    id="adminUserDetailsBack"
+                    class="adminUserDetailsBack"
+                >
+                    ← Назад к пользователям
+                </button>
+
+                <div class="adminUserDetailsName">
+                    👤 ${user.nickname}
+                </div>
+
+                <div class="adminUserDetailsRow">
+                    Роль
+                </div>
+
+                <div class="adminUserDetailsValue">
+                    ${roleLabel}
+                </div>
+
+                <div class="adminUserDetailsRow">
+                    Зарегистрирован
+                </div>
+
+                <div class="adminUserDetailsValue">
+                    ${registeredDate}
+                </div>
+
+                <div class="adminUserDetailsRow">
+                    Колодцев
+                </div>
+
+                <div class="adminUserDetailsValue">
+                    ${user.well_count}
+                </div>
+
+            </div>
+
+        </div>
+    `;
+
+    document
+        .getElementById(
+            'adminUserDetailsBack'
+        )
+        .addEventListener(
+            'click',
+            () => {
+
+                details.style.display =
+                    'none';
+
+                list.style.display =
+                    'block';
+
+            }
+        );
+}
                     }
                 )
                 .join('');
@@ -4908,7 +5008,86 @@ document
 
         }
     );
+    .adminUserDetails {
+    margin-top: 15px;
+}
 
+.adminUserDetailsCard {
+    padding: 18px;
+    border-radius: 14px;
+    background: #151515;
+}
+
+.adminUserDetailsBack {
+    margin-bottom: 15px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #aaa;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.adminUserDetailsName {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.adminUserDetailsRow {
+    margin-top: 12px;
+    color: #aaa;
+    font-size: 14px;
+}
+
+.adminUserDetailsValue {
+    margin-top: 4px;
+    color: white;
+    font-size: 16px;
+}
+document
+    .getElementById(
+        'adminUsersList'
+    )
+    .addEventListener(
+        'click',
+        event => {
+
+            const item =
+                event.target.closest(
+                    '.adminUserItem'
+                );
+
+            if (!item) {
+                return;
+            }
+
+            const userId =
+                Number(
+                    item.dataset.userId
+                );
+
+            const users =
+                window.adminUsers || [];
+
+            const user =
+                users.find(
+                    u =>
+                        Number(u.id) ===
+                        userId
+                );
+
+            if (!user) {
+                return;
+            }
+
+            showAdminUserDetails(
+                user
+            );
+
+        }
+    );
+    
     /* =========================
        АВТОРИЗАЦИЯ
        ========================= */
