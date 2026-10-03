@@ -211,6 +211,17 @@ button:disabled { opacity: .55; }
 .auditText { margin-top: 4px; font-size: 14px; line-height: 1.4; word-break: break-word; color: #ddd; }
 .auditMoreButton { width: 100%; height: 44px; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 15px; cursor: pointer; }
 
+.popBtn.photo { background: #374151; }
+
+.photoViewer { position: fixed; inset: 0; z-index: 9500; display: none; flex-direction: column; background: #080808; color: #fff; animation: panelIn .2s ease; }
+.photoList { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 14px; }
+.photoItem { border: 1px solid #242424; border-radius: 14px; background: #111; overflow: hidden; }
+.photoItem img { display: block; width: 100%; max-height: 60vh; object-fit: contain; background: #000; }
+.photoItemBar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; color: #777; font-size: 12px; }
+.photoDeleteButton { padding: 8px 12px; border: none; border-radius: 10px; background: #3b1212; color: #ff8a8a; font-size: 13px; cursor: pointer; }
+.photoFooter { padding: 12px 15px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid #222; }
+.photoFooter .adminSaveButton { margin-top: 8px; }
+
 /* ===== ФОРМА КОЛОДЦА ===== */
 #wellForm { position: fixed; inset: 0; z-index: 9000; display: none; align-items: flex-start; justify-content: center; padding: 20px; background: rgba(0,0,0,.65); overflow-y: auto; }
 .wellFormBox { width: 100%; max-width: 380px; margin: auto; padding: 24px 20px; background: #111; border: 1px solid #292929; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,.45); color: #fff; animation: panelIn .2s ease; }
@@ -482,6 +493,23 @@ button:disabled { opacity: .55; }
             <button id="createWellButton" class="createWellButton">Создать колодец</button>
             <button id="cancelWellButton" class="cancelWellButton">Отмена</button>
         </div>
+    </div>
+</div>
+
+<!-- ФОТОГРАФИИ КОЛОДЦА -->
+<div id="photoViewer" class="photoViewer">
+    <div class="sectionHeader">
+        <div>
+            <h2 class="sectionHeaderTitle">Фотографии</h2>
+            <div id="photoViewerSubtitle" class="sectionHeaderSubtitle"></div>
+        </div>
+        <button id="photoViewerClose" class="sectionCloseButton">×</button>
+    </div>
+    <div id="photoList" class="photoList"></div>
+    <div class="photoFooter">
+        <div id="photoMessage" class="adminMessage"></div>
+        <button id="photoAddButton" class="adminSaveButton" style="display:none;">+ Добавить фото</button>
+        <input id="photoFileInput" type="file" accept="image/*" style="display:none;">
     </div>
 </div>
 
@@ -975,6 +1003,9 @@ function renderFilteredWells() {
         if (well.approx_address) {
             popupHtml += `<br><strong>Ориентир:</strong> ${escapeHtml(well.approx_address)}`;
         }
+
+        popupHtml +=
+            `<button class="popBtn photo photosWellButton" data-well-id="${Number(well.id)}">📷 Фото (${Number(well.photo_count) || 0})</button>`;
 
         // Кнопки только для UX — права проверяет backend
         if (
@@ -2016,6 +2047,12 @@ function describeAudit(entry) {
         case 'user_registered':
             return 'зарегистрировался в приложении';
 
+        case 'photo_added':
+            return `добавил фото к колодцу #${id}`;
+
+        case 'photo_deleted':
+            return `удалил фото колодца #${id}` + (d.auto ? ' (автозамена старого при лимите)' : '');
+
         default:
             return String(entry.action);
     }
@@ -2157,6 +2194,252 @@ adminTrashList.addEventListener('click', async event => {
         button.disabled = false;
         button.textContent = '↩ Восстановить';
     }
+});
+
+
+/* =========================
+   ФОТОГРАФИИ КОЛОДЦА
+   ========================= */
+
+const MAX_PHOTOS = 3;
+
+const photoViewer = $('photoViewer');
+const photoList = $('photoList');
+const photoAddButton = $('photoAddButton');
+const photoFileInput = $('photoFileInput');
+const photoMessage = $('photoMessage');
+
+let photoViewerWellId = null;
+let photosChanged = false;
+let photoBusy = false;
+
+// Только для UX: реальные права проверяет сервер
+function canManageWell(well) {
+    return !!(
+        currentUser && well &&
+        (currentUser.role === 'admin' || Number(currentUser.id) === Number(well.user_id))
+    );
+}
+
+function setPhotoMessage(text, type) {
+    photoMessage.className = 'adminMessage' + (type ? ' ' + type : '');
+    photoMessage.textContent = text || '';
+}
+
+async function refreshPhotoViewer() {
+
+    const well = allWells.find(item => Number(item.id) === photoViewerWellId);
+    const manage = canManageWell(well);
+
+    photoAddButton.style.display = manage ? 'block' : 'none';
+
+    try {
+
+        const data = await apiRequest('list_well_photos', { wellId: photoViewerWellId });
+        const photos = Array.isArray(data.photos) ? data.photos : [];
+
+        if (well && Number(well.photo_count) !== photos.length) {
+            well.photo_count = photos.length;
+            photosChanged = true;
+        }
+
+        $('photoViewerSubtitle').textContent =
+            `${photos.length} из ${MAX_PHOTOS} · старые фото заменяются новыми`;
+
+        photoAddButton.textContent = photos.length >= MAX_PHOTOS
+            ? 'Заменить самое старое фото'
+            : `+ Добавить фото (${photos.length}/${MAX_PHOTOS})`;
+
+        if (photos.length === 0) {
+            photoList.innerHTML = '<div class="emptyState">Фотографий пока нет.</div>';
+            return;
+        }
+
+        photoList.innerHTML = photos.map(photo => `
+            <div class="photoItem">
+                <img src="${escapeHtml(photo.url)}" alt="Фото колодца" loading="lazy">
+                <div class="photoItemBar">
+                    <span>${escapeHtml(formatDate(photo.created_at, true))}</span>
+                    ${manage ? `<button type="button" class="photoDeleteButton" data-photo-id="${Number(photo.id)}">Удалить</button>` : ''}
+                </div>
+            </div>
+        `).join('');
+
+    } catch (error) {
+
+        photoList.innerHTML =
+            `<div class="emptyState">Ошибка: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+async function openPhotoViewer(wellId) {
+
+    photoViewerWellId = wellId;
+    photosChanged = false;
+
+    setPhotoMessage('');
+    $('photoViewerSubtitle').textContent = '';
+    photoList.innerHTML = '<div class="emptyState">Загрузка...</div>';
+    photoViewer.style.display = 'flex';
+
+    await refreshPhotoViewer();
+}
+
+function closePhotoViewer() {
+
+    photoViewer.style.display = 'none';
+    photoViewerWellId = null;
+    photoList.innerHTML = '';
+
+    // Обновляем счётчик в popup (маркеры пересоздаются)
+    if (photosChanged) {
+        photosChanged = false;
+        renderFilteredWells();
+    }
+}
+
+function loadImageFromFile(file) {
+    return new Promise((resolve, reject) => {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            reject(new Error('Не удалось прочитать изображение.'));
+        };
+        img.src = url;
+    });
+}
+
+// Сжатие на устройстве: максимум 1600px по большей стороне, JPEG
+async function compressImage(file) {
+
+    const img = await loadImageFromFile(file);
+
+    const scale = Math.min(1, 1600 / Math.max(img.naturalWidth, img.naturalHeight));
+    const width = Math.max(1, Math.round(img.naturalWidth * scale));
+    const height = Math.max(1, Math.round(img.naturalHeight * scale));
+
+    const canvas = document.createElement('canvas');
+    canvas.width = width;
+    canvas.height = height;
+    canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+
+    for (const quality of [0.8, 0.65, 0.5, 0.4]) {
+
+        const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
+
+        if (blob && blob.size <= 1400000) return blob;
+    }
+
+    throw new Error('Фото слишком большое даже после сжатия.');
+}
+
+function blobToBase64(blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
+        reader.onerror = () => reject(new Error('Не удалось подготовить фото.'));
+        reader.readAsDataURL(blob);
+    });
+}
+
+photoAddButton.addEventListener('click', () => {
+    if (photoBusy) return;
+    photoFileInput.value = '';
+    photoFileInput.click();
+});
+
+photoFileInput.addEventListener('change', async () => {
+
+    const file = photoFileInput.files && photoFileInput.files[0];
+
+    if (!file || photoBusy || photoViewerWellId === null) return;
+
+    if (!file.type.startsWith('image/')) {
+        setPhotoMessage('Выберите изображение.', 'err');
+        return;
+    }
+
+    photoBusy = true;
+    photoAddButton.disabled = true;
+
+    const previousLabel = photoAddButton.textContent;
+    photoAddButton.textContent = 'Загрузка...';
+    setPhotoMessage('');
+
+    try {
+
+        const blob = await compressImage(file);
+        const image = await blobToBase64(blob);
+
+        const data = await apiRequest('add_well_photo', { wellId: photoViewerWellId, image });
+
+        photosChanged = true;
+
+        await refreshPhotoViewer();
+
+        setPhotoMessage(
+            data.removed > 0 ? 'Фото добавлено, самое старое удалено.' : 'Фото добавлено.',
+            'ok'
+        );
+
+    } catch (error) {
+
+        photoAddButton.textContent = previousLabel;
+        setPhotoMessage(error.message || 'Не удалось добавить фото.', 'err');
+
+    } finally {
+
+        photoBusy = false;
+        photoAddButton.disabled = false;
+    }
+});
+
+photoList.addEventListener('click', async event => {
+
+    const button = event.target.closest('.photoDeleteButton');
+
+    if (!button || photoBusy) return;
+
+    if (!confirm('Удалить это фото?')) return;
+
+    photoBusy = true;
+    button.disabled = true;
+    button.textContent = 'Удаление...';
+    setPhotoMessage('');
+
+    try {
+
+        await apiRequest('delete_well_photo', { photoId: Number(button.dataset.photoId) });
+
+        photosChanged = true;
+
+        await refreshPhotoViewer();
+
+    } catch (error) {
+
+        button.disabled = false;
+        button.textContent = 'Удалить';
+        setPhotoMessage(error.message || 'Не удалось удалить фото.', 'err');
+
+    } finally {
+
+        photoBusy = false;
+    }
+});
+
+$('photoViewerClose').addEventListener('click', closePhotoViewer);
+
+document.addEventListener('click', event => {
+
+    const button = event.target.closest('.photosWellButton');
+
+    if (!button) return;
+
+    const wellId = Number(button.dataset.wellId);
+
+    if (Number.isInteger(wellId) && wellId > 0) openPhotoViewer(wellId);
 });
 
 
