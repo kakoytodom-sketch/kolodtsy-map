@@ -2850,11 +2850,19 @@
                 }
 
 
-                popupHtml +=
-                    `<br><small>` +
-                    `${latitude.toFixed(6)}, ` +
-                    `${longitude.toFixed(6)}` +
-                    `</small>`;
+                if (well.approx_address) {
+
+    popupHtml +=
+        `<br><strong>Ориентир:</strong> ` +
+        `${escapeHtml(well.approx_address)}`;
+
+}
+
+popupHtml +=
+    `<br><small>` +
+    `${latitude.toFixed(6)}, ` +
+    `${longitude.toFixed(6)}` +
+    `</small>`;
 
 
                 const popup =
