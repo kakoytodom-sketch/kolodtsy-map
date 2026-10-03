@@ -215,7 +215,7 @@ button:disabled { opacity: .55; }
 
 .photoViewer { position: fixed; inset: 0; z-index: 9500; display: none; flex-direction: column; background: #080808; color: #fff; animation: panelIn .2s ease; }
 .photoList { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 14px; }
-.photoItem { border: 1px solid #242424; border-radius: 14px; background: #111; overflow: hidden; }
+.photoItem { flex-shrink: 0; border: 1px solid #242424; border-radius: 14px; background: #111; overflow: hidden; }
 .photoItem img { display: block; width: 100%; max-height: 60vh; object-fit: contain; background: #000; }
 .photoItemBar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; color: #777; font-size: 12px; }
 .photoDeleteButton { padding: 8px 12px; border: none; border-radius: 10px; background: #3b1212; color: #ff8a8a; font-size: 13px; cursor: pointer; }
@@ -2232,6 +2232,10 @@ async function refreshPhotoViewer() {
     const manage = canManageWell(well);
 
     photoAddButton.style.display = manage ? 'block' : 'none';
+
+    if (!manage) {
+        setPhotoMessage('Добавлять и удалять фото могут автор колодца и администратор.');
+    }
 
     try {
 
