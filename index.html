@@ -207,6 +207,10 @@ button:disabled { opacity: .55; }
 .nicknameEditBox input { width: 100%; height: 46px; padding: 0 12px; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 16px; outline: none; }
 .nicknameEditBox input:focus { border-color: #777; }
 
+.auditMeta { color: #777; font-size: 12px; }
+.auditText { margin-top: 4px; font-size: 14px; line-height: 1.4; word-break: break-word; color: #ddd; }
+.auditMoreButton { width: 100%; height: 44px; border: 1px solid #303030; border-radius: 12px; background: #191919; color: #fff; font-size: 15px; cursor: pointer; }
+
 /* ===== ФОРМА КОЛОДЦА ===== */
 #wellForm { position: fixed; inset: 0; z-index: 9000; display: none; align-items: flex-start; justify-content: center; padding: 20px; background: rgba(0,0,0,.65); overflow-y: auto; }
 .wellFormBox { width: 100%; max-width: 380px; margin: auto; padding: 24px 20px; background: #111; border: 1px solid #292929; border-radius: 20px; box-shadow: 0 8px 30px rgba(0,0,0,.45); color: #fff; animation: panelIn .2s ease; }
@@ -404,6 +408,14 @@ button:disabled { opacity: .55; }
 
         <div id="adminUsersList" class="inviteList" style="display:none;"></div>
         <div id="adminUserDetails" class="adminUserDetails" style="display:none;"></div>
+
+        <h3 class="adminSectionTitle">Контроль данных</h3>
+
+        <button id="adminTrashButton" class="generateInviteButton">🗑 Корзина колодцев</button>
+        <div id="adminTrashList" class="inviteList" style="display:none; margin-top:12px;"></div>
+
+        <button id="adminAuditButton" class="generateInviteButton" style="margin-top:10px;">📜 Журнал действий</button>
+        <div id="adminAuditList" class="inviteList" style="display:none; margin-top:12px;"></div>
 
         <h3 class="adminSectionTitle">Приглашения</h3>
 
@@ -1798,6 +1810,9 @@ function showAdminUserDetails(user) {
             <div class="adminUserDetailsRow" style="margin-top:20px;">Колодцы пользователя</div>
             <div id="adminUserWells" class="userWellsList"></div>
 
+            <div class="adminUserDetailsRow" style="margin-top:20px;">Последние действия</div>
+            <div id="adminUserAudit" class="userWellsList"></div>
+
         </div>
     `;
 
@@ -1822,6 +1837,8 @@ function showAdminUserDetails(user) {
             wellsBox.appendChild(item);
         });
     }
+
+    loadUserAudit(user.id);
 
     $('adminUserDetailsBack').addEventListener('click', showAdminUsersList);
 
@@ -1915,6 +1932,235 @@ adminUsersList.addEventListener('click', event => {
 
 
 /* =========================
+   АДМИНКА: КОРЗИНА И ЖУРНАЛ
+   ========================= */
+
+const adminTrashList = $('adminTrashList');
+const adminAuditList = $('adminAuditList');
+let auditBeforeId = null;
+
+async function loadTrash() {
+
+    adminTrashList.style.display = 'flex';
+    adminTrashList.innerHTML = '<div class="inviteItem">Загрузка...</div>';
+
+    try {
+
+        const data = await apiRequest('list_deleted_wells');
+        const wells = Array.isArray(data.wells) ? data.wells : [];
+
+        if (wells.length === 0) {
+            adminTrashList.innerHTML = '<div class="inviteItem">Корзина пуста.</div>';
+            return;
+        }
+
+        adminTrashList.innerHTML =
+            `<div class="adminHint">Удалённые колодцы хранятся ${Number(data.retention_days) || 30} дней, затем стираются окончательно.</div>` +
+            wells.map(well => `
+                <div class="inviteItem">
+                    <div class="inviteCode" style="letter-spacing:0;">${escapeHtml(getTypeName(well.type))} #${Number(well.id)}</div>
+                    <div class="inviteStatus">${escapeHtml(getStatusName(well.status))}${well.approx_address ? ' · ' + escapeHtml(well.approx_address) : ''}</div>
+                    <div class="inviteStatus">Автор: ${escapeHtml(well.owner_nickname || '—')}</div>
+                    <div class="inviteStatus">Удалил: ${escapeHtml(well.deleted_by_nickname || '—')}, ${escapeHtml(formatDate(well.deleted_at, true))}</div>
+                    <button class="adminSaveButton restoreWellButton" data-well-id="${Number(well.id)}" style="height:42px;margin-top:12px;">↩ Восстановить</button>
+                </div>
+            `).join('');
+
+    } catch (error) {
+
+        adminTrashList.innerHTML =
+            `<div class="inviteItem">Ошибка: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+function describeAudit(entry) {
+
+    const d = entry.details || {};
+    const id = entry.entity_id;
+
+    const roleName = role => role === 'admin' ? 'Администратор' : 'Пользователь';
+
+    switch (entry.action) {
+
+        case 'well_created':
+            return `добавил колодец #${id} (${getTypeName(d.type)}, ${getStatusName(d.status)})`;
+
+        case 'well_updated': {
+            const parts = [];
+            if (d.status) parts.push(`статус: ${getStatusName(d.status[0])} → ${getStatusName(d.status[1])}`);
+            if (d.type) parts.push(`тип: ${getTypeName(d.type[0])} → ${getTypeName(d.type[1])}`);
+            if (Array.isArray(d.fields) && d.fields.length) parts.push('изменено: ' + d.fields.join(', '));
+            return `изменил колодец #${id}` + (parts.length ? ` (${parts.join('; ')})` : '');
+        }
+
+        case 'well_deleted':
+            return `удалил колодец #${id} (${getTypeName(d.type)})`;
+
+        case 'well_restored':
+            return `восстановил колодец #${id}`;
+
+        case 'nickname_changed':
+            return d.nickname ? `сменил никнейм: ${d.nickname[0]} → ${d.nickname[1]}` : 'сменил никнейм';
+
+        case 'user_updated': {
+            const parts = [];
+            if (d.nickname) parts.push(`никнейм: ${d.nickname[0]} → ${d.nickname[1]}`);
+            if (d.role) parts.push(`роль: ${roleName(d.role[0])} → ${roleName(d.role[1])}`);
+            return `изменил пользователя ${d.target_nickname || '#' + id}` +
+                (parts.length ? ` (${parts.join('; ')})` : '');
+        }
+
+        case 'invite_created':
+            return `создал приглашение ${d.code || ''}`.trim();
+
+        case 'user_registered':
+            return 'зарегистрировался в приложении';
+
+        default:
+            return String(entry.action);
+    }
+}
+
+function auditItemHtml(entry) {
+
+    const who = entry.user_nickname || (entry.user_id ? '#' + entry.user_id : 'Система');
+
+    return `
+        <div class="inviteItem">
+            <div class="auditMeta">${escapeHtml(formatDate(entry.created_at, true))}</div>
+            <div class="auditText"><b>${escapeHtml(who)}</b> ${escapeHtml(describeAudit(entry))}</div>
+        </div>
+    `;
+}
+
+async function loadAudit(append = false) {
+
+    adminAuditList.style.display = 'flex';
+
+    if (append) {
+        const more = adminAuditList.querySelector('.auditMoreButton');
+        if (more) more.remove();
+    } else {
+        auditBeforeId = null;
+        adminAuditList.innerHTML = '<div class="inviteItem">Загрузка...</div>';
+    }
+
+    try {
+
+        const data = await apiRequest('list_audit', {
+            limit: 30,
+            beforeId: auditBeforeId || undefined
+        });
+
+        const entries = Array.isArray(data.entries) ? data.entries : [];
+
+        if (!append && entries.length === 0) {
+            adminAuditList.innerHTML = '<div class="inviteItem">Записей пока нет.</div>';
+            return;
+        }
+
+        let html = entries.map(auditItemHtml).join('');
+
+        if (data.hasMore && entries.length) {
+            auditBeforeId = entries[entries.length - 1].id;
+            html += '<button type="button" class="auditMoreButton">Показать ещё</button>';
+        }
+
+        if (append) {
+            adminAuditList.insertAdjacentHTML('beforeend', html);
+        } else {
+            adminAuditList.innerHTML = html;
+        }
+
+    } catch (error) {
+
+        adminAuditList.innerHTML =
+            `<div class="inviteItem">Ошибка: ${escapeHtml(error.message)}</div>`;
+    }
+}
+
+async function loadUserAudit(userId) {
+
+    const box = $('adminUserAudit');
+
+    if (!box) return;
+
+    box.innerHTML = '<div class="inviteStatus">Загрузка...</div>';
+
+    try {
+
+        const data = await apiRequest('list_audit', { userId, limit: 10 });
+        const entries = Array.isArray(data.entries) ? data.entries : [];
+
+        // Пользователь мог уйти со страницы за время запроса
+        if (!$('adminUserAudit')) return;
+
+        $('adminUserAudit').innerHTML = entries.length
+            ? entries.map(auditItemHtml).join('')
+            : '<div class="inviteStatus">Действий пока нет.</div>';
+
+    } catch (error) {
+
+        if ($('adminUserAudit')) {
+            $('adminUserAudit').innerHTML =
+                `<div class="inviteStatus">Ошибка: ${escapeHtml(error.message)}</div>`;
+        }
+    }
+}
+
+$('adminTrashButton').addEventListener('click', async () => {
+
+    if (adminTrashList.style.display !== 'none') {
+        adminTrashList.style.display = 'none';
+    } else {
+        await loadTrash();
+    }
+});
+
+$('adminAuditButton').addEventListener('click', async () => {
+
+    if (adminAuditList.style.display !== 'none') {
+        adminAuditList.style.display = 'none';
+    } else {
+        await loadAudit(false);
+    }
+});
+
+adminAuditList.addEventListener('click', event => {
+    if (event.target.closest('.auditMoreButton')) loadAudit(true);
+});
+
+adminTrashList.addEventListener('click', async event => {
+
+    const button = event.target.closest('.restoreWellButton');
+
+    if (!button) return;
+
+    const wellId = Number(button.dataset.wellId);
+
+    button.disabled = true;
+    button.textContent = 'Восстановление...';
+
+    try {
+
+        await apiRequest('restore_well', { wellId });
+
+        await loadWells();
+        await loadTrash();
+
+        safeAlert('Колодец восстановлен.');
+
+    } catch (error) {
+
+        safeAlert(error.message || 'Не удалось восстановить колодец.');
+
+        button.disabled = false;
+        button.textContent = '↩ Восстановить';
+    }
+});
+
+
+/* =========================
    РЕДАКТИРОВАНИЕ / УДАЛЕНИЕ КОЛОДЦА (из popup)
    ========================= */
 
@@ -1954,7 +2200,7 @@ document.addEventListener('click', async event => {
         return;
     }
 
-    if (!confirm('Удалить этот колодец?\n\nЭто действие нельзя отменить.')) return;
+    if (!confirm('Удалить этот колодец?\n\nАдминистратор сможет восстановить его из корзины.')) return;
 
     button.disabled = true;
     button.textContent = 'Удаление...';
