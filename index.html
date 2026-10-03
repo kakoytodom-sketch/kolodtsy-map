@@ -2868,27 +2868,11 @@ let editingWellId =
 ) {
 
     popupHtml +=
-        `<br>
-        <button
-            class="editWellButton"
-            data-well-id="${well.id}"
-            style="
-                margin-top:10px;
-                width:100%;
-                padding:8px;
-                border:none;
-                border-radius:8px;
-                background:#2563eb;
-                color:white;
-                cursor:pointer;
-            "
-        >Редактировать</button>
-
-        <button
+        `<br><button
             class="deleteWellButton"
             data-well-id="${well.id}"
             style="
-                margin-top:8px;
+                margin-top:10px;
                 width:100%;
                 padding:8px;
                 border:none;
@@ -2900,44 +2884,6 @@ let editingWellId =
         >Удалить колодец</button>`;
 
 }
-
-}
-                
-popupHtml +=
-    `<br><small>` +
-    `${latitude.toFixed(6)}, ` +
-    `${longitude.toFixed(6)}` +
-    `</small>`;
-
-
-                const popup =
-                    new mapboxgl.Popup({
-                        offset: 28
-                    })
-                    .setHTML(
-                        popupHtml
-                    );
-
-
-                marker
-                    .setPopup(
-                        popup
-                    )
-                    .addTo(map);
-
-
-                wellMarkers.push(
-                    marker
-                );
-
-            }
-        );
-
-
-        updateStatistics();
-
-    }
-
 
     /* =========================
        ЗАГРУЗКА КОЛОДЦЕВ
