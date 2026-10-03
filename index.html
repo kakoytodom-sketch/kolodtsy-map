@@ -5135,9 +5135,14 @@ document
             );
 
 
-            registrationError.textContent =
-                'Ошибка подключения: ' +
-                error.message;
+           registrationError.textContent =
+    'ОШИБКА: ' +
+    error.message;
+
+alert(
+    'Ошибка авторизации:\n\n' +
+    error.message
+);
 
 
             registrationScreen.style.display =
